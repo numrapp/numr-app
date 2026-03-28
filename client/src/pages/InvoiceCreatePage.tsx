@@ -1,0 +1,409 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, UserPlus, Users, MessageCircle, Mail, ChevronRight, ClipboardList, Trash2, Plus, X } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { useI18n } from '../i18n';
+import { clientService } from '../services/clientService';
+import { invoiceService } from '../services/invoiceService';
+import { Client, InvoiceItem } from '../types';
+import { todayISO, addDays, formatCurrency } from '../utils/formatters';
+import BtwChatbot from '../components/BtwChatbot';
+import SuccessAnimation from '../components/SuccessAnimation';
+
+const slide = { initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0}, transition:{duration:0.15} };
+
+function parseWorkText(text: string): InvoiceItem[] {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const items: InvoiceItem[] = [];
+  for (const line of lines) {
+    const m1 = line.match(/(\d+[.,]?\d*)\s*(uur|uren|u|hours?|saat|st|stuks?)\s*[x×*]\s*[€]?\s*(\d+[.,]?\d*)/i);
+    const m2 = line.match(/(\d+[.,]?\d*)\s*(uur|uren|u|hours?|saat|st|stuks?)\s+[€]?\s*(\d+[.,]?\d*)/i);
+    const m3 = line.match(/[€]\s*(\d+[.,]?\d*)/);
+    const m4 = line.match(/(?:prijs|bedrag|totaal|price|fiyat)[:\s]+[€]?\s*(\d+[.,]?\d*)/i);
+    const m5 = line.match(/[\s\-–]\s*(\d+[.,]?\d{2})\s*$/);
+    const match = m1 || m2;
+    if (match) {
+      const qty = parseFloat(match[1].replace(',', '.'));
+      const price = parseFloat(match[3].replace(',', '.'));
+      const desc = line.replace(match[0], '').replace(/^[\s\-–—:,]+/, '').replace(/[\s\-–—:,]+$/, '').trim() || `Regel ${items.length + 1}`;
+      items.push({ description: desc, quantity: qty, unit_price: price, btw_rate: 21 });
+    } else if (m4) {
+      const price = parseFloat(m4[1].replace(',', '.'));
+      const desc = line.replace(m4[0], '').replace(/^[\s\-–—:,]+/, '').trim() || `Regel ${items.length + 1}`;
+      items.push({ description: desc, quantity: 1, unit_price: price, btw_rate: 21 });
+    } else if (m3) {
+      const price = parseFloat(m3[1].replace(',', '.'));
+      const desc = line.replace(m3[0], '').replace(/^[\s\-–—:,]+/, '').trim() || `Regel ${items.length + 1}`;
+      items.push({ description: desc, quantity: 1, unit_price: price, btw_rate: 21 });
+    } else if (m5) {
+      const price = parseFloat(m5[1].replace(',', '.'));
+      const desc = line.replace(m5[0], '').trim() || `Regel ${items.length + 1}`;
+      items.push({ description: desc, quantity: 1, unit_price: price, btw_rate: 21 });
+    } else if (line.length > 3) {
+      items.push({ description: line, quantity: 1, unit_price: 0, btw_rate: 21 });
+    }
+  }
+  return items;
+}
+
+export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: string }) {
+  const { t } = useI18n();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const isCredit = docType === 'credit';
+  const [step, setStep] = useState(1);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showBtw, setShowBtw] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
+  const [clientError, setClientError] = useState('');
+  const [clientInvoices, setClientInvoices] = useState<any[]>([]);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [showCreditConfirm, setShowCreditConfirm] = useState(false);
+
+  const [clientId, setClientId] = useState<number | null>(null);
+  const [newClient, setNewClient] = useState({ company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'' });
+  const [btwRate, setBtwRate] = useState<number | 'verlegd'>(21);
+  const [amount, setAmount] = useState('');
+  const [rawText, setRawText] = useState('');
+  const [parsedItems, setParsedItems] = useState<InvoiceItem[]>([]);
+  const [items, setItems] = useState<InvoiceItem[]>([]);
+  const [wantDesc, setWantDesc] = useState<boolean | null>(null);
+  const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    clientService.getAll().then(list => {
+      const unique = new Map<string, Client>();
+      list.forEach(c => { const key = c.kvk_number || c.company_name; if (!unique.has(key)) unique.set(key, c); });
+      setClients(Array.from(unique.values()));
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const selectedClient = clients.find(c => c.id === clientId);
+  const rate = btwRate === 'verlegd' ? 0 : btwRate;
+
+  const handleBtw = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.toUpperCase();
+    if (!val.startsWith('NL')) val = 'NL' + val.replace(/^NL/i, '');
+    setNewClient(p => ({ ...p, btw_number: val }));
+  };
+
+  const saveNewClient = async () => {
+    if (!newClient.company_name.trim() || !newClient.kvk_number.trim() || !newClient.btw_number.trim() || !newClient.email.trim() || !newClient.address.trim()) {
+      setClientError(t('register.alleVeldenVerplicht')); return;
+    }
+    if (!/^\d{8}$/.test(newClient.kvk_number.trim())) { setClientError(t('register.kvkOngeldig')); return; }
+    if (!/^NL\d{9}B\d{2}$/.test(newClient.btw_number.trim())) { setClientError(t('register.btwOngeldig')); return; }
+    const btwDigits = newClient.btw_number.trim().slice(2, 10);
+    if (btwDigits !== newClient.kvk_number.trim()) { setClientError(t('register.kvkBtwNietOvereen')); return; }
+    setSaving(true); setClientError('');
+    try {
+      const c = await clientService.create({ company_name:newClient.company_name, kvk_number:newClient.kvk_number, email:newClient.email, btw_number:newClient.btw_number, address:newClient.address });
+      setClients(prev => [...prev, c]); setClientId(c.id); setStep(3);
+    } catch (err: any) { setClientError(err.response?.data?.error || 'Fout bij opslaan'); }
+    finally { setSaving(false); }
+  };
+
+  const handleParse = () => {
+    const parsed = parseWorkText(rawText);
+    parsed.forEach(p => { p.btw_rate = rate; });
+    setParsedItems(parsed);
+  };
+
+  const totalFromItems = (list: InvoiceItem[]) => list.reduce((s, i) => s + i.quantity * i.unit_price * (1 + (btwRate === 'verlegd' ? 0 : i.btw_rate) / 100), 0);
+
+  const handleSend = async (method: 'email' | 'whatsapp') => {
+    setSaving(true);
+    try {
+      const finalItems = items.length > 0 ? items : [{ description: description || 'Voor u verrichte werkzaamheden', quantity: 1, unit_price: parseFloat(amount.replace(',','.')) || 0, btw_rate: rate }];
+      const desc = description || 'Voor u verrichte werkzaamheden';
+      const invoice = await invoiceService.create({
+        client_id: clientId!, invoice_date: todayISO(), delivery_date: todayISO(),
+        due_date: addDays(todayISO(), user?.default_payment_days || 30),
+        payment_terms_days: user?.default_payment_days || 30, description: desc, items: finalItems,
+      });
+      if (method === 'email') { try { await invoiceService.send(invoice.id); } catch {} }
+      if (method === 'whatsapp') {
+        const total = formatCurrency(finalItems.reduce((s, i) => s + i.quantity * i.unit_price * (1 + rate/100), 0));
+        const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+      setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
+    } catch {} finally { setSaving(false); }
+  };
+
+  if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
+
+  const goBack = () => { if (step===10) setStep(1); else if (step===11) setStep(10); else if (step===41||step===42) setStep(4); else if (step===43) setStep(42); else if (step===51) setStep(5); else if (step>1) setStep(step-1); else navigate(-1); };
+
+  return (
+    <div className="min-h-screen bg-white safe-top">
+      <AnimatePresence>{showSuccess && <SuccessAnimation message={t('invoice.factuurVerzonden')} />}</AnimatePresence>
+      <BtwChatbot open={showBtw} onClose={() => setShowBtw(false)} onSelect={r => { setBtwRate(r); setShowBtw(false); setStep(4); }} />
+
+      <div className="px-6 pt-6 flex items-center gap-3 mb-6">
+        <button onClick={goBack} className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"><ArrowLeft size={22} /></button>
+        <h1 className="text-lg font-bold text-dark">{isCredit ? t('credit.title') : t('invoice.title')}</h1>
+      </div>
+
+      <div className="px-6">
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div key="s1" {...slide} className="flex flex-col items-center justify-center min-h-[50vh] space-y-4 max-w-sm mx-auto w-full">
+              {!isCredit && (
+                <button onClick={() => setStep(2)}
+                  className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
+                  style={{ background: 'linear-gradient(135deg, #DFFF00 0%, #B8D900 100%)', boxShadow: '0 8px 32px rgba(223,255,0,0.3)' }}>
+                  <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center"><UserPlus size={28} className="text-dark" strokeWidth={2.2} /></div>
+                  <div className="flex-1 text-left"><p className="text-lg font-extrabold text-dark">{t('invoice.nieuweKlant')}</p></div>
+                  <ChevronRight size={22} className="text-dark/40" />
+                </button>
+              )}
+              <button onClick={() => setStep(10)}
+                className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
+                style={{ background: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)', boxShadow: '0 8px 32px rgba(59,130,246,0.12)' }}>
+                <div className="w-16 h-16 rounded-2xl bg-white/50 backdrop-blur-sm flex items-center justify-center"><Users size={28} className="text-blue-500" strokeWidth={2.2} /></div>
+                <div className="flex-1 text-left"><p className="text-lg font-extrabold text-dark">{t('invoice.bestaandeKlant')}</p></div>
+                <ChevronRight size={22} className="text-blue-300" />
+              </button>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div key="s2" {...slide} className="space-y-4">
+              {clientError && <div className="p-3 bg-red-50 rounded-2xl text-red-600 text-sm font-medium">{clientError}</div>}
+              <div><label className="label-send notranslate">KVK Nummer *</label><input type="text" value={newClient.kvk_number} onChange={e => setNewClient(p=>({...p,kvk_number:e.target.value}))} className="input-send" maxLength={8} placeholder="12345678" /></div>
+              <div><label className="label-send">{t('register.bedrijfsnaam')} *</label><input type="text" value={newClient.company_name} onChange={e => setNewClient(p=>({...p,company_name:e.target.value}))} className="input-send" /></div>
+              <div><label className="label-send">{t('register.adres')} *</label><input type="text" value={newClient.address} onChange={e => setNewClient(p=>({...p,address:e.target.value}))} className="input-send" placeholder="Straatnaam 1, 1234 AB Plaats" /></div>
+              <div><label className="label-send">{t('register.email')} *</label><input type="email" value={newClient.email} onChange={e => setNewClient(p=>({...p,email:e.target.value}))} className="input-send" /></div>
+              <div><label className="label-send notranslate">BTW Nummer *</label><input type="text" value={newClient.btw_number} onChange={handleBtw} className="input-send notranslate" placeholder="NL000000000B00" /></div>
+              <button onClick={saveNewClient} disabled={saving} className="btn-brand w-full">{saving ? t('invoice.opslaan') : t('invoice.klantOpslaan')}</button>
+            </motion.div>
+          )}
+
+          {step === 10 && (
+            <motion.div key="s10" {...slide} className="space-y-2">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">{t('invoice.selecteer')}</p>
+              {clients.map(c => (
+                <button key={c.id} onClick={async () => {
+                  setClientId(c.id);
+                  if (isCredit) {
+                    try {
+                      const invs = await invoiceService.getAll();
+                      setClientInvoices(invs.filter((inv: any) => inv.client_id === c.id));
+                    } catch { setClientInvoices([]); }
+                    setStep(11);
+                  } else { setStep(3); }
+                }} className={`card-send w-full text-left p-4 ${clientId===c.id?'border-brand border-2':''}`}>
+                  <p className="font-bold text-dark">{c.company_name}</p>
+                  {c.email && <p className="text-sm text-gray-400">{c.email}</p>}
+                </button>
+              ))}
+              {clients.length === 0 && <p className="text-center text-gray-300 py-10">Geen klanten</p>}
+            </motion.div>
+          )}
+
+          {step === 11 && isCredit && (
+            <motion.div key="s11" {...slide} className="space-y-2">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">{t('credit.selecteerFactuur')}</p>
+              {clientInvoices.length === 0 ? (
+                <p className="text-center text-gray-300 py-10">{t('history.geen')}</p>
+              ) : clientInvoices.map((inv: any) => (
+                <button key={inv.id} onClick={() => { setSelectedInvoice(inv); setShowCreditConfirm(true); }}
+                  className="card-send w-full text-left p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-dark notranslate">{inv.invoice_number}</p>
+                      <p className="text-xs text-gray-400">{inv.invoice_date}</p>
+                    </div>
+                    <p className="text-base font-extrabold text-dark notranslate">{formatCurrency(inv.total)}</p>
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div key="s3" {...slide} className="flex flex-col items-center justify-center min-h-[55vh] space-y-4">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.btwSelectie')}</p>
+              <div className="w-full max-w-xs space-y-3">
+                <button onClick={() => { setBtwRate(21); setStep(4); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate===21?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>21%</button>
+                <button onClick={() => { setBtwRate(9); setStep(4); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate===9?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>9%</button>
+                <button onClick={() => { setBtwRate('verlegd'); setStep(4); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate==='verlegd'?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>{t('invoice.verlegd')}</button>
+              </div>
+              <button onClick={() => setShowBtw(true)} className="flex items-center gap-2 py-3 text-sm font-bold text-gray-400 hover:text-dark transition-colors"><MessageCircle size={18} /> {t('invoice.btwHulp')}</button>
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div key="s4" {...slide} className="flex flex-col items-center justify-center min-h-[50vh] space-y-4 max-w-sm mx-auto w-full">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.hoeFactureren')}</p>
+              <button onClick={() => setStep(41)} className="card-send w-full flex items-center gap-4 p-5">
+                <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center"><span className="text-2xl font-black text-dark notranslate">€</span></div>
+                <div className="flex-1 text-left"><p className="font-bold text-dark">{t('invoice.direct')}</p><p className="text-sm text-gray-400">{t('invoice.directSub')}</p></div>
+                <ChevronRight size={20} className="text-gray-300" />
+              </button>
+              <button onClick={() => { setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:rate}]); setStep(42); }} className="card-send w-full flex items-center gap-4 p-5">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center"><ClipboardList size={22} className="text-blue-600" /></div>
+                <div className="flex-1 text-left"><p className="font-bold text-dark">{t('invoice.ayrintili')}</p><p className="text-sm text-gray-400">{t('invoice.ayrintiliSub')}</p></div>
+                <ChevronRight size={20} className="text-gray-300" />
+              </button>
+            </motion.div>
+          )}
+
+          {step === 41 && (
+            <motion.div key="s41" {...slide} className="space-y-6">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.bedrag')}</p>
+              <div className="text-center py-8">
+                <span className="text-5xl font-black text-dark notranslate">€</span>
+                <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value.replace(/[^0-9.,]/g,''))} onFocus={e => e.target.select()} placeholder="0,00" className="text-5xl font-black text-dark bg-transparent border-none outline-none w-48 text-center notranslate" />
+              </div>
+              <button onClick={() => { setItems([]); setStep(5); }} disabled={!amount || parseFloat(amount.replace(',','.'))=== 0} className="btn-brand w-full">{t('common.volgende')}</button>
+            </motion.div>
+          )}
+
+          {step === 42 && (
+            <motion.div key="s42" {...slide} className="space-y-4">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.ayrintili')}</p>
+              <div className="space-y-3">
+                {parsedItems.map((item, i) => (
+                  <div key={i} className="p-3 bg-gray-50 rounded-2xl space-y-2">
+                    <div className="flex items-start gap-2">
+                      <input type="text" value={item.description} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],description:e.target.value}; setParsedItems(n); }} className="input-send flex-1 text-sm" placeholder={t('invoice.adresOfWeek')} />
+                      {parsedItems.length > 1 && <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-2 rounded-xl hover:bg-red-50 text-gray-400"><Trash2 size={16} /></button>}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center gap-1"><span className="text-xs font-medium text-gray-400">{t('invoice.aantalLabel')}:</span><input type="text" inputMode="decimal" value={item.quantity === 0 ? '' : item.quantity} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }} onFocus={e => e.target.select()} className="input-send flex-1 text-sm py-2" placeholder={t('invoice.aantalPlaceholder')} /></div>
+                      <div className="flex items-center gap-1"><span className="text-sm font-bold text-gray-400 notranslate">€</span><input type="text" inputMode="decimal" value={item.unit_price === 0 ? '' : item.unit_price} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],unit_price:parseFloat(e.target.value.replace(',','.'))||0}; setParsedItems(n); }} onFocus={e => e.target.select()} className="input-send flex-1 text-sm py-2" /></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setParsedItems(p => [...p, {description:'',quantity:0,unit_price:0,btw_rate:rate}])} className="w-full flex items-center justify-center gap-1 text-sm font-bold py-3 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-brand hover:text-dark transition-colors"><Plus size={18} /> {t('invoice.regelToevoegen')}</button>
+              {parsedItems.some(i => i.unit_price > 0) && (
+                <div className="p-3 bg-gray-50 rounded-2xl text-right notranslate">
+                  <span className="text-lg font-black text-dark">Totaal: {formatCurrency(totalFromItems(parsedItems))}</span>
+                </div>
+              )}
+              <button onClick={() => { setItems(parsedItems.filter(i => i.description.trim() && i.unit_price > 0)); setDescription(parsedItems.filter(i=>i.description.trim()).map(i => i.description).join(', ')); setStep(6); }} disabled={!parsedItems.some(i => i.description.trim() && i.unit_price > 0)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
+            </motion.div>
+          )}
+
+          {step === 43 && (
+            <motion.div key="s43" {...slide} className="space-y-4">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.controleer')}</p>
+              {parsedItems.length === 0 ? (
+                <div className="text-center py-8 text-gray-400"><p>Geen regels herkend.</p><button onClick={() => setStep(42)} className="btn-outline mt-4">{t('common.terug')}</button></div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    {parsedItems.map((item, i) => (
+                      <div key={i} className="p-3 bg-gray-50 rounded-2xl space-y-2">
+                        <div className="flex items-start gap-2">
+                          <input type="text" value={item.description} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],description:e.target.value}; setParsedItems(n); }} className="input-send flex-1 text-sm" />
+                          <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-2 rounded-xl hover:bg-red-50 text-gray-400"><Trash2 size={16} /></button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center gap-1"><span className="text-xs font-medium text-gray-400">{t('invoice.aantalLabel')}:</span><input type="text" inputMode="decimal" value={item.quantity||''} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }} className="input-send flex-1 text-sm py-2" /></div>
+                          <div className="flex items-center gap-1"><span className="text-sm font-bold text-gray-400 notranslate">€</span><input type="text" inputMode="decimal" value={item.unit_price||''} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],unit_price:parseFloat(e.target.value.replace(',','.'))||0}; setParsedItems(n); }} className="input-send flex-1 text-sm py-2" /></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setParsedItems(p => [...p, {description:'',quantity:1,unit_price:0,btw_rate:rate}])} className="w-full text-center text-sm font-bold text-brand-dark py-2"><Plus size={16} className="inline" /> {t('invoice.regelToevoegen')}</button>
+                  <div className="p-3 bg-gray-50 rounded-2xl text-right notranslate">
+                    <span className="text-lg font-black text-dark">Totaal: {formatCurrency(totalFromItems(parsedItems))}</span>
+                  </div>
+                  <button onClick={() => { setItems(parsedItems.filter(i => i.description.trim())); setDescription(parsedItems.map(i => i.description).join(', ')); setStep(6); }} className="btn-brand w-full">{t('invoice.verzenden')}</button>
+                </>
+              )}
+            </motion.div>
+          )}
+
+          {step === 5 && (
+            <motion.div key="s5" {...slide} className="space-y-6">
+              <p className="text-lg font-bold text-dark text-center py-4">{t('invoice.beschrijvingVraag')}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <button onClick={() => { setWantDesc(true); setStep(51); }} className="btn-outline py-5 text-lg font-bold">{t('invoice.ja')}</button>
+                <button onClick={() => { setWantDesc(false); setDescription('Voor u verrichte werkzaamheden'); setStep(6); }} className="btn-brand py-5 text-lg">{t('invoice.nee')}</button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 51 && (
+            <motion.div key="s51" {...slide} className="space-y-4">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.beschrijving')}</p>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} rows={4} className="input-send resize-none" placeholder="Omschrijving van werkzaamheden..." />
+              <button onClick={() => setStep(6)} disabled={!description.trim()} className="btn-brand w-full">{t('common.volgende')}</button>
+            </motion.div>
+          )}
+
+          {step === 6 && (
+            <motion.div key="s6" {...slide} className="space-y-4">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">{t('invoice.verzenden')}</p>
+              <button onClick={() => handleSend('whatsapp')} disabled={saving} className="card-send w-full flex items-center gap-4 p-5">
+                <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-green-600" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.612.638l4.67-1.228A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.153 0-4.16-.655-5.828-1.777l-.244-.163-3.298.868.882-3.222-.178-.267A9.935 9.935 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+                </div>
+                <p className="font-bold text-dark flex-1 text-left">{t('invoice.whatsapp')}</p>
+                <ChevronRight size={20} className="text-gray-300" />
+              </button>
+              <button onClick={() => setShowConfirm(true)} disabled={saving} className="card-send w-full flex items-center gap-4 p-5">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center"><Mail size={22} className="text-blue-600" /></div>
+                <p className="font-bold text-dark flex-1 text-left">{t('invoice.emailVerzend')}</p>
+                <ChevronRight size={20} className="text-gray-300" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {showConfirm && (
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-6">
+          <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <Mail size={32} className="mx-auto mb-4 text-blue-500" />
+            <p className="text-lg font-bold text-dark mb-6">{t('invoice.confirmVersturen')}</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => { setShowConfirm(false); setShowCancelled(true); setTimeout(() => setShowCancelled(false), 2500); }}
+                className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-base hover:bg-gray-200 transition-colors">{t('btw.nee')}</button>
+              <button onClick={() => { setShowConfirm(false); handleSend('email'); }}
+                className="py-3 rounded-2xl bg-green-500 text-white font-bold text-base hover:bg-green-600 transition-colors">{t('btw.ja')}</button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {showCancelled && (
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-6">
+          <motion.div initial={{scale:0.9}} animate={{scale:1}} className="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4"><X size={32} className="text-red-500" /></div>
+            <p className="text-lg font-bold text-dark">{t('invoice.nietVerstuurd')}</p>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {showCreditConfirm && selectedInvoice && (
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-6">
+          <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4"><X size={32} className="text-red-500" /></div>
+            <p className="text-lg font-extrabold text-dark mb-2">{t('credit.iptalBevestiging')}</p>
+            <p className="text-sm text-gray-500 mb-1 notranslate">{selectedInvoice.invoice_number}</p>
+            <p className="text-lg font-extrabold text-dark mb-6 notranslate">{formatCurrency(selectedInvoice.total)}</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => setShowCreditConfirm(false)}
+                className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-base">{t('invoice.nee')}</button>
+              <button onClick={async () => {
+                setShowCreditConfirm(false); setSaving(true);
+                try { await invoiceService.remove(selectedInvoice.id); setShowSuccess(true); setTimeout(() => navigate('/'), 2500); } catch {} finally { setSaving(false); }
+              }} className="py-3 rounded-2xl bg-red-500 text-white font-bold text-base">{t('invoice.ja')}</button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </div>
+  );
+}

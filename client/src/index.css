@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    @apply bg-white text-dark;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #root {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  input, select, textarea { font-size: 16px !important; }
+}
+
+@layer components {
+  .page-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  .btn-brand {
+    @apply text-dark font-extrabold px-6 py-4 rounded-2xl text-base transition-all duration-200
+           active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed;
+    background: #DFFF00;
+    box-shadow: 0 4px 24px rgba(223,255,0,0.35);
+    min-height: 52px;
+  }
+  .btn-brand:hover:not(:disabled) { background: #C8E600; }
+  .btn-outline {
+    @apply bg-white text-dark font-bold px-6 py-4 rounded-2xl text-base border-2 border-gray-200
+           transition-all duration-200 active:scale-[0.96] hover:border-gray-300 hover:bg-gray-50;
+    min-height: 52px;
+  }
+  .input-send {
+    @apply w-full px-4 py-4 bg-gray-50 border-0 rounded-2xl text-base font-medium
+           focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white
+           placeholder-gray-400 transition-all duration-200;
+  }
+  .card-send {
+    @apply bg-white rounded-3xl border border-gray-100/80 p-5 transition-all duration-200
+           active:scale-[0.98] cursor-pointer;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  }
+  .card-send:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); }
+  .label-send { @apply block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-widest; }
+  .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
