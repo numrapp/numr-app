@@ -32,13 +32,16 @@ export default function RegisterPage() {
     e.preventDefault();
     if (honeypot) return;
     if (Date.now() - formStartTime.current < 2000) { setError(t('register.tooFast')); return; }
-    const missing = [form.company_name, form.company_address, form.company_postcode, form.company_city, form.kvk_number, form.btw_number, form.iban, form.email, form.password].some(v => !v || !v.trim());
-    if (missing) { setError(t('register.alleVeldenVerplicht')); return; }
+    if (!form.email.trim() || !form.password.trim() || !form.company_name.trim()) {
+      setError(t('register.vulAlleVelden')); return;
+    }
     if (form.password.length < 6) { setError(t('register.wachtwoordMin')); return; }
-    if (!/^\d{8}$/.test(form.kvk_number.trim())) { setError(t('register.kvkOngeldig')); return; }
-    if (!/^NL\d{9}B\d{2}$/.test(form.btw_number.trim())) { setError(t('register.btwOngeldig')); return; }
-    const btwDigits = form.btw_number.trim().slice(2, 10);
-    if (btwDigits !== form.kvk_number.trim()) { setError(t('register.kvkBtwNietOvereen')); return; }
+    if (form.kvk_number.trim() && !/^\d{8}$/.test(form.kvk_number.trim())) { setError(t('register.kvkOngeldig')); return; }
+    if (form.btw_number.trim() && form.btw_number.trim() !== 'NL' && !/^NL\d{9}B\d{2}$/.test(form.btw_number.trim())) { setError(t('register.btwOngeldig')); return; }
+    if (form.kvk_number.trim() && form.btw_number.trim() && form.btw_number.trim() !== 'NL') {
+      const btwDigits = form.btw_number.trim().slice(2, 10);
+      if (btwDigits !== form.kvk_number.trim()) { setError(t('register.kvkBtwNietOvereen')); return; }
+    }
     setError(''); setLoading(true);
     try {
       await register({
@@ -74,17 +77,17 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-3">
               <input type="text" value={honeypot} onChange={e => setHoneypot(e.target.value)} className="absolute opacity-0 h-0 w-0 pointer-events-none" tabIndex={-1} autoComplete="off" />
               <div><label className="label-send">{t('register.bedrijfsnaam')} *</label><input type="text" value={form.company_name} onChange={set('company_name')} className="input-send" placeholder={t('register.bedrijfsnaamPh')} /></div>
-              <div><label className="label-send">{t('register.adres')} *</label><input type="text" value={form.company_address} onChange={set('company_address')} className="input-send" placeholder={t('register.adresPh')} /></div>
+              <div><label className="label-send">{t('register.adres')}</label><input type="text" value={form.company_address} onChange={set('company_address')} className="input-send" placeholder={t('register.adresPh')} /></div>
               <div className="grid grid-cols-5 gap-3">
-                <div className="col-span-2"><label className="label-send">{t('register.postcode')} *</label><input type="text" value={form.company_postcode} onChange={set('company_postcode')} className="input-send" placeholder="1234 AB" maxLength={7} /></div>
-                <div className="col-span-3"><label className="label-send">{t('register.plaats')} *</label><input type="text" value={form.company_city} onChange={set('company_city')} className="input-send" placeholder="Amsterdam" /></div>
+                <div className="col-span-2"><label className="label-send">{t('register.postcode')}</label><input type="text" value={form.company_postcode} onChange={set('company_postcode')} className="input-send" placeholder="1234 AB" maxLength={7} /></div>
+                <div className="col-span-3"><label className="label-send">{t('register.plaats')}</label><input type="text" value={form.company_city} onChange={set('company_city')} className="input-send" placeholder="Amsterdam" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="label-send notranslate">KVK *</label><input type="text" value={form.kvk_number} onChange={set('kvk_number')} className="input-send" placeholder="12345678" maxLength={8} /></div>
-                <div><label className="label-send notranslate">BTW *</label><input type="text" value={form.btw_number} onChange={handleBtw} className="input-send notranslate" placeholder="NL000000000B00" /></div>
+                <div><label className="label-send notranslate">KVK</label><input type="text" value={form.kvk_number} onChange={set('kvk_number')} className="input-send" placeholder="12345678" maxLength={8} /></div>
+                <div><label className="label-send notranslate">BTW</label><input type="text" value={form.btw_number} onChange={handleBtw} className="input-send notranslate" placeholder="NL000000000B00" /></div>
               </div>
               <div><label className="label-send">{t('register.email')} *</label><input type="email" value={form.email} onChange={set('email')} className="input-send" placeholder="info@bedrijf.nl" /></div>
-              <div><label className="label-send notranslate">IBAN *</label><input type="text" value={form.iban} onChange={set('iban')} className="input-send notranslate" placeholder="NL00 BANK 0000 0000 00" /></div>
+              <div><label className="label-send notranslate">IBAN</label><input type="text" value={form.iban} onChange={set('iban')} className="input-send notranslate" placeholder="NL00 BANK 0000 0000 00" /></div>
               <div><label className="label-send">{t('register.password')} *</label><input type="password" value={form.password} onChange={set('password')} className="input-send" placeholder={t('register.passwordPh')} /></div>
               <button type="submit" disabled={loading} className="btn-brand w-full mt-2">{loading ? t('register.creating') : t('register.create')}</button>
             </form>

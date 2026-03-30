@@ -12,7 +12,6 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AppStoreScreenshots from './pages/AppStoreScreenshots';
 import InvoiceEditPage from './pages/InvoiceEditPage';
-import CookieBanner from './components/CookieBanner';
 
 function P({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -42,7 +41,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-      <CookieBanner />
     </div>
   );
 }
