@@ -9,42 +9,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0A0A0A; color: #fff; overflow-x: hidden; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #DFFF00; color: #1A1A1A; overflow-x: hidden; }
     .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 40px 20px; }
     .glow { position: absolute; border-radius: 50%; pointer-events: none; }
     .glow-1 { top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(223,255,0,0.12) 0%, transparent 60%); }
     .glow-2 { bottom: -50px; right: -80px; width: 350px; height: 350px; background: radial-gradient(circle, rgba(223,255,0,0.08) 0%, transparent 60%); }
-    .logo-box { width: 120px; height: 120px; border-radius: 32px; background: #DFFF00; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; box-shadow: 0 20px 80px rgba(223,255,0,0.4); }
-    .logo-box span { font-size: 48px; font-weight: 900; color: #1A1A1A; }
-    h1 { font-size: 56px; font-weight: 900; letter-spacing: -2px; margin-bottom: 12px; }
-    .divider { width: 40px; height: 4px; border-radius: 2px; background: #DFFF00; margin-bottom: 20px; }
-    .subtitle { font-size: 18px; color: rgba(255,255,255,0.5); font-weight: 500; text-align: center; max-width: 400px; line-height: 1.6; margin-bottom: 40px; }
+    .logo-box { width: 120px; height: 120px; border-radius: 32px; background: #1A1A1A; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; box-shadow: 0 20px 80px rgba(0,0,0,0.2); }
+    .logo-box span { font-size: 48px; font-weight: 900; color: #DFFF00; }
+    h1 { font-size: 56px; font-weight: 900; letter-spacing: -2px; margin-bottom: 12px; color: #1A1A1A; }
+    .divider { width: 40px; height: 4px; border-radius: 2px; background: #1A1A1A; margin-bottom: 20px; }
+    .subtitle { font-size: 18px; color: rgba(26,26,26,0.6); font-weight: 500; text-align: center; max-width: 400px; line-height: 1.6; margin-bottom: 40px; }
     .features { display: flex; gap: 12px; margin-bottom: 50px; flex-wrap: wrap; justify-content: center; }
-    .feature { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 18px; padding: 16px 20px; text-align: center; min-width: 110px; }
+    .feature { background: rgba(26,26,26,0.08); border: 1px solid rgba(26,26,26,0.1); border-radius: 18px; padding: 16px 20px; text-align: center; min-width: 110px; }
     .feature-icon { font-size: 28px; margin-bottom: 6px; }
-    .feature-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); }
-    .feature-sub { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
-    .cta { background: #DFFF00; color: #1A1A1A; font-weight: 900; font-size: 18px; padding: 18px 50px; border-radius: 16px; border: none; cursor: pointer; box-shadow: 0 10px 40px rgba(223,255,0,0.35); text-decoration: none; display: inline-block; transition: transform 0.2s; }
+    .feature-label { font-size: 13px; font-weight: 700; color: rgba(26,26,26,0.7); }
+    .feature-sub { font-size: 10px; color: rgba(26,26,26,0.4); margin-top: 3px; }
+    .cta { background: #1A1A1A; color: #DFFF00; font-weight: 900; font-size: 18px; padding: 18px 50px; border-radius: 16px; border: none; cursor: pointer; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-decoration: none; display: inline-block; transition: transform 0.2s; }
     .cta:hover { transform: scale(1.03); }
-    .app-store-badge { margin-top: 16px; opacity: 0.5; font-size: 13px; color: rgba(255,255,255,0.4); }
+    .app-store-badge { margin-top: 16px; font-size: 13px; color: rgba(26,26,26,0.4); }
 
     .section { padding: 80px 20px; max-width: 800px; margin: 0 auto; }
-    .section h2 { font-size: 36px; font-weight: 900; margin-bottom: 16px; color: #DFFF00; }
-    .section p { font-size: 16px; line-height: 1.8; color: rgba(255,255,255,0.6); margin-bottom: 12px; }
+    .section h2 { font-size: 36px; font-weight: 900; margin-bottom: 16px; color: #1A1A1A; }
+    .section p { font-size: 16px; line-height: 1.8; color: rgba(26,26,26,0.6); margin-bottom: 12px; }
     .section ul { list-style: none; padding: 0; }
-    .section ul li { padding: 8px 0; font-size: 16px; color: rgba(255,255,255,0.6); }
-    .section ul li::before { content: "•"; color: #DFFF00; font-weight: 900; margin-right: 10px; }
+    .section ul li { padding: 8px 0; font-size: 16px; color: rgba(26,26,26,0.7); }
+    .section ul li::before { content: "•"; color: #1A1A1A; font-weight: 900; margin-right: 10px; }
 
     .langs { display: flex; flex-direction: column; gap: 12px; margin: 30px 0; }
-    .lang-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+    .lang-card { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
     .lang-flag { font-size: 28px; }
-    .lang-name { font-size: 16px; font-weight: 800; color: #fff; }
-    .lang-desc { font-size: 13px; color: rgba(255,255,255,0.4); }
+    .lang-name { font-size: 16px; font-weight: 800; color: #1A1A1A; }
+    .lang-desc { font-size: 13px; color: rgba(26,26,26,0.5); }
 
-    footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
-    footer a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 13px; margin: 0 12px; }
-    footer a:hover { color: #DFFF00; }
-    footer .copy { color: rgba(255,255,255,0.2); font-size: 12px; margin-top: 16px; }
+    footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(26,26,26,0.1); }
+    footer a { color: rgba(26,26,26,0.5); text-decoration: none; font-size: 13px; margin: 0 12px; }
+    footer a:hover { color: #1A1A1A; }
+    footer .copy { color: rgba(26,26,26,0.3); font-size: 12px; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
     @media (max-width: 600px) {
       h1 { font-size: 40px; }
@@ -101,7 +101,7 @@
     <a href="/terms">Algemene Voorwaarden</a>
     <a href="https://tiktok.com/@numrapp" target="_blank">TikTok</a>
     <a href="https://instagram.com/numrapp" target="_blank">Instagram</a>
-    <div class="copy">&copy; 2026 numr. Alle rechten voorbehouden.</div>
+    <div class="copy"><span>&copy; 2026 numr. Alle rechten voorbehouden.</span> <span>|</span> <span>Powered by <a href="https://mrefinance.nl" target="_blank" style="margin:0;color:rgba(26,26,26,0.5);font-weight:700;">mrefinance.nl</a></span></div>
   </footer>
 </body>
 </html>
