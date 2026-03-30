@@ -58,10 +58,9 @@ export default function RegisterPage() {
     <>
       <AnimatePresence>{success && <SuccessAnimation message={t('register.gelukt')} />}</AnimatePresence>
       <div className="h-full flex flex-col safe-top">
-        <div className="px-6 pt-6 flex items-center justify-between flex-shrink-0">
+        <div className="px-6 pt-6 flex items-center gap-3 flex-shrink-0">
           <Link to="/login" className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"><ArrowLeft size={22} /></Link>
-          <span className="text-2xl font-black text-brand notranslate">numr</span>
-          <div className="w-10" />
+          <span className="text-base font-black text-brand notranslate">numr</span>
         </div>
 
         <div className="page-scroll">

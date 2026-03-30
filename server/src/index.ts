@@ -30,6 +30,11 @@ async function main() {
   app.use(express.json());
   app.use('/uploads', express.static(UPLOADS_DIR));
 
+  const PUBLIC_DIR = path.join(__dirname, '../public');
+  app.get('/', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
+  app.get('/privacy', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'privacy.html')));
+  app.get('/terms', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'terms.html')));
+
   app.use('/api/auth', authRoutes);
   app.use('/api/clients', clientRoutes);
   app.use('/api/invoices', invoiceRoutes);

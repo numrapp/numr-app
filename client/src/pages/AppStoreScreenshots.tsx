@@ -1,4 +1,6 @@
+import { useState, useRef } from 'react';
 import { Send, RotateCcw, Inbox, ChevronRight, CheckCircle, AlertCircle, Save, LogOut, Eye } from 'lucide-react';
+import { toPng } from 'html-to-image';
 
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
@@ -120,14 +122,54 @@ function Screen3Content() {
 }
 
 export default function AppStoreScreenshots() {
-  return (
-    <div style={{ background: '#f5f5f5', padding: 40, minHeight: '100vh', overflow: 'auto', position: 'fixed', inset: 0, zIndex: 9999 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 30, textAlign: 'center', color: '#1A1A1A' }}>App Store Screenshots</h1>
-      <p style={{ textAlign: 'center', color: '#888', marginBottom: 40, fontSize: 14 }}>Her afisi sag tiklayip kaydedin</p>
+  const [current, setCurrent] = useState(0);
+  const [downloading, setDownloading] = useState(false);
+  const ref1 = useRef<HTMLDivElement>(null);
+  const ref2 = useRef<HTMLDivElement>(null);
+  const ref3 = useRef<HTMLDivElement>(null);
+  const refs = [ref1, ref2, ref3];
+  const screenshots = [
+    { id: 'hero', label: 'Afis 1 - Hero' },
+    { id: 'dashboard', label: 'Afis 2 - Dashboard' },
+    { id: 'languages', label: 'Afis 3 - Diller' },
+  ];
 
-      <div style={{ display: 'flex', gap: 40, justifyContent: 'center', flexWrap: 'wrap' }}>
+  const downloadCurrent = async () => {
+    const node = refs[current].current;
+    if (!node) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(node, { width: 1242, height: 2688, pixelRatio: 2.89 });
+      const link = document.createElement('a');
+      link.download = `numr-screenshot-${current + 1}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    setDownloading(false);
+  };
+
+  return (
+    <div style={{ background: '#f5f5f5', minHeight: '100vh', overflow: 'auto', position: 'fixed', inset: 0, zIndex: 9999 }}>
+      <div style={{ padding: '20px', textAlign: 'center', background: '#fff', borderBottom: '1px solid #eee' }}>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 10 }}>
+          {screenshots.map((s, i) => (
+            <button key={s.id} onClick={() => setCurrent(i)}
+              style={{ padding: '8px 20px', borderRadius: 12, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13,
+                background: current === i ? '#1A1A1A' : '#eee', color: current === i ? '#fff' : '#666' }}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <button onClick={downloadCurrent} disabled={downloading}
+          style={{ padding: '12px 40px', borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: 15,
+            background: '#DFFF00', color: '#1A1A1A', marginTop: 8 }}>
+          {downloading ? 'Indiriliyor...' : `PNG Indir (Afis ${current + 1})`}
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', padding: 30 }}>
         {/* AFIS 1: Hero / Logo */}
-        <div style={{
+        {current === 0 && <div ref={ref1} style={{
           width: 430, height: 932, borderRadius: 20, overflow: 'hidden', flexShrink: 0,
           background: 'linear-gradient(160deg, #0A0A0A 0%, #1A1A1A 50%, #0D0D0D 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -185,10 +227,10 @@ export default function AppStoreScreenshots() {
             </div>
             <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 500 }}>Beschikbaar op iOS</span>
           </div>
-        </div>
+        </div>}
 
         {/* AFIS 2: Dashboard + tum bayraklar */}
-        <div style={{
+        {current === 1 && <div ref={ref2} style={{
           width: 430, height: 932, borderRadius: 20, overflow: 'hidden', flexShrink: 0,
           background: 'linear-gradient(180deg, #DFFF00 0%, #B8D900 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px 30px 30px',
@@ -206,10 +248,10 @@ export default function AppStoreScreenshots() {
           <div style={{ marginTop: 'auto', paddingTop: 16 }}>
             <span style={{ fontSize: 28, fontWeight: 900, color: '#1A1A1A', opacity: 0.3 }}>numr</span>
           </div>
-        </div>
+        </div>}
 
         {/* AFIS 3: Coklu dil */}
-        <div style={{
+        {current === 2 && <div ref={ref3} style={{
           width: 430, height: 932, borderRadius: 20, overflow: 'hidden', flexShrink: 0,
           background: 'linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px 30px 30px',
@@ -250,7 +292,7 @@ export default function AppStoreScreenshots() {
             </div>
             <p style={{ fontSize: 24, fontWeight: 900, color: '#1A1A1A', opacity: 0.15 }}>numr</p>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

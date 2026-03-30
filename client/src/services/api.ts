@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Capacitor } from '@capacitor/core';
 
 const baseURL = Capacitor.isNativePlatform()
-  ? 'https://your-server.com/api'
+  ? 'https://numr-app-production.up.railway.app/api'
   : '/api';
 
 const api = axios.create({

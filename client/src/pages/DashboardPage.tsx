@@ -17,8 +17,8 @@ export default function DashboardPage() {
         <span className="text-lg font-black text-brand notranslate">numr</span>
         <div className="flex items-center gap-1">
           <LanguageSelector />
-          <button onClick={() => navigate('/invoices')} className="p-2 rounded-xl hover:bg-gray-100 transition-colors"><FolderOpen size={18} className="text-brand" /></button>
-          <button onClick={() => navigate('/settings')} className="p-2 rounded-xl hover:bg-gray-100 transition-colors"><Settings size={18} className="text-brand" /></button>
+          <button onClick={() => navigate('/invoices')} className="p-2 rounded-xl hover:bg-gray-100 transition-colors"><FolderOpen size={18} className="text-dark" /></button>
+          <button onClick={() => navigate('/settings')} className="p-2 rounded-xl hover:bg-gray-100 transition-colors"><Settings size={18} className="text-dark" /></button>
         </div>
       </div>
 
