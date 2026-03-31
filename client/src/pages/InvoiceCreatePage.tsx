@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, UserPlus, Users, MessageCircle, Mail, ChevronRight, ClipboardList, Trash2, Plus, X } from 'lucide-react';
@@ -10,8 +10,10 @@ import { Client, InvoiceItem } from '../types';
 import { todayISO, addDays, formatCurrency } from '../utils/formatters';
 import BtwChatbot from '../components/BtwChatbot';
 import SuccessAnimation from '../components/SuccessAnimation';
+import InvoicePreview from '../components/invoice/InvoicePreview';
 
 const slide = { initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0}, transition:{duration:0.15} };
+const DRAFT_KEY = 'invoiceCreateDraft';
 
 function parseWorkText(text: string): InvoiceItem[] {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
@@ -52,7 +54,8 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
   const { user } = useAuth();
   const navigate = useNavigate();
   const isCredit = docType === 'credit';
-  const [step, setStep] = useState(1);
+  const draft = (() => { try { const d = sessionStorage.getItem(DRAFT_KEY); return d ? JSON.parse(d) : null; } catch { return null; } })();
+  const [step, setStep] = useState(draft?.step || 1);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -65,15 +68,15 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [showCreditConfirm, setShowCreditConfirm] = useState(false);
 
-  const [clientId, setClientId] = useState<number | null>(null);
-  const [newClient, setNewClient] = useState({ company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'' });
-  const [btwRate, setBtwRate] = useState<number | 'verlegd'>(21);
-  const [amount, setAmount] = useState('');
+  const [clientId, setClientId] = useState<number | null>(draft?.clientId ?? null);
+  const [newClient, setNewClient] = useState(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'' });
+  const [btwRate, setBtwRate] = useState<number | 'verlegd'>(draft?.btwRate ?? 21);
+  const [amount, setAmount] = useState(draft?.amount || '');
   const [rawText, setRawText] = useState('');
-  const [parsedItems, setParsedItems] = useState<InvoiceItem[]>([]);
-  const [items, setItems] = useState<InvoiceItem[]>([]);
-  const [wantDesc, setWantDesc] = useState<boolean | null>(null);
-  const [description, setDescription] = useState('');
+  const [parsedItems, setParsedItems] = useState<InvoiceItem[]>(draft?.parsedItems || []);
+  const [items, setItems] = useState<InvoiceItem[]>(draft?.items || []);
+  const [wantDesc, setWantDesc] = useState<boolean | null>(draft?.wantDesc ?? null);
+  const [description, setDescription] = useState(draft?.description || '');
 
   useEffect(() => {
     clientService.getAll().then(list => {
@@ -82,6 +85,29 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
       setClients(Array.from(unique.values()));
     }).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (showSuccess) { sessionStorage.removeItem(DRAFT_KEY); return; }
+    try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ step, clientId, newClient, btwRate, amount, parsedItems, items, wantDesc, description })); } catch {}
+  }, [step, clientId, newClient, btwRate, amount, parsedItems, items, wantDesc, description, showSuccess]);
+
+  const stepRef = useRef(step);
+  stepRef.current = step;
+
+  const goBack = useCallback(() => {
+    const s = stepRef.current;
+    if (s===10) setStep(1); else if (s===11) setStep(10); else if (s===41||s===42) setStep(4); else if (s===43) setStep(42); else if (s===45) setStep(42); else if (s===51) setStep(5); else if (s>1) setStep(s-1); else navigate(-1);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (step > 1) window.history.pushState({ invoiceStep: step }, '');
+  }, [step]);
+
+  useEffect(() => {
+    const onPop = () => { if (stepRef.current > 1) goBack(); else navigate(-1); };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [goBack, navigate]);
 
   const selectedClient = clients.find(c => c.id === clientId);
   const rate = btwRate === 'verlegd' ? 0 : btwRate;
@@ -137,8 +163,6 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
   };
 
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
-
-  const goBack = () => { if (step===10) setStep(1); else if (step===11) setStep(10); else if (step===41||step===42) setStep(4); else if (step===43) setStep(42); else if (step===45) setStep(42); else if (step===51) setStep(5); else if (step>1) setStep(step-1); else navigate(-1); };
 
   return (
     <div className="min-h-screen bg-white safe-top">
@@ -299,13 +323,13 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                       {parsedItems.length > 1 && <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>}
                     </div>
                     <div className="grid grid-cols-3 gap-0 border-t border-gray-50">
-                      <div className="p-2.5 border-r border-gray-50">
+                      <div className="p-3.5 border-r border-gray-50">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.aantalLabel')}</span>
                         <div className="flex items-center gap-1">
                           <input type="text" inputMode="decimal" value={item.quantity === 0 ? '' : item.quantity}
                             onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }}
                             onFocus={e => e.target.select()}
-                            className="w-full text-sm font-bold bg-transparent border-none outline-none placeholder-gray-300" placeholder="0" />
+                            className="w-full text-base font-bold bg-transparent border-none outline-none placeholder-gray-300" placeholder="0" />
                           <span className="text-[9px] text-gray-400 font-medium whitespace-nowrap">{t('invoice.aantalPlaceholder')}</span>
                         </div>
                       </div>
@@ -340,40 +364,30 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
             </motion.div>
           )}
 
-          {step === 45 && (
-            <motion.div key="s45" {...slide} className="space-y-4">
-              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.onizleme')}</p>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 space-y-3" style={{boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase">Factuur</p>
-                    <p className="text-sm font-extrabold text-dark">{selectedClient?.company_name || ''}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400">{todayISO()}</p>
-                    <p className="text-sm font-extrabold text-dark notranslate">BTW {btwRate === 'verlegd' ? 'verlegd' : btwRate + '%'}</p>
-                  </div>
+          {step === 45 && (() => {
+            const previewItems = items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0);
+            const subtotal = previewItems.reduce((s, i) => s + (i.quantity || 0) * (i.unit_price || 0), 0);
+            const btwAmount = previewItems.reduce((s, i) => s + (i.quantity || 0) * (i.unit_price || 0) * (rate / 100), 0);
+            const payDays = user?.default_payment_days || 30;
+            return (
+              <motion.div key="s45" {...slide} className="space-y-4">
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.onizleme')}</p>
+                <InvoicePreview
+                  supplierName={user?.company_name || ''} supplierAddress={user?.company_address || ''} supplierPostcode={user?.company_postcode || ''} supplierCity={user?.company_city || ''}
+                  supplierKvk={user?.kvk_number || ''} supplierBtw={user?.btw_number || ''} supplierIban={user?.iban || ''} supplierPhone={user?.phone || ''}
+                  customerName={selectedClient?.company_name || ''} customerAddress={selectedClient?.address || ''} customerPostcode={selectedClient?.postcode || ''} customerCity={selectedClient?.city || ''} customerCountry={selectedClient?.country || ''}
+                  invoiceNumber={`${user?.invoice_prefix || 'FAC'}${String(user?.next_invoice_number || 1).padStart(3, '0')}`}
+                  invoiceDate={todayISO()} dueDate={addDays(todayISO(), payDays)} deliveryDate={todayISO()}
+                  paymentDays={payDays} description={description || previewItems.map(i => i.description).join(', ')}
+                  items={previewItems} subtotal={subtotal} btwAmount={btwAmount} total={subtotal + btwAmount}
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => setStep(42)} className="btn-outline w-full">{t('invoice.bewerken')}</button>
+                  <button onClick={() => setStep(6)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
                 </div>
-                <div className="border-t border-gray-100 pt-2">
-                  {(items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0)).map((item, i) => (
-                    <div key={i} className="flex justify-between py-1.5 text-sm">
-                      <div className="flex-1"><span className="text-dark font-medium">{item.description}</span><span className="text-gray-400 ml-2">{item.quantity}x</span></div>
-                      <span className="font-bold text-dark notranslate">{formatCurrency(item.quantity * item.unit_price)}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-gray-200 pt-2 space-y-1">
-                  <div className="flex justify-between text-sm text-gray-500"><span>Subtotaal</span><span className="notranslate">{formatCurrency((items.length > 0 ? items : parsedItems).reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0), 0))}</span></div>
-                  <div className="flex justify-between text-sm text-gray-500"><span>BTW</span><span className="notranslate">{formatCurrency((items.length > 0 ? items : parsedItems).reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0)*(rate/100), 0))}</span></div>
-                  <div className="flex justify-between text-lg font-extrabold text-dark border-t border-gray-200 pt-1"><span>Totaal</span><span className="notranslate">{formatCurrency(totalFromItems(items.length > 0 ? items : parsedItems))}</span></div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => setStep(42)} className="btn-outline w-full">{t('invoice.bewerken')}</button>
-                <button onClick={() => setStep(6)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            );
+          })()}
 
           {step === 43 && (
             <motion.div key="s43" {...slide} className="space-y-4">
