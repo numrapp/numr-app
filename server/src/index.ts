@@ -31,10 +31,14 @@ async function main() {
   app.use('/uploads', express.static(UPLOADS_DIR));
 
   const PUBLIC_DIR = path.join(__dirname, '../public');
-  app.get('/', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
+  const CLIENT_DIR = path.join(__dirname, '../../client/dist');
+
   app.get('/privacy', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'privacy.html')));
   app.get('/terms', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'terms.html')));
   app.get('/video', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'video.html')));
+  app.get('/site', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
+
+  app.use('/assets', express.static(path.join(CLIENT_DIR, 'assets')));
 
   app.use('/api/auth', authRoutes);
   app.use('/api/clients', clientRoutes);
@@ -50,6 +54,15 @@ async function main() {
       res.json({ logo_path: logoPath });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('*', (_req, res) => {
+    const clientIndex = path.join(CLIENT_DIR, 'index.html');
+    if (fs.existsSync(clientIndex)) {
+      res.sendFile(clientIndex);
+    } else {
+      res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
     }
   });
 
