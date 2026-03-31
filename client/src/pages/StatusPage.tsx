@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, MessageCircle, Film, MapPin, Search } from 'lucide-react';
+import { Plus, MessageCircle, User, MapPin, Search } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { mockVideos, CATEGORIES } from '../data/mockVideos';
 
@@ -68,9 +68,9 @@ export default function StatusPage() {
 
       <div className="flex-shrink-0 bg-white/95 backdrop-blur-lg border-t border-gray-200/60 safe-bottom">
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
-          <button className="flex flex-col items-center gap-0.5 text-dark">
-            <Film size={20} strokeWidth={2.5} />
-            <span className="text-[9px] font-extrabold">{t('status.videos')}</span>
+          <button onClick={() => navigate('/status/profile')} className="flex flex-col items-center gap-0.5 text-dark">
+            <User size={20} strokeWidth={2.5} />
+            <span className="text-[9px] font-extrabold">{t('status.profiel')}</span>
           </button>
           <button onClick={() => navigate('/status/upload')}
             className="w-10 h-10 -mt-2 rounded-full bg-brand flex items-center justify-center shadow-lg shadow-brand/30 active:scale-90 transition-transform">

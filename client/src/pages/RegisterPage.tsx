@@ -20,6 +20,7 @@ export default function RegisterPage() {
     email: '', password: '', company_name: '', company_address: '',
     company_postcode: '', company_city: '', kvk_number: '', btw_number: 'NL', iban: '',
   });
+  const [role, setRole] = useState<'ondernemer' | 'particulier' | ''>('');
   const set = (f: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(p => ({ ...p, [f]: e.target.value }));
 
   const handleBtw = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +33,7 @@ export default function RegisterPage() {
     e.preventDefault();
     if (honeypot) return;
     if (Date.now() - formStartTime.current < 2000) { setError(t('register.tooFast')); return; }
-    if (!form.email.trim() || !form.password.trim() || !form.company_name.trim()) {
+    if (!form.email.trim() || !form.password.trim() || !form.company_name.trim() || !role) {
       setError(t('register.vulAlleVelden')); return;
     }
     if (form.password.length < 6) { setError(t('register.wachtwoordMin')); return; }
@@ -89,6 +90,19 @@ export default function RegisterPage() {
               <div><label className="label-send">{t('register.email')} *</label><input type="email" value={form.email} onChange={set('email')} className="input-send" placeholder="info@bedrijf.nl" /></div>
               <div><label className="label-send notranslate">IBAN</label><input type="text" value={form.iban} onChange={set('iban')} className="input-send notranslate" placeholder="NL00 BANK 0000 0000 00" /></div>
               <div><label className="label-send">{t('register.password')} *</label><input type="password" value={form.password} onChange={set('password')} className="input-send" placeholder={t('register.passwordPh')} /></div>
+              <div className="pt-2">
+                <label className="label-send">{t('register.kiesRol')} *</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setRole('ondernemer')}
+                    className={`py-3 rounded-xl text-xs font-bold transition-all ${role === 'ondernemer' ? 'bg-brand text-dark shadow-md' : 'bg-gray-50 text-gray-500'}`}>
+                    {t('register.ondernemer')}
+                  </button>
+                  <button type="button" onClick={() => setRole('particulier')}
+                    className={`py-3 rounded-xl text-xs font-bold transition-all ${role === 'particulier' ? 'bg-gray-200 text-dark shadow-md' : 'bg-gray-50 text-gray-500'}`}>
+                    {t('register.geenOndernemer')}
+                  </button>
+                </div>
+              </div>
               <button type="submit" disabled={loading} className="btn-brand w-full mt-2">{loading ? t('register.creating') : t('register.create')}</button>
             </form>
 

@@ -87,4 +87,5 @@ registerLocale('bg', {
   'status.zoekLocatie':'Търси по местоположение...','status.videos':'Видеа',
   'status.toegangContacten':'Достъп до контакти','status.toegangContactenBeschrijving':'numr се нуждае от достъп до контактите за изпращане на съобщения.',
   'invoice.onizleme':'Преглед на фактура','invoice.bewerken':'Редактиране',
+  'status.profiel':'Профил','status.biografie':'Биография','status.biografiePh':'Напишете нещо за фирмата си...','status.mijnVideos':'Моите видеа','status.videoVerwijderen':'Изтрий','status.fotoUploaden':'Качи снимка','register.kiesRol':'Изберете роля','register.ondernemer':'Аз съм предприемач','register.geenOndernemer':'Не съм предприемач',
 });

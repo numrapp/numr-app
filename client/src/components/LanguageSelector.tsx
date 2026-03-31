@@ -33,14 +33,13 @@ export default function LanguageSelector({ dark }: { dark?: boolean }) {
           <>
             <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
             <motion.div initial={{opacity:0,y:-5,scale:0.95}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:-5,scale:0.95}}
-              className="absolute right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden" style={{minWidth:140}}>
-              <div className="max-h-64 overflow-y-auto py-1">
+              className="absolute right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-2" style={{minWidth:180}}>
+              <div className="grid grid-cols-2 gap-1">
                 {LANGS.map(l => (
                   <button key={l.code} onClick={() => { setLang(l.code); setOpen(false); }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 transition-colors ${lang === l.code ? 'bg-brand/10' : 'hover:bg-gray-50'}`}>
-                    <span className="text-lg">{l.flag}</span>
-                    <span className={`text-xs font-bold ${lang === l.code ? 'text-dark' : 'text-gray-500'}`}>{l.short}</span>
-                    {lang === l.code && <div className="ml-auto w-2 h-2 rounded-full bg-brand" />}
+                    className={`flex items-center gap-2 px-2.5 py-2 rounded-xl transition-colors ${lang === l.code ? 'bg-brand/15' : 'hover:bg-gray-50'}`}>
+                    <span className="text-base">{l.flag}</span>
+                    <span className={`text-[10px] font-bold ${lang === l.code ? 'text-dark' : 'text-gray-400'}`}>{l.short}</span>
                   </button>
                 ))}
               </div>

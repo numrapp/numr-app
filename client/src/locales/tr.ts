@@ -92,4 +92,5 @@ registerLocale('tr', {
   'status.zoekLocatie':'Konum ara...','status.videos':'Videolar',
   'status.toegangContacten':'Kisilere erisim','status.toegangContactenBeschrijving':'numr mesaj gondermek icin kisilerinize erisim istiyor.',
   'invoice.onizleme':'Fatura onizleme','invoice.bewerken':'Duzenle',
+  'status.profiel':'Profil','status.biografie':'Biyografi','status.biografiePh':'Sirketiniz hakkinda bir seyler yazin...','status.mijnVideos':'Videolarim','status.videoVerwijderen':'Sil','status.fotoUploaden':'Foto yukle','register.kiesRol':'Rolunuzu secin','register.ondernemer':'Ben bir girisimciyim','register.geenOndernemer':'Ben bir girisimci degilim',
 });

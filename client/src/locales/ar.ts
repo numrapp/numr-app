@@ -87,4 +87,5 @@ registerLocale('ar', {
   'status.zoekLocatie':'البحث حسب الموقع...','status.videos':'فيديوهات',
   'status.toegangContacten':'الوصول للجهات','status.toegangContactenBeschrijving':'يحتاج numr للوصول إلى جهات الاتصال لإرسال الرسائل.',
   'invoice.onizleme':'معاينة الفاتورة','invoice.bewerken':'تعديل',
+  'status.profiel':'الملف الشخصي','status.biografie':'السيرة الذاتية','status.biografiePh':'اكتب شيئا عن شركتك...','status.mijnVideos':'فيديوهاتي','status.videoVerwijderen':'حذف','status.fotoUploaden':'رفع صورة','register.kiesRol':'اختر دورك','register.ondernemer':'أنا رائد أعمال','register.geenOndernemer':'لست رائد أعمال',
 });

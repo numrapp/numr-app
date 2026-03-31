@@ -17,6 +17,7 @@ import VideoPlayerPage from './pages/VideoPlayerPage';
 import VideoUploadPage from './pages/VideoUploadPage';
 import StatusMessagesPage from './pages/StatusMessagesPage';
 import StatusChatPage from './pages/StatusChatPage';
+import StatusProfilePage from './pages/StatusProfilePage';
 import BottomBar from './components/layout/BottomBar';
 
 function P({ children }: { children: React.ReactNode }) {
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/status/upload" element={<P><VideoUploadPage /></P>} />
           <Route path="/status/messages" element={<P><StatusMessagesPage /></P>} />
           <Route path="/status/chat/:id" element={<P><StatusChatPage /></P>} />
+          <Route path="/status/profile" element={<P><StatusProfilePage /></P>} />
           <Route path="/screenshots" element={<AppStoreScreenshots />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -92,4 +92,5 @@ registerLocale('nl', {
   'status.zoekLocatie':'Zoek op locatie...','status.videos':'Video\'s',
   'status.toegangContacten':'Toegang tot contacten','status.toegangContactenBeschrijving':'numr heeft toegang tot uw contacten nodig om berichten te versturen.',
   'invoice.onizleme':'Factuur overzicht','invoice.bewerken':'Bewerken',
+  'status.profiel':'Profiel','status.biografie':'Biografie','status.biografiePh':'Schrijf iets over uw bedrijf...','status.mijnVideos':'Mijn video\'s','status.videoVerwijderen':'Verwijderen','status.fotoUploaden':'Foto uploaden','register.kiesRol':'Kies uw rol','register.ondernemer':'Ik ben een ondernemer','register.geenOndernemer':'Ik ben geen ondernemer',
 });

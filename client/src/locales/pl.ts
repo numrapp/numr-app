@@ -87,4 +87,5 @@ registerLocale('pl', {
   'status.zoekLocatie':'Szukaj wg lokalizacji...','status.videos':'Filmy',
   'status.toegangContacten':'Dostep do kontaktow','status.toegangContactenBeschrijving':'numr potrzebuje dostepu do kontaktow aby wysylac wiadomosci.',
   'invoice.onizleme':'Podglad faktury','invoice.bewerken':'Edytuj',
+  'status.profiel':'Profil','status.biografie':'Biografia','status.biografiePh':'Napisz cos o swojej firmie...','status.mijnVideos':'Moje filmy','status.videoVerwijderen':'Usun','status.fotoUploaden':'Dodaj zdjecie','register.kiesRol':'Wybierz role','register.ondernemer':'Jestem przedsiebiorca','register.geenOndernemer':'Nie jestem przedsiebiorca',
 });
