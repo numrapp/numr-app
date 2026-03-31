@@ -86,4 +86,5 @@ registerLocale('bg', {
   'status.toestaan':'Разреши','status.weigeren':'Откажи',
   'status.zoekLocatie':'Търси по местоположение...','status.videos':'Видеа',
   'status.toegangContacten':'Достъп до контакти','status.toegangContactenBeschrijving':'numr се нуждае от достъп до контактите за изпращане на съобщения.',
+  'invoice.onizleme':'Преглед на фактура','invoice.bewerken':'Редактиране',
 });

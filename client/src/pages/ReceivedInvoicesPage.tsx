@@ -33,7 +33,9 @@ export default function ReceivedInvoicesPage() {
                   border: '1px solid',
                   borderColor: inv.status === 'paid' ? '#BBF7D0' : '#FDE68A',
                 }}>
-                <div className="w-12 h-12 flex-shrink-0 rounded-xl overflow-hidden" dangerouslySetInnerHTML={{ __html: inv.senderLogoSvg.replace('width="40" height="40"', 'width="48" height="48"') }} />
+                <div className={`w-12 h-12 flex-shrink-0 rounded-xl flex items-center justify-center ${inv.status === 'paid' ? 'bg-green-500' : 'bg-red-500'}`}>
+                  <span className="text-white text-[10px] font-bold">{inv.sender.substring(0, 3).toUpperCase()}</span>
+                </div>
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-extrabold text-sm text-dark">{inv.sender}</p>
                   <p className="text-[11px] text-gray-500 font-medium">{inv.invoiceNumber} · {formatDate(inv.invoiceDate)}</p>

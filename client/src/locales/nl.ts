@@ -91,4 +91,5 @@ registerLocale('nl', {
   'status.toestaan':'Toestaan','status.weigeren':'Weigeren',
   'status.zoekLocatie':'Zoek op locatie...','status.videos':'Video\'s',
   'status.toegangContacten':'Toegang tot contacten','status.toegangContactenBeschrijving':'numr heeft toegang tot uw contacten nodig om berichten te versturen.',
+  'invoice.onizleme':'Factuur overzicht','invoice.bewerken':'Bewerken',
 });

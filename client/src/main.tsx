@@ -7,6 +7,8 @@ import App from './App';
 import './locales/nl';
 import './locales/tr';
 import './locales/en';
+import './locales/fr';
+import './locales/es';
 import './locales/ar';
 import './locales/bg';
 import './locales/pl';

@@ -86,4 +86,5 @@ registerLocale('ar', {
   'status.toestaan':'السماح','status.weigeren':'رفض',
   'status.zoekLocatie':'البحث حسب الموقع...','status.videos':'فيديوهات',
   'status.toegangContacten':'الوصول للجهات','status.toegangContactenBeschrijving':'يحتاج numr للوصول إلى جهات الاتصال لإرسال الرسائل.',
+  'invoice.onizleme':'معاينة الفاتورة','invoice.bewerken':'تعديل',
 });

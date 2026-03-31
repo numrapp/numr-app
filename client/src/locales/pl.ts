@@ -86,4 +86,5 @@ registerLocale('pl', {
   'status.toestaan':'Zezwol','status.weigeren':'Odmow',
   'status.zoekLocatie':'Szukaj wg lokalizacji...','status.videos':'Filmy',
   'status.toegangContacten':'Dostep do kontaktow','status.toegangContactenBeschrijving':'numr potrzebuje dostepu do kontaktow aby wysylac wiadomosci.',
+  'invoice.onizleme':'Podglad faktury','invoice.bewerken':'Edytuj',
 });

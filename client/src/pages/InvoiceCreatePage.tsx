@@ -138,7 +138,7 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
 
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
 
-  const goBack = () => { if (step===10) setStep(1); else if (step===11) setStep(10); else if (step===41||step===42) setStep(4); else if (step===43) setStep(42); else if (step===51) setStep(5); else if (step>1) setStep(step-1); else navigate(-1); };
+  const goBack = () => { if (step===10) setStep(1); else if (step===11) setStep(10); else if (step===41||step===42) setStep(4); else if (step===43) setStep(42); else if (step===45) setStep(42); else if (step===51) setStep(5); else if (step>1) setStep(step-1); else navigate(-1); };
 
   return (
     <div className="min-h-screen bg-white safe-top">
@@ -336,7 +336,42 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                 </div>
               )}
 
-              <button onClick={() => { setItems(parsedItems.filter(i => i.description.trim() && i.unit_price > 0)); setDescription(parsedItems.filter(i=>i.description.trim()).map(i => i.description).join(', ')); setStep(6); }} disabled={!parsedItems.some(i => i.description.trim() && i.unit_price > 0)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
+              <button onClick={() => { setItems(parsedItems.filter(i => i.description.trim() && i.unit_price > 0)); setDescription(parsedItems.filter(i=>i.description.trim()).map(i => i.description).join(', ')); setStep(45); }} disabled={!parsedItems.some(i => i.description.trim() && i.unit_price > 0)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
+            </motion.div>
+          )}
+
+          {step === 45 && (
+            <motion.div key="s45" {...slide} className="space-y-4">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.onizleme')}</p>
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 space-y-3" style={{boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase">Factuur</p>
+                    <p className="text-sm font-extrabold text-dark">{selectedClient?.company_name || ''}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400">{todayISO()}</p>
+                    <p className="text-sm font-extrabold text-dark notranslate">BTW {btwRate === 'verlegd' ? 'verlegd' : btwRate + '%'}</p>
+                  </div>
+                </div>
+                <div className="border-t border-gray-100 pt-2">
+                  {(items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0)).map((item, i) => (
+                    <div key={i} className="flex justify-between py-1.5 text-sm">
+                      <div className="flex-1"><span className="text-dark font-medium">{item.description}</span><span className="text-gray-400 ml-2">{item.quantity}x</span></div>
+                      <span className="font-bold text-dark notranslate">{formatCurrency(item.quantity * item.unit_price)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-gray-200 pt-2 space-y-1">
+                  <div className="flex justify-between text-sm text-gray-500"><span>Subtotaal</span><span className="notranslate">{formatCurrency((items.length > 0 ? items : parsedItems).reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0), 0))}</span></div>
+                  <div className="flex justify-between text-sm text-gray-500"><span>BTW</span><span className="notranslate">{formatCurrency((items.length > 0 ? items : parsedItems).reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0)*(rate/100), 0))}</span></div>
+                  <div className="flex justify-between text-lg font-extrabold text-dark border-t border-gray-200 pt-1"><span>Totaal</span><span className="notranslate">{formatCurrency(totalFromItems(items.length > 0 ? items : parsedItems))}</span></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => setStep(42)} className="btn-outline w-full">{t('invoice.bewerken')}</button>
+                <button onClick={() => setStep(6)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
+              </div>
             </motion.div>
           )}
 

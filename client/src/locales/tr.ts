@@ -91,4 +91,5 @@ registerLocale('tr', {
   'status.toestaan':'Izin ver','status.weigeren':'Reddet',
   'status.zoekLocatie':'Konum ara...','status.videos':'Videolar',
   'status.toegangContacten':'Kisilere erisim','status.toegangContactenBeschrijving':'numr mesaj gondermek icin kisilerinize erisim istiyor.',
+  'invoice.onizleme':'Fatura onizleme','invoice.bewerken':'Duzenle',
 });
