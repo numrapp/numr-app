@@ -267,28 +267,75 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
           )}
 
           {step === 42 && (
-            <motion.div key="s42" {...slide} className="space-y-4">
-              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.ayrintili')}</p>
-              <div className="space-y-3">
+            <motion.div key="s42" {...slide} className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.ayrintili')}</p>
+                <button onClick={() => {
+                  const last = parsedItems[parsedItems.length - 1];
+                  let newDesc = '';
+                  if (last && last.description) {
+                    const dateMatch = last.description.match(/(\d{2})-(\d{2})-(\d{4})/);
+                    if (dateMatch) {
+                      const d = new Date(parseInt(dateMatch[3]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]) + 1);
+                      const dd = String(d.getDate()).padStart(2, '0');
+                      const mm = String(d.getMonth() + 1).padStart(2, '0');
+                      const rest = last.description.replace(/\d{2}-\d{2}-\d{4}/, '').trim();
+                      newDesc = `${dd}-${mm}-${d.getFullYear()} ${rest}`;
+                    }
+                  }
+                  setParsedItems(p => [...p, { description: newDesc, quantity: last?.quantity || 0, unit_price: last?.unit_price || 0, btw_rate: rate }]);
+                }} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand text-dark text-xs font-bold active:scale-95 transition-all">
+                  <Plus size={14} /> {t('invoice.regelToevoegen')}
+                </button>
+              </div>
+
+              <div className="space-y-2">
                 {parsedItems.map((item, i) => (
-                  <div key={i} className="p-3 bg-gray-50 rounded-2xl space-y-2">
-                    <div className="flex items-start gap-2">
-                      <input type="text" value={item.description} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],description:e.target.value}; setParsedItems(n); }} className="input-send flex-1 text-sm" placeholder={t('invoice.adresOfWeek')} />
-                      {parsedItems.length > 1 && <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-2 rounded-xl hover:bg-red-50 text-gray-400"><Trash2 size={16} /></button>}
+                  <div key={i} className="bg-white border border-gray-100 rounded-2xl overflow-hidden" style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
+                    <div className="flex items-center gap-2 px-3 pt-3 pb-1">
+                      <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500">{i + 1}</span>
+                      <input type="text" value={item.description} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],description:e.target.value}; setParsedItems(n); }}
+                        className="flex-1 text-sm font-medium bg-transparent border-none outline-none placeholder-gray-300" placeholder="bijv. 02-03-2026 Amsterdam" />
+                      {parsedItems.length > 1 && <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>}
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center gap-1"><span className="text-xs font-medium text-gray-400">{t('invoice.aantalLabel')}:</span><input type="text" inputMode="decimal" value={item.quantity === 0 ? '' : item.quantity} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }} onFocus={e => e.target.select()} className="input-send flex-1 text-sm py-2" placeholder={t('invoice.aantalPlaceholder')} /></div>
-                      <div className="flex items-center gap-1"><span className="text-sm font-bold text-gray-400 notranslate">€</span><input type="text" inputMode="decimal" value={item.unit_price === 0 ? '' : item.unit_price} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],unit_price:parseFloat(e.target.value.replace(',','.'))||0}; setParsedItems(n); }} onFocus={e => e.target.select()} className="input-send flex-1 text-sm py-2" /></div>
+                    <div className="grid grid-cols-3 gap-0 border-t border-gray-50">
+                      <div className="p-2.5 border-r border-gray-50">
+                        <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.aantalLabel')}</span>
+                        <div className="flex items-center gap-1">
+                          <input type="text" inputMode="decimal" value={item.quantity === 0 ? '' : item.quantity}
+                            onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }}
+                            onFocus={e => e.target.select()}
+                            className="w-full text-sm font-bold bg-transparent border-none outline-none placeholder-gray-300" placeholder="0" />
+                          <span className="text-[9px] text-gray-400 font-medium whitespace-nowrap">{t('invoice.aantalPlaceholder')}</span>
+                        </div>
+                      </div>
+                      <div className="p-2.5 border-r border-gray-50">
+                        <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.bedrag')}</span>
+                        <div className="flex items-center gap-0.5">
+                          <span className="text-xs font-bold text-gray-300 notranslate">€</span>
+                          <input type="text" inputMode="decimal" value={item.unit_price === 0 ? '' : item.unit_price}
+                            onChange={e => { const n=[...parsedItems]; n[i]={...n[i],unit_price:parseFloat(e.target.value.replace(',','.'))||0}; setParsedItems(n); }}
+                            onFocus={e => e.target.select()}
+                            className="w-full text-sm font-bold bg-transparent border-none outline-none placeholder-gray-300 notranslate" placeholder="0,00" />
+                        </div>
+                      </div>
+                      <div className="p-2.5">
+                        <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">Totaal</span>
+                        <p className="text-sm font-extrabold text-dark notranslate">{formatCurrency((item.quantity || 0) * (item.unit_price || 0) * (1 + rate / 100))}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <button onClick={() => setParsedItems(p => [...p, {description:'',quantity:0,unit_price:0,btw_rate:rate}])} className="w-full flex items-center justify-center gap-1 text-sm font-bold py-3 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-brand hover:text-dark transition-colors"><Plus size={18} /> {t('invoice.regelToevoegen')}</button>
+
               {parsedItems.some(i => i.unit_price > 0) && (
-                <div className="p-3 bg-gray-50 rounded-2xl text-right notranslate">
-                  <span className="text-lg font-black text-dark">Totaal: {formatCurrency(totalFromItems(parsedItems))}</span>
+                <div className="p-4 rounded-2xl" style={{background:'linear-gradient(135deg, #DFFF00, #B8D900)'}}>
+                  <div className="flex justify-between text-sm text-dark/60 mb-1"><span>Subtotaal</span><span className="notranslate">{formatCurrency(parsedItems.reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0), 0))}</span></div>
+                  <div className="flex justify-between text-sm text-dark/60 mb-1"><span>BTW ({btwRate === 'verlegd' ? 'verlegd' : btwRate + '%'})</span><span className="notranslate">{formatCurrency(parsedItems.reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0)*(rate/100), 0))}</span></div>
+                  <div className="flex justify-between text-lg font-extrabold text-dark border-t border-dark/10 pt-2 mt-1"><span>Totaal</span><span className="notranslate">{formatCurrency(totalFromItems(parsedItems))}</span></div>
                 </div>
               )}
+
               <button onClick={() => { setItems(parsedItems.filter(i => i.description.trim() && i.unit_price > 0)); setDescription(parsedItems.filter(i=>i.description.trim()).map(i => i.description).join(', ')); setStep(6); }} disabled={!parsedItems.some(i => i.description.trim() && i.unit_price > 0)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
             </motion.div>
           )}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;font-family:'Inter',system-ui,sans-serif;overflow:hidden;height:100vh;width:100vw;display:flex;align-items:center;justify-content:center}
+
+.phone{width:300px;height:650px;background:#fff;border-radius:36px;overflow:hidden;position:relative;border:7px solid #222;box-shadow:0 20px 60px rgba(0,0,0,.5);flex-shrink:0}
+
+.dot{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(223,255,0,.25);border:2px solid rgba(223,255,0,.7);z-index:50;opacity:0;transition:left .5s ease,top .5s ease,opacity .2s,transform .15s;transform:translate(-50%,-50%)}
+.dot.on{opacity:1}
+.dot.tap{transform:translate(-50%,-50%) scale(.5);background:rgba(223,255,0,.7)}
+
+.lbl{position:absolute;z-index:60;opacity:0;transition:all .3s;pointer-events:none}
+.lbl.on{opacity:1}
+.lbl div{background:#111;color:#fff;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap}
+.lbl b{color:#DFFF00}
+
+.hd{position:absolute;top:30px;left:0;right:0;text-align:center;z-index:70;opacity:0;transition:opacity .3s}
+.hd.on{opacity:1}
+.hd h2{color:#fff;font-size:22px;font-weight:900}
+.hd h2 b{color:#DFFF00}
+.hd p{color:rgba(255,255,255,.3);font-size:11px;margin-top:3px}
+
+.end{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:#DFFF00;color:#111;padding:12px 30px;border-radius:14px;font-size:15px;font-weight:900;z-index:70;opacity:0;transition:opacity .3s;white-space:nowrap}
+.end.on{opacity:1}
+
+.s{position:absolute;inset:0;opacity:0;transition:opacity .4s;overflow:hidden}
+.s.on{opacity:1}
+
+/* Login */
+.s0{background:#DFFF00;padding:45px 18px 18px;display:flex;flex-direction:column}
+.s0 .logo{font-size:36px;font-weight:900;color:#fff;text-shadow:1px 1px 6px rgba(0,0,0,.2);margin-bottom:auto}
+.s0 .wt{font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:12px}
+.s0 .inp{background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;font-size:12px;color:#bbb}
+.s0 .inp.ok{color:#1a1a1a}
+.s0 .btn{background:#1a1a1a;color:#fff;border-radius:12px;padding:12px;text-align:center;font-weight:800;font-size:13px;margin-top:6px}
+
+/* Dashboard */
+.s1{padding:45px 14px 14px;background:#fff}
+.s1 .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.s1 .tl{font-size:14px;font-weight:900;color:#DFFF00}
+.s1 .tf{font-size:10px}
+.s1 .hi{text-align:center;font-size:12px;font-weight:700;margin-bottom:14px}
+.cd{border-radius:16px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.cd i{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cd .ct{font-size:12px;font-weight:800}
+.cd .cs{font-size:8px;color:rgba(0,0,0,.4)}
+.g1{background:linear-gradient(135deg,#DFFF00,#B8D900)}.g1 i{background:rgba(255,255,255,.3)}
+.g2{background:linear-gradient(135deg,#FEE2E2,#FECACA)}.g2 i{background:rgba(255,255,255,.5)}
+.g3{background:linear-gradient(135deg,#DBEAFE,#BFDBFE)}.g3 i{background:rgba(255,255,255,.5)}
+
+/* New/Existing client */
+.s2{padding:45px 14px 14px;background:#fff}
+.s2 .st{font-size:14px;font-weight:800;margin-bottom:14px}
+.cb{border-radius:16px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cb i{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cb .ct{font-size:13px;font-weight:800}
+
+/* Client list */
+.s3{padding:45px 14px 14px;background:#fff}
+.s3 .st{font-size:12px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.cl{background:#f7f7f7;border-radius:12px;padding:12px;margin-bottom:6px}
+.cl .cn{font-size:13px;font-weight:800}
+.cl .ce{font-size:9px;color:#999}
+
+/* BTW */
+.s4{padding:45px 14px 14px;background:#fff;display:flex;flex-direction:column;align-items:center}
+.s4 .st{font-size:12px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.bw{width:100%;padding:16px;border-radius:16px;text-align:center;font-size:18px;font-weight:900;margin-bottom:8px;color:#1a1a1a}
+.bw1{background:#f7f7f7}.bw2{background:#f7f7f7}.bw3{background:#f7f7f7}
+
+/* Amount */
+.s5{padding:45px 14px 14px;background:#fff;text-align:center}
+.s5 .st{font-size:12px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px}
+.s5 .am{font-size:42px;font-weight:900;color:#1a1a1a;margin-bottom:20px}
+.s5 .nb{background:#DFFF00;border-radius:14px;padding:14px;font-weight:900;font-size:14px;color:#1a1a1a}
+
+/* Send method */
+.s6{padding:45px 14px 14px;background:#fff}
+.s6 .st{font-size:12px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.sm{border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;background:#f7f7f7}
+.sm i{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sm .sn{font-size:13px;font-weight:800}
+
+/* Lang screen */
+.s7{padding:45px 14px 14px;background:#fff}
+.s7 .lt{text-align:center;font-size:14px;font-weight:800;margin-bottom:10px}
+.fl{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+.fl span{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+.fl span.pk{background:rgba(223,255,0,.2);box-shadow:0 0 0 2px #DFFF00;transform:scale(1.15)}
+.lr{background:#f7f7f7;border-radius:10px;padding:9px 12px;margin-bottom:5px}
+.lr .rn{font-size:11px;font-weight:800}
+.lr .rd{font-size:8px;color:#999}
+
+/* Success */
+.s8{background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s8 .ck{width:60px;height:60px;border-radius:50%;background:#22C55E;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:14px;box-shadow:0 8px 20px rgba(34,197,94,.3)}
+.s8 h2{font-size:18px;font-weight:900}
+.s8 p{font-size:10px;color:#999;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="hd" id="hd"><h2 id="hh"></h2><p id="hp"></p></div>
+<div class="end" id="ed"></div>
+<div class="phone">
+<div class="dot" id="dt"></div>
+<div class="lbl" id="lb"><div id="lt"></div></div>
+
+<div class="s s0 on" id="p0"><div class="logo">numr</div><div class="wt">Welkom bij numr</div><div class="inp" id="e1">info@bedrijf.nl</div><div class="inp" id="e2">••••••</div><div class="btn">Inloggen</div></div>
+
+<div class="s s1" id="p1"><div class="th"><span class="tl">numr</span><div class="tf">🇳🇱🇹🇷🇬🇧🇸🇦🇧🇬🇵🇱</div></div><div class="hi">Hallo, numr Test BV</div><div class="cd g1"><i>📤</i><div><div class="ct">Nieuw Factuur</div><div class="cs">Factuur aanmaken</div></div></div><div class="cd g2"><i>↩️</i><div><div class="ct">Credit Factuur</div><div class="cs">Creditfactuur opstellen</div></div></div><div class="cd g3"><i>📥</i><div><div class="ct">Ontvangen Factuur</div><div class="cs">Ontvangen facturen bekijken</div></div></div></div>
+
+<div class="s s2" id="p2"><div class="st">Nieuw Factuur</div><div class="cb g1"><i>👤+</i><div><div class="ct">Nieuwe klant toevoegen</div></div></div><div class="cb" style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE)"><i style="background:rgba(255,255,255,.5)">👥</i><div><div class="ct">Bestaande klant selecteren</div></div></div></div>
+
+<div class="s s3" id="p3"><div class="st">Selecteer een klant</div><div class="cl"><div class="cn">Bouwbedrijf De Vries BV</div><div class="ce">info@devries-bouw.nl</div></div><div class="cl"><div class="cn">Schoonmaak Express</div><div class="ce">info@schoonmaakexpress.nl</div></div><div class="cl"><div class="cn">Bakkerij Amsterdam</div><div class="ce">info@bakkerij-adam.nl</div></div></div>
+
+<div class="s s4" id="p4"><div class="st">BTW selectie</div><div class="bw bw1" style="background:#DFFF00">21%</div><div class="bw bw2">9%</div><div class="bw bw3">Verlegd</div></div>
+
+<div class="s s5" id="p5"><div class="st">Bedrag</div><div class="am">€ 2.450,00</div><div class="nb">Volgende</div></div>
+
+<div class="s s6" id="p6"><div class="st">Verzenden</div><div class="sm" style="background:#E8F5E9"><i style="background:#22C55E;color:#fff;border-radius:12px">💬</i><div class="sn">WhatsApp</div></div><div class="sm" style="background:#EFF6FF"><i style="background:#3B82F6;color:#fff;border-radius:12px">✉️</i><div class="sn">E-mail</div></div></div>
+
+<div class="s s7" id="p7"><div class="tl" style="font-size:14px;font-weight:900;color:#DFFF00;margin-bottom:8px">numr</div><div class="lt">Kies uw taal</div><div class="fl" id="fw"><span class="pk">🇳🇱</span><span>🇹🇷</span><span>🇬🇧</span><span>🇸🇦</span><span>🇧🇬</span><span>🇵🇱</span></div><div class="lr"><div class="rn">Nederlands</div><div class="rd">Verstuur eenvoudig facturen</div></div><div class="lr"><div class="rn">Türkçe</div><div class="rd">Kolayca fatura gönderin</div></div><div class="lr"><div class="rn">English</div><div class="rd">Send invoices easily</div></div><div class="lr"><div class="rn">العربية</div><div class="rd">أرسل الفواتير بسهولة</div></div><div class="lr"><div class="rn">Български</div><div class="rd">Изпращайте фактури лесно</div></div><div class="lr"><div class="rn">Polski</div><div class="rd">Wysyłaj faktury łatwo</div></div></div>
+
+<div class="s s8" id="p8"><div class="ck">✓</div><h2>Factuur verzonden!</h2><p>Bouwbedrijf De Vries BV — €2.450,00</p></div>
+</div>
+
+<script>
+const dt=document.getElementById('dt'),lb=document.getElementById('lb'),lt=document.getElementById('lt'),hd=document.getElementById('hd'),hh=document.getElementById('hh'),hp=document.getElementById('hp'),ed=document.getElementById('ed');
+function pg(n){for(let i=0;i<9;i++)document.getElementById('p'+i).classList.toggle('on',i===n)}
+function d(x,y){dt.style.left=x+'px';dt.style.top=y+'px';dt.classList.add('on')}
+function nd(){dt.classList.remove('on')}
+function tp(){dt.classList.add('tap');setTimeout(()=>dt.classList.remove('tap'),200)}
+function l(x,y,h){lb.style.left=x+'px';lb.style.top=y+'px';lt.innerHTML=h;lb.classList.add('on')}
+function nl(){lb.classList.remove('on')}
+function h(a,b){hh.innerHTML=a;hp.textContent=b||'';hd.classList.add('on')}
+function nh(){hd.classList.remove('on')}
+function bd(s){ed.textContent=s;ed.classList.add('on')}
+function nb(){ed.classList.remove('on')}
+function pk(i){document.querySelectorAll('.fl span').forEach((f,j)=>f.classList.toggle('pk',j===i))}
+
+const A=[
+// Login
+[()=>{pg(0);nd();nl();h('Welkom bij <b>numr</b>','De snelste facturen app')},3000],
+[()=>{nh();d(150,365);l(165,350,'<b>E-mail</b> invullen')},1500],
+[()=>{tp();nl();document.getElementById('e1').textContent='test@numr.nl';document.getElementById('e1').classList.add('ok')},1000],
+[()=>{d(150,405);l(165,390,'<b>Wachtwoord</b>')},1000],
+[()=>{tp();nl();document.getElementById('e2').classList.add('ok')},800],
+[()=>{d(150,450);l(165,455,'Klik <b>Inloggen</b>')},1000],
+[()=>{tp();nl()},600],
+
+// Dashboard
+[()=>{pg(1);nd();h('Uw <b>dashboard</b>','3 opties')},2500],
+[()=>{nh();d(150,210);l(165,195,'📤 <b>Nieuw Factuur</b>')},1800],
+[()=>{tp();nl()},500],
+
+// New invoice - client choice
+[()=>{pg(2);nd();h('<b>Nieuw</b> factuur maken','')},2000],
+[()=>{nh();d(150,160);l(165,145,'<b>Bestaande klant</b> kiezen')},1500],
+// Click existing client
+[()=>{d(150,215);tp()},800],
+
+// Client list
+[()=>{pg(3);nd();h('Selecteer een <b>klant</b>','')},2000],
+[()=>{nh();d(150,130);l(165,115,'<b>Bouwbedrijf De Vries</b>')},1500],
+[()=>{tp();nl()},600],
+
+// BTW
+[()=>{pg(4);nd();h('<b>BTW</b> selectie','')},2000],
+[()=>{nh();d(150,140);l(165,125,'<b>21%</b> BTW')},1500],
+[()=>{tp();nl()},600],
+
+// Amount
+[()=>{pg(5);nd();h('Voer het <b>bedrag</b> in','')},2000],
+[()=>{nh();d(150,290);l(165,275,'Klik <b>Volgende</b>')},1500],
+[()=>{tp();nl()},600],
+
+// Send method
+[()=>{pg(6);nd();h('Hoe wilt u <b>verzenden</b>?','')},2000],
+[()=>{nh();d(150,195);l(165,180,'Via <b>E-mail</b> versturen')},1500],
+[()=>{tp();nl()},600],
+
+// Success
+[()=>{pg(8);nd();h('<b>Verzonden!</b>','In minder dan 30 seconden')},3000],
+
+// Languages
+[()=>{pg(7);nh();nd();h('<b>6 talen</b> beschikbaar','Schakel eenvoudig')},2500],
+[()=>{nh();d(113,128);l(10,90,'🇹🇷 <b>Türkçe</b>')},1200],
+[()=>{tp();pk(1);nl()},800],
+[()=>{d(143,128);l(10,90,'🇬🇧 <b>English</b>')},1000],
+[()=>{tp();pk(2);nl()},800],
+[()=>{d(173,128);l(10,90,'🇸🇦 <b>العربية</b>')},1000],
+[()=>{tp();pk(3);nl()},800],
+[()=>{d(83,128);l(10,90,'🇳🇱 <b>Nederlands</b>')},1000],
+[()=>{tp();pk(0);nl()},800],
+
+// NL rules
+[()=>{nd();h('Facturen altijd in <b>het Nederlands</b>','Conform Nederlandse wetgeving')},3000],
+
+// Final
+[()=>{nh();bd('numr — Download nu gratis')},3500],
+
+// Reset
+[()=>{nb();pg(0);document.getElementById('e1').textContent='info@bedrijf.nl';document.getElementById('e1').classList.remove('ok');document.getElementById('e2').classList.remove('ok');pk(0)},500],
+];
+
+let i=0;
+function run(){A[i][0]();setTimeout(()=>{i=(i+1)%A.length;run()},A[i][1])}
+run();
+</script>
+</body>
+</html>

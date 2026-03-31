@@ -34,6 +34,7 @@ async function main() {
   app.get('/', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
   app.get('/privacy', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'privacy.html')));
   app.get('/terms', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'terms.html')));
+  app.get('/video', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'video.html')));
 
   app.use('/api/auth', authRoutes);
   app.use('/api/clients', clientRoutes);

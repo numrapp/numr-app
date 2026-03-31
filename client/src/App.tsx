@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -12,6 +12,12 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AppStoreScreenshots from './pages/AppStoreScreenshots';
 import InvoiceEditPage from './pages/InvoiceEditPage';
+import StatusPage from './pages/StatusPage';
+import VideoPlayerPage from './pages/VideoPlayerPage';
+import VideoUploadPage from './pages/VideoUploadPage';
+import StatusMessagesPage from './pages/StatusMessagesPage';
+import StatusChatPage from './pages/StatusChatPage';
+import BottomBar from './components/layout/BottomBar';
 
 function P({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -20,7 +26,14 @@ function P({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots'];
+const FULL_SCREEN = ['/status/video'];
+
 export default function App() {
+  const location = useLocation();
+  const showBar = !NO_BAR.includes(location.pathname) && !FULL_SCREEN.some(p => location.pathname.startsWith(p));
+  const isStatusInternal = location.pathname.startsWith('/status/');
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-hidden flex flex-col">
@@ -37,10 +50,16 @@ export default function App() {
           <Route path="/settings" element={<P><SettingsPage /></P>} />
           <Route path="/received" element={<P><ReceivedInvoicesPage /></P>} />
           <Route path="/received/:id" element={<P><ReceivedInvoiceDetailPage /></P>} />
+          <Route path="/status" element={<P><StatusPage /></P>} />
+          <Route path="/status/video/:id" element={<P><VideoPlayerPage /></P>} />
+          <Route path="/status/upload" element={<P><VideoUploadPage /></P>} />
+          <Route path="/status/messages" element={<P><StatusMessagesPage /></P>} />
+          <Route path="/status/chat/:id" element={<P><StatusChatPage /></P>} />
           <Route path="/screenshots" element={<AppStoreScreenshots />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      {showBar && !isStatusInternal && <BottomBar />}
     </div>
   );
 }
