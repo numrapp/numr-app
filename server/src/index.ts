@@ -32,13 +32,15 @@ async function main() {
 
   const PUBLIC_DIR = path.join(__dirname, '../public');
   const CLIENT_DIR = path.join(__dirname, '../../client/dist');
+  const ALT_CLIENT_DIR = path.join(process.cwd(), 'client/dist');
+  const EFFECTIVE_CLIENT_DIR = fs.existsSync(path.join(CLIENT_DIR, 'index.html')) ? CLIENT_DIR : ALT_CLIENT_DIR;
 
   app.get('/privacy', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'privacy.html')));
   app.get('/terms', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'terms.html')));
   app.get('/video', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'video.html')));
   app.get('/site', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
 
-  app.use(express.static(CLIENT_DIR));
+  app.use(express.static(EFFECTIVE_CLIENT_DIR));
 
   app.use('/api/auth', authRoutes);
   app.use('/api/clients', clientRoutes);
@@ -58,7 +60,7 @@ async function main() {
   });
 
   app.get('*', (_req, res) => {
-    const clientIndex = path.join(CLIENT_DIR, 'index.html');
+    const clientIndex = path.join(EFFECTIVE_CLIENT_DIR, 'index.html');
     if (fs.existsSync(clientIndex)) {
       res.sendFile(clientIndex);
     } else {
