@@ -38,7 +38,7 @@ async function main() {
   app.get('/video', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'video.html')));
   app.get('/site', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
 
-  app.use('/assets', express.static(path.join(CLIENT_DIR, 'assets')));
+  app.use(express.static(CLIENT_DIR));
 
   app.use('/api/auth', authRoutes);
   app.use('/api/clients', clientRoutes);
