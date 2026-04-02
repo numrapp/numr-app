@@ -33,7 +33,9 @@ async function main() {
   const PUBLIC_DIR = path.join(__dirname, '../public');
   const CLIENT_DIR = path.join(__dirname, '../../client/dist');
   const ALT_CLIENT_DIR = path.join(process.cwd(), 'client/dist');
-  const EFFECTIVE_CLIENT_DIR = fs.existsSync(path.join(CLIENT_DIR, 'index.html')) ? CLIENT_DIR : ALT_CLIENT_DIR;
+  const ALT2_CLIENT_DIR = path.join(process.cwd(), '../client/dist');
+  const EFFECTIVE_CLIENT_DIR = [CLIENT_DIR, ALT_CLIENT_DIR, ALT2_CLIENT_DIR].find(d => fs.existsSync(path.join(d, 'index.html'))) || CLIENT_DIR;
+  console.log('Resolved CLIENT_DIR:', EFFECTIVE_CLIENT_DIR, 'exists:', fs.existsSync(path.join(EFFECTIVE_CLIENT_DIR, 'index.html')));
 
   app.get('/privacy', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'privacy.html')));
   app.get('/terms', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'terms.html')));
