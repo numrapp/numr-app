@@ -31,11 +31,10 @@ async function main() {
     app.use(express_1.default.json());
     app.use('/uploads', express_1.default.static(UPLOADS_DIR));
     const PUBLIC_DIR = path_1.default.join(__dirname, '../public');
-    const CLIENT_DIR = path_1.default.join(__dirname, '../../client/dist');
-    const ALT_CLIENT_DIR = path_1.default.join(process.cwd(), 'client/dist');
-    const ALT2_CLIENT_DIR = path_1.default.join(process.cwd(), '../client/dist');
-    const EFFECTIVE_CLIENT_DIR = [CLIENT_DIR, ALT_CLIENT_DIR, ALT2_CLIENT_DIR].find(d => fs_1.default.existsSync(path_1.default.join(d, 'index.html'))) || CLIENT_DIR;
-    console.log('Resolved CLIENT_DIR:', EFFECTIVE_CLIENT_DIR, 'exists:', fs_1.default.existsSync(path_1.default.join(EFFECTIVE_CLIENT_DIR, 'index.html')));
+    const BUNDLED_CLIENT_DIR = path_1.default.join(__dirname, '../client-dist');
+    const EXT_CLIENT_DIR = path_1.default.join(__dirname, '../../client/dist');
+    const EFFECTIVE_CLIENT_DIR = fs_1.default.existsSync(path_1.default.join(BUNDLED_CLIENT_DIR, 'index.html')) ? BUNDLED_CLIENT_DIR : EXT_CLIENT_DIR;
+    console.log('Client dir:', EFFECTIVE_CLIENT_DIR, 'exists:', fs_1.default.existsSync(path_1.default.join(EFFECTIVE_CLIENT_DIR, 'index.html')));
     app.get('/privacy', (_req, res) => res.sendFile(path_1.default.join(PUBLIC_DIR, 'privacy.html')));
     app.get('/terms', (_req, res) => res.sendFile(path_1.default.join(PUBLIC_DIR, 'terms.html')));
     app.get('/video', (_req, res) => res.sendFile(path_1.default.join(PUBLIC_DIR, 'video.html')));

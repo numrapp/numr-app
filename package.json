@@ -5,7 +5,7 @@
     "dev": "concurrently -n server,client -c blue,green \"cd server && npm run dev\" \"cd client && npm run dev\"",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
-    "build": "cd client && npm install && npm run build && cd ../server && npm install && npm run build",
+    "build": "cd client && npm install && npm run build && cd ../server && npm install && npm run build && cp -r ../client/dist ../server/client-dist",
     "start": "cd server && node dist/index.js",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install"
   },
