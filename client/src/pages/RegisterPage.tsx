@@ -39,10 +39,6 @@ export default function RegisterPage() {
     if (form.password.length < 6) { setError(t('register.wachtwoordMin')); return; }
     if (form.kvk_number.trim() && !/^\d{8}$/.test(form.kvk_number.trim())) { setError(t('register.kvkOngeldig')); return; }
     if (form.btw_number.trim() && form.btw_number.trim() !== 'NL' && !/^NL\d{9}B\d{2}$/.test(form.btw_number.trim())) { setError(t('register.btwOngeldig')); return; }
-    if (form.kvk_number.trim() && form.btw_number.trim() && form.btw_number.trim() !== 'NL') {
-      const btwDigits = form.btw_number.trim().slice(2, 10);
-      if (btwDigits !== form.kvk_number.trim()) { setError(t('register.kvkBtwNietOvereen')); return; }
-    }
     setError(''); setLoading(true);
     try {
       await register({

@@ -2,8 +2,12 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import TermsAgreementPage from './pages/TermsAgreementPage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import DashboardPage from './pages/DashboardPage';
 import InvoiceCreatePage from './pages/InvoiceCreatePage';
+import OfferteCreatePage from './pages/OfferteCreatePage';
 import InvoiceHistoryPage from './pages/InvoiceHistoryPage';
 import SettingsPage from './pages/SettingsPage';
 import ReceivedInvoicesPage from './pages/ReceivedInvoicesPage';
@@ -24,10 +28,19 @@ function P({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="h-full flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
   if (!user) return <Navigate to="/login" replace />;
+  if (!(user as any).terms_accepted) return <Navigate to="/terms-agreement" replace />;
+  if (!(user as any).subscription_type) return <Navigate to="/subscription" replace />;
   return <>{children}</>;
 }
 
-const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots'];
+function AuthOnly({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="h-full flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
+const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots', '/forgot-password', '/terms-agreement', '/subscription'];
 const FULL_SCREEN = ['/status/video'];
 
 export default function App() {
@@ -41,10 +54,14 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/terms-agreement" element={<AuthOnly><TermsAgreementPage /></AuthOnly>} />
+          <Route path="/subscription" element={<AuthOnly><SubscriptionPage /></AuthOnly>} />
           <Route path="/" element={<P><DashboardPage /></P>} />
           <Route path="/invoices/new" element={<P><InvoiceCreatePage docType="invoice" /></P>} />
+          <Route path="/offerte/new" element={<P><OfferteCreatePage /></P>} />
           <Route path="/credit/new" element={<P><InvoiceCreatePage docType="credit" /></P>} />
           <Route path="/invoices" element={<P><InvoiceHistoryPage /></P>} />
           <Route path="/invoices/edit/:id" element={<P><InvoiceEditPage /></P>} />

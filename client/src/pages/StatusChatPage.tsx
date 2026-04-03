@@ -99,7 +99,7 @@ export default function StatusChatPage() {
         )}
       </div>
 
-      <div className="flex-shrink-0 p-3 border-t border-gray-100 safe-bottom">
+      <div className="flex-shrink-0 px-3 pt-2 pb-1 border-t border-gray-100">
         <div className="flex items-center gap-2">
           <input type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSend()}

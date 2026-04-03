@@ -93,4 +93,12 @@ registerLocale('fr', {
   'status.toegangContacten':'Acces aux contacts','status.toegangContactenBeschrijving':'numr a besoin d\'acceder a vos contacts pour envoyer des messages.',
   'invoice.onizleme':'Apercu de la facture','invoice.bewerken':'Modifier',
   'status.profiel':'Profil','status.biografie':'Biographie','status.biografiePh':'Ecrivez quelque chose sur votre entreprise...','status.mijnVideos':'Mes videos','status.videoVerwijderen':'Supprimer','status.fotoUploaden':'Telecharger photo','register.kiesRol':'Choisissez votre role','register.ondernemer':'Je suis entrepreneur','register.geenOndernemer':'Je ne suis pas entrepreneur',
+  'dashboard.nieuwOfferte':'Nouveau Devis','dashboard.offerteAanmaken':'Creer un devis',
+  'offerte.title':'Nouveau Devis','offerte.onizleme':'Apercu du devis','offerte.verzonden':'Devis envoye!','offerte.confirmVersturen':'Voulez-vous envoyer ce devis?','offerte.nietVerstuurd':'Le devis n\'a pas ete envoye',
+  'forgot.link':'Mot de passe oublie?','forgot.title':'Mot de passe oublie','forgot.desc':'Entrez votre adresse e-mail. Nous vous enverrons un lien pour reinitialiser votre mot de passe.','forgot.send':'Envoyer','forgot.sent':'E-mail envoye','forgot.sentDesc':'Si votre adresse e-mail est enregistree, vous recevrez un e-mail avec des instructions.','forgot.backToLogin':'Retour a la connexion',
+  'login.faceId':'Se connecter avec Face ID',
+  'terms.title':'Conditions d\'utilisation','terms.agree':'J\'ai lu et j\'accepte les conditions d\'utilisation','terms.continue':'Continuer',
+  'sub.title':'Choisissez votre abonnement','sub.desc':'Un abonnement est requis pour utiliser numr','sub.monthly':'Mensuel','sub.monthlyDesc':'Resiliation flexible','sub.yearly':'Annuel','sub.yearlyFree':'2 mois gratuits!','sub.month':'mois','sub.year':'an','sub.popular':'Populaire','sub.required':'Un abonnement actif est requis pour creer et envoyer des factures.',
+  'settings.logoUpload':'Telecharger le logo','settings.logoDesc':'Votre logo apparait sur les factures',
+  'status.it':'IT','status.videoproductie':'Production Video','status.boekhouder':'Comptable',
 });

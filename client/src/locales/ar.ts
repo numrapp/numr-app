@@ -88,4 +88,12 @@ registerLocale('ar', {
   'status.toegangContacten':'الوصول للجهات','status.toegangContactenBeschrijving':'يحتاج numr للوصول إلى جهات الاتصال لإرسال الرسائل.',
   'invoice.onizleme':'معاينة الفاتورة','invoice.bewerken':'تعديل',
   'status.profiel':'الملف الشخصي','status.biografie':'السيرة الذاتية','status.biografiePh':'اكتب شيئا عن شركتك...','status.mijnVideos':'فيديوهاتي','status.videoVerwijderen':'حذف','status.fotoUploaden':'رفع صورة','register.kiesRol':'اختر دورك','register.ondernemer':'أنا رائد أعمال','register.geenOndernemer':'لست رائد أعمال',
+  'dashboard.nieuwOfferte':'عرض سعر جديد','dashboard.offerteAanmaken':'إنشاء عرض سعر',
+  'offerte.title':'عرض سعر جديد','offerte.onizleme':'معاينة العرض','offerte.verzonden':'تم إرسال العرض!','offerte.confirmVersturen':'هل تريد إرسال هذا العرض؟','offerte.nietVerstuurd':'لم يتم إرسال العرض',
+  'forgot.link':'نسيت كلمة المرور؟','forgot.title':'نسيت كلمة المرور','forgot.desc':'أدخل بريدك الإلكتروني. سنرسل لك رابطا لإعادة تعيين كلمة المرور.','forgot.send':'إرسال','forgot.sent':'تم إرسال البريد','forgot.sentDesc':'إذا كان بريدك الإلكتروني مسجلا، ستتلقى بريدا إلكترونيا بالتعليمات.','forgot.backToLogin':'العودة لتسجيل الدخول',
+  'login.faceId':'تسجيل الدخول بالوجه',
+  'terms.title':'شروط الاستخدام','terms.agree':'لقد قرأت ووافقت على شروط الاستخدام','terms.continue':'متابعة',
+  'sub.title':'اختر خطتك','sub.desc':'الاشتراك مطلوب لاستخدام numr','sub.monthly':'شهري','sub.monthlyDesc':'إلغاء مرن','sub.yearly':'سنوي','sub.yearlyFree':'شهران مجانا!','sub.month':'شهر','sub.year':'سنة','sub.popular':'الأكثر شعبية','sub.required':'الاشتراك النشط مطلوب لإنشاء وإرسال الفواتير.',
+  'settings.logoUpload':'رفع الشعار','settings.logoDesc':'يظهر شعارك على الفواتير',
+  'status.it':'تكنولوجيا المعلومات','status.videoproductie':'إنتاج الفيديو','status.boekhouder':'محاسب',
 });

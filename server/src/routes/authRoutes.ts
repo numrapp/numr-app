@@ -66,7 +66,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authMiddleware, (req: AuthRequest, res) => {
   try {
     const user = queryOne(
-      'SELECT id, email, company_name, company_address, company_postcode, company_city, kvk_number, btw_number, iban, phone, logo_path, smtp_host, smtp_port, smtp_user, smtp_pass, default_payment_days, invoice_prefix, next_invoice_number, deepl_api_key FROM users WHERE id = ?',
+      'SELECT id, email, company_name, company_address, company_postcode, company_city, kvk_number, btw_number, iban, phone, logo_path, smtp_host, smtp_port, smtp_user, smtp_pass, default_payment_days, invoice_prefix, next_invoice_number, deepl_api_key, terms_accepted, subscription_type, subscription_end FROM users WHERE id = ?',
       [req.userId!]
     );
 
@@ -76,6 +76,40 @@ router.get('/profile', authMiddleware, (req: AuthRequest, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
+});
+
+router.post('/accept-terms', authMiddleware, (req: AuthRequest, res) => {
+  try {
+    run('UPDATE users SET terms_accepted = 1 WHERE id = ?', [req.userId!]);
+    res.json({ success: true });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/subscribe', authMiddleware, (req: AuthRequest, res) => {
+  try {
+    const { type } = req.body;
+    const start = new Date().toISOString().split('T')[0];
+    const endDate = new Date();
+    if (type === 'yearly') endDate.setFullYear(endDate.getFullYear() + 1);
+    else endDate.setMonth(endDate.getMonth() + 1);
+    const end = endDate.toISOString().split('T')[0];
+    run('UPDATE users SET subscription_type = ?, subscription_start = ?, subscription_end = ? WHERE id = ?', [type, start, end, req.userId!]);
+    res.json({ success: true, subscription_type: type, subscription_end: end });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const user = queryOne('SELECT id FROM users WHERE email = ?', [email]);
+    if (user) {
+      const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      const expires = new Date(Date.now() + 3600000).toISOString();
+      run('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [token, expires, user.id]);
+    }
+    res.json({ success: true });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 router.put('/profile', authMiddleware, (req: AuthRequest, res) => {

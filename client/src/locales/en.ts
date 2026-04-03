@@ -93,4 +93,12 @@ registerLocale('en', {
   'status.toegangContacten':'Access contacts','status.toegangContactenBeschrijving':'numr needs access to your contacts to send messages.',
   'invoice.onizleme':'Invoice preview','invoice.bewerken':'Edit',
   'status.profiel':'Profile','status.biografie':'Biography','status.biografiePh':'Write something about your company...','status.mijnVideos':'My videos','status.videoVerwijderen':'Delete','status.fotoUploaden':'Upload photo','register.kiesRol':'Choose your role','register.ondernemer':'I am an entrepreneur','register.geenOndernemer':'I am not an entrepreneur',
+  'dashboard.nieuwOfferte':'New Quote','dashboard.offerteAanmaken':'Create quote',
+  'offerte.title':'New Quote','offerte.onizleme':'Quote preview','offerte.verzonden':'Quote sent!','offerte.confirmVersturen':'Do you want to send this quote?','offerte.nietVerstuurd':'Quote was not sent',
+  'forgot.link':'Forgot password?','forgot.title':'Forgot Password','forgot.desc':'Enter your email address. We will send you a link to reset your password.','forgot.send':'Send','forgot.sent':'Email sent','forgot.sentDesc':'If your email address is registered, you will receive an email with instructions.','forgot.backToLogin':'Back to login',
+  'login.faceId':'Sign in with Face ID',
+  'terms.title':'Terms of Use','terms.agree':'I have read and agree to the terms of use','terms.continue':'Continue',
+  'sub.title':'Choose your plan','sub.desc':'A subscription is required to use numr','sub.monthly':'Monthly','sub.monthlyDesc':'Cancel anytime','sub.yearly':'Yearly','sub.yearlyFree':'2 months free!','sub.month':'month','sub.year':'year','sub.popular':'Popular','sub.required':'An active subscription is required to create and send invoices.',
+  'settings.logoUpload':'Upload logo','settings.logoDesc':'Your logo appears on invoices',
+  'status.it':'IT','status.videoproductie':'Video Production','status.boekhouder':'Accountant',
 });

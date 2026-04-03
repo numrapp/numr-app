@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, Inbox } from 'lucide-react';
+import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, Inbox, FileText } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import LanguageSelector from '../components/LanguageSelector';
@@ -26,19 +26,30 @@ export default function DashboardPage() {
         <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-lg font-bold text-dark mb-10">{t('dashboard.hello')} {firstName}</motion.p>
 
         <div className="w-full max-w-sm space-y-4">
-          <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}}
-            onClick={() => navigate('/invoices/new')}
-            className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
-            style={{ background: 'linear-gradient(135deg, #DFFF00 0%, #B8D900 100%)', boxShadow: '0 8px 32px rgba(223,255,0,0.3)' }}>
-            <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <Send size={28} className="text-dark" strokeWidth={2.2} />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-lg font-extrabold text-dark">{t('dashboard.nieuwFactuur')}</p>
-              <p className="text-sm text-dark/60 font-medium">{t('dashboard.factuurAanmaken')}</p>
-            </div>
-            <ChevronRight size={22} className="text-dark/40" />
-          </motion.button>
+          <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}} className="grid grid-cols-2 gap-3">
+            <button onClick={() => navigate('/offerte/new')}
+              className="flex flex-col items-center gap-3 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
+              style={{ background: 'linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%)', boxShadow: '0 8px 32px rgba(59,130,246,0.2)' }}>
+              <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center">
+                <FileText size={26} className="text-blue-700" strokeWidth={2.2} />
+              </div>
+              <div className="text-center">
+                <p className="text-base font-extrabold text-dark">{t('dashboard.nieuwOfferte')}</p>
+                <p className="text-[11px] text-blue-700/60 font-medium mt-0.5">{t('dashboard.offerteAanmaken')}</p>
+              </div>
+            </button>
+            <button onClick={() => navigate('/invoices/new')}
+              className="flex flex-col items-center gap-3 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
+              style={{ background: 'linear-gradient(135deg, #DFFF00 0%, #B8D900 100%)', boxShadow: '0 8px 32px rgba(223,255,0,0.3)' }}>
+              <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center">
+                <Send size={26} className="text-dark" strokeWidth={2.2} />
+              </div>
+              <div className="text-center">
+                <p className="text-base font-extrabold text-dark">{t('dashboard.nieuwFactuur')}</p>
+                <p className="text-[11px] text-dark/60 font-medium mt-0.5">{t('dashboard.factuurAanmaken')}</p>
+              </div>
+            </button>
+          </motion.div>
 
           <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.2}}
             onClick={() => navigate('/credit/new')}

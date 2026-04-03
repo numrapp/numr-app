@@ -93,4 +93,12 @@ registerLocale('es', {
   'status.toegangContacten':'Acceso a contactos','status.toegangContactenBeschrijving':'numr necesita acceso a sus contactos para enviar mensajes.',
   'invoice.onizleme':'Vista previa','invoice.bewerken':'Editar',
   'status.profiel':'Perfil','status.biografie':'Biografia','status.biografiePh':'Escribe algo sobre tu empresa...','status.mijnVideos':'Mis videos','status.videoVerwijderen':'Eliminar','status.fotoUploaden':'Subir foto','register.kiesRol':'Elige tu rol','register.ondernemer':'Soy emprendedor','register.geenOndernemer':'No soy emprendedor',
+  'dashboard.nieuwOfferte':'Nuevo Presupuesto','dashboard.offerteAanmaken':'Crear presupuesto',
+  'offerte.title':'Nuevo Presupuesto','offerte.onizleme':'Vista previa del presupuesto','offerte.verzonden':'Presupuesto enviado!','offerte.confirmVersturen':'Desea enviar este presupuesto?','offerte.nietVerstuurd':'El presupuesto no fue enviado',
+  'forgot.link':'Olvide mi contrasena','forgot.title':'Olvide mi contrasena','forgot.desc':'Ingrese su correo electronico. Le enviaremos un enlace para restablecer su contrasena.','forgot.send':'Enviar','forgot.sent':'Correo enviado','forgot.sentDesc':'Si su correo esta registrado, recibira un correo con instrucciones.','forgot.backToLogin':'Volver al inicio de sesion',
+  'login.faceId':'Iniciar sesion con Face ID',
+  'terms.title':'Terminos de uso','terms.agree':'He leido y acepto los terminos de uso','terms.continue':'Continuar',
+  'sub.title':'Elija su plan','sub.desc':'Se requiere una suscripcion para usar numr','sub.monthly':'Mensual','sub.monthlyDesc':'Cancelacion flexible','sub.yearly':'Anual','sub.yearlyFree':'2 meses gratis!','sub.month':'mes','sub.year':'ano','sub.popular':'Popular','sub.required':'Se requiere una suscripcion activa para crear y enviar facturas.',
+  'settings.logoUpload':'Subir logo','settings.logoDesc':'Su logo aparece en las facturas',
+  'status.it':'IT','status.videoproductie':'Produccion de Video','status.boekhouder':'Contador',
 });

@@ -21,10 +21,10 @@ export default function StatusPage() {
         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Status</span>
       </div>
 
-      <div className="px-5 mb-2 flex gap-2 overflow-x-auto no-scrollbar flex-shrink-0">
+      <div className="px-5 mb-2 flex gap-3 overflow-x-auto no-scrollbar flex-shrink-0">
         {CATEGORIES.map(c => (
           <button key={c.key} onClick={() => setFilter(c.key)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filter === c.key ? 'bg-dark text-white' : 'bg-gray-100 text-gray-500'}`}>
+            className={`px-4 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${filter === c.key ? 'bg-dark text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}>
             {t(c.label)}
           </button>
         ))}

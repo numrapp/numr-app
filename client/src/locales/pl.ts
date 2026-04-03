@@ -88,4 +88,12 @@ registerLocale('pl', {
   'status.toegangContacten':'Dostep do kontaktow','status.toegangContactenBeschrijving':'numr potrzebuje dostepu do kontaktow aby wysylac wiadomosci.',
   'invoice.onizleme':'Podglad faktury','invoice.bewerken':'Edytuj',
   'status.profiel':'Profil','status.biografie':'Biografia','status.biografiePh':'Napisz cos o swojej firmie...','status.mijnVideos':'Moje filmy','status.videoVerwijderen':'Usun','status.fotoUploaden':'Dodaj zdjecie','register.kiesRol':'Wybierz role','register.ondernemer':'Jestem przedsiebiorca','register.geenOndernemer':'Nie jestem przedsiebiorca',
+  'dashboard.nieuwOfferte':'Nowa Oferta','dashboard.offerteAanmaken':'Utworz oferte',
+  'offerte.title':'Nowa Oferta','offerte.onizleme':'Podglad oferty','offerte.verzonden':'Oferta wyslana!','offerte.confirmVersturen':'Czy chcesz wyslac te oferte?','offerte.nietVerstuurd':'Oferta nie zostala wyslana',
+  'forgot.link':'Nie pamietam hasla','forgot.title':'Zapomnialem hasla','forgot.desc':'Wpisz swoj adres e-mail. Wyslimy Ci link do zresetowania hasla.','forgot.send':'Wyslij','forgot.sent':'E-mail wyslany','forgot.sentDesc':'Jesli Twoj adres e-mail jest zarejestrowany, otrzymasz wiadomosc z instrukcjami.','forgot.backToLogin':'Powrot do logowania',
+  'login.faceId':'Zaloguj sie za pomoca Face ID',
+  'terms.title':'Regulamin','terms.agree':'Przeczytalam/em i akceptuje regulamin','terms.continue':'Dalej',
+  'sub.title':'Wybierz plan','sub.desc':'Subskrypcja jest wymagana do korzystania z numr','sub.monthly':'Miesieczny','sub.monthlyDesc':'Elastyczne anulowanie','sub.yearly':'Roczny','sub.yearlyFree':'2 miesiace gratis!','sub.month':'miesiac','sub.year':'rok','sub.popular':'Popularny','sub.required':'Aktywna subskrypcja jest wymagana do tworzenia i wysylania faktur.',
+  'settings.logoUpload':'Dodaj logo','settings.logoDesc':'Twoje logo pojawi sie na fakturach',
+  'status.it':'IT','status.videoproductie':'Produkcja Wideo','status.boekhouder':'Ksiegowy',
 });

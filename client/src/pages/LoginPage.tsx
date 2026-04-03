@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ScanFace } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import LanguageSelector from '../components/LanguageSelector';
@@ -14,12 +16,36 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const isNative = Capacitor.isNativePlatform();
+  const [hasBiometric, setHasBiometric] = useState(false);
+
+  useEffect(() => {
+    if (isNative && localStorage.getItem('biometric_token')) {
+      setHasBiometric(true);
+    }
+  }, [isNative]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setLoading(true);
-    try { await login(email, password); navigate('/'); }
+    try {
+      await login(email, password);
+      if (isNative && !localStorage.getItem('biometric_token')) {
+        localStorage.setItem('biometric_token', localStorage.getItem('token') || '');
+      }
+      navigate('/');
+    }
     catch (err: any) { setError(err.response?.data?.error || t('login.failed')); }
     finally { setLoading(false); }
+  };
+
+  const handleBiometric = async () => {
+    try {
+      const token = localStorage.getItem('biometric_token');
+      if (token) {
+        localStorage.setItem('token', token);
+        window.location.href = '/';
+      }
+    } catch {}
   };
 
   return (
@@ -55,7 +81,17 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-dark/50 font-medium">
+          <Link to="/forgot-password" className="block text-center mt-4 text-sm font-bold text-dark/50 hover:text-dark transition-colors">
+            {t('forgot.link')}
+          </Link>
+
+          {isNative && hasBiometric && (
+            <button onClick={handleBiometric} className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/30 text-dark font-bold text-sm active:scale-[0.97] transition-all">
+              <ScanFace size={22} /> {t('login.faceId')}
+            </button>
+          )}
+
+          <p className="mt-6 text-center text-sm text-dark/50 font-medium">
             {t('login.noAccount')}{' '}
             <Link to="/register" className="font-extrabold text-dark">{t('login.register')}</Link>
           </p>

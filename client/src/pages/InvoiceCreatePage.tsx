@@ -119,13 +119,11 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
   };
 
   const saveNewClient = async () => {
-    if (!newClient.company_name.trim() || !newClient.kvk_number.trim() || !newClient.btw_number.trim() || !newClient.email.trim() || !newClient.address.trim()) {
+    if (!newClient.company_name.trim() || !newClient.email.trim()) {
       setClientError(t('register.alleVeldenVerplicht')); return;
     }
-    if (!/^\d{8}$/.test(newClient.kvk_number.trim())) { setClientError(t('register.kvkOngeldig')); return; }
-    if (!/^NL\d{9}B\d{2}$/.test(newClient.btw_number.trim())) { setClientError(t('register.btwOngeldig')); return; }
-    const btwDigits = newClient.btw_number.trim().slice(2, 10);
-    if (btwDigits !== newClient.kvk_number.trim()) { setClientError(t('register.kvkBtwNietOvereen')); return; }
+    if (newClient.kvk_number.trim() && !/^\d{8}$/.test(newClient.kvk_number.trim())) { setClientError(t('register.kvkOngeldig')); return; }
+    if (newClient.btw_number.trim() && newClient.btw_number.trim() !== 'NL' && !/^NL\d{9}B\d{2}$/.test(newClient.btw_number.trim())) { setClientError(t('register.btwOngeldig')); return; }
     setSaving(true); setClientError('');
     try {
       const c = await clientService.create({ company_name:newClient.company_name, kvk_number:newClient.kvk_number, email:newClient.email, btw_number:newClient.btw_number, address:newClient.address });
@@ -322,7 +320,7 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                         className="flex-1 text-sm font-medium bg-transparent border-none outline-none placeholder-gray-300" placeholder="bijv. 02-03-2026 Amsterdam" />
                       {parsedItems.length > 1 && <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>}
                     </div>
-                    <div className="grid grid-cols-3 gap-0 border-t border-gray-50">
+                    <div className="grid grid-cols-[2fr_2fr_1.5fr] gap-0 border-t border-gray-50">
                       <div className="p-3.5 border-r border-gray-50">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.aantalLabel')}</span>
                         <div className="flex items-center gap-1">
@@ -330,22 +328,21 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                             onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }}
                             onFocus={e => e.target.select()}
                             className="w-full text-base font-bold bg-transparent border-none outline-none placeholder-gray-300" placeholder="0" />
-                          <span className="text-[9px] text-gray-400 font-medium whitespace-nowrap">{t('invoice.aantalPlaceholder')}</span>
                         </div>
                       </div>
-                      <div className="p-2.5 border-r border-gray-50">
+                      <div className="p-3.5 border-r border-gray-50">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.bedrag')}</span>
                         <div className="flex items-center gap-0.5">
-                          <span className="text-xs font-bold text-gray-300 notranslate">€</span>
+                          <span className="text-sm font-bold text-gray-300 notranslate">€</span>
                           <input type="text" inputMode="decimal" value={item.unit_price === 0 ? '' : item.unit_price}
                             onChange={e => { const n=[...parsedItems]; n[i]={...n[i],unit_price:parseFloat(e.target.value.replace(',','.'))||0}; setParsedItems(n); }}
                             onFocus={e => e.target.select()}
-                            className="w-full text-sm font-bold bg-transparent border-none outline-none placeholder-gray-300 notranslate" placeholder="0,00" />
+                            className="w-full text-base font-bold bg-transparent border-none outline-none placeholder-gray-300 notranslate" placeholder="0,00" />
                         </div>
                       </div>
-                      <div className="p-2.5">
+                      <div className="p-3.5">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">Totaal</span>
-                        <p className="text-sm font-extrabold text-dark notranslate">{formatCurrency((item.quantity || 0) * (item.unit_price || 0) * (1 + rate / 100))}</p>
+                        <p className="text-base font-extrabold text-dark notranslate">{formatCurrency((item.quantity || 0) * (item.unit_price || 0) * (1 + rate / 100))}</p>
                       </div>
                     </div>
                   </div>

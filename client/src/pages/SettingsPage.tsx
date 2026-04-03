@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, LogOut, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Save, LogOut, Eye, EyeOff, Camera } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import { authService } from '../services/authService';
 import { User } from '../types';
 import LanguageSelector from '../components/LanguageSelector';
 import FooterBanner from '../components/layout/FooterBanner';
+import api from '../services/api';
 
 export default function SettingsPage() {
   const { t } = useI18n();
@@ -16,11 +17,24 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (user) setForm({...user}); }, [user]);
   const set = (f:string) => (e:React.ChangeEvent<HTMLInputElement>) => setForm(p=>({...p,[f]:e.target.value}));
 
   const handleSave = async () => { setSaving(true);setMessage('');try{await authService.updateProfile(form);await refreshUser();setMessage(t('settings.opgeslagen'));setTimeout(()=>setMessage(''),3000);}catch{setMessage('Error');}finally{setSaving(false);} };
+
+  const handleLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('logo', file);
+    try {
+      const res = await api.post('/upload-logo', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(p => ({ ...p, logo_path: res.data.logo_path }));
+      await refreshUser();
+    } catch {}
+  };
 
   return (
     <div className="h-full flex flex-col safe-top">
@@ -32,6 +46,27 @@ export default function SettingsPage() {
       <div className="page-scroll">
         <div className="px-6 space-y-4 max-w-md mx-auto pb-6">
           {message && <div className="p-3 bg-success/10 rounded-2xl text-success text-sm font-bold">{message}</div>}
+
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200">
+                {form.logo_path ? (
+                  <img src={form.logo_path} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-black text-gray-300">{(form.company_name || 'N')[0]}</span>
+                )}
+              </div>
+              <button onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-brand flex items-center justify-center shadow-md">
+                <Camera size={14} className="text-dark" />
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" onChange={handleLogo} className="hidden" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-dark">{t('settings.logoUpload')}</p>
+              <p className="text-xs text-gray-400">{t('settings.logoDesc')}</p>
+            </div>
+          </div>
+
           <div><label className="label-send">{t('settings.bedrijfsnaam')}</label><input type="text" value={form.company_name||''} onChange={set('company_name')} className="input-send" /></div>
           <div><label className="label-send">{t('settings.adres')}</label><input type="text" value={form.company_address||''} onChange={set('company_address')} className="input-send" /></div>
           <div className="grid grid-cols-5 gap-3">

@@ -6,18 +6,18 @@ interface Props {
   supplierKvk: string; supplierBtw: string; supplierIban: string; supplierPhone: string;
   supplierLogo?: string;
   customerName: string; customerAddress: string; customerPostcode: string; customerCity: string; customerCountry: string;
-  invoiceNumber: string; invoiceDate: string; dueDate: string; deliveryDate: string;
-  paymentDays: number; description: string; items: InvoiceItem[]; subtotal: number; btwAmount: number; total: number;
+  offerteNumber: string; offerteDate: string; validUntil: string;
+  description: string; items: InvoiceItem[]; subtotal: number; btwAmount: number; total: number;
 }
 
-export default function InvoicePreview(props: Props) {
+export default function OffertePreview(props: Props) {
   return (
     <div className="notranslate bg-white rounded-xl shadow-md border border-gray-200 text-[11px] leading-relaxed" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
       <div className="px-5 pt-5 pb-3 flex justify-between items-start">
         {props.supplierLogo ? (
           <img src={props.supplierLogo} alt="" className="h-10 object-contain" />
         ) : (
-          <span className="text-lg font-bold text-blue-800 tracking-wide">FACTUUR</span>
+          <span className="text-lg font-bold text-blue-800 tracking-wide">OFFERTE</span>
         )}
         <div className="text-right text-[10px] text-gray-700">
           <p className="font-semibold">{props.supplierName}</p>
@@ -33,17 +33,16 @@ export default function InvoicePreview(props: Props) {
 
       <div className="px-5 py-3 flex justify-between">
         <div className="text-[10px]">
-          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Factuur aan</p>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Offerte aan</p>
           <p className="font-medium text-gray-900">{props.customerName || '-'}</p>
           <p>{props.customerAddress}</p>
           <p>{props.customerPostcode} {props.customerCity}</p>
           {props.customerCountry && props.customerCountry !== 'Nederland' && <p>{props.customerCountry}</p>}
         </div>
         <div className="text-[10px] text-right space-y-0.5">
-          <Row label="Factuurnummer" value={props.invoiceNumber || 'FAC20XX001'} />
-          <Row label="Factuurdatum" value={props.invoiceDate ? formatDate(props.invoiceDate) : '-'} />
-          <Row label="Vervaldatum" value={props.dueDate ? formatDate(props.dueDate) : '-'} />
-          <Row label="Leveringsdatum" value={props.deliveryDate ? formatDate(props.deliveryDate) : '-'} />
+          <Row label="Offertenummer" value={props.offerteNumber || 'OFF001'} />
+          <Row label="Offertedatum" value={props.offerteDate ? formatDate(props.offerteDate) : '-'} />
+          <Row label="Geldig tot" value={props.validUntil ? formatDate(props.validUntil) : '-'} />
         </div>
       </div>
 
@@ -89,14 +88,6 @@ export default function InvoicePreview(props: Props) {
           <div className="flex justify-between text-gray-500"><span>BTW:</span><span className="text-gray-900">{formatCurrency(props.btwAmount)}</span></div>
           <div className="flex justify-between font-bold text-blue-800 text-[11px] border-t border-gray-300 pt-1 mt-1"><span>Totaal:</span><span>{formatCurrency(props.total)}</span></div>
         </div>
-      </div>
-
-      <div className="border-t border-gray-200 mx-5" />
-
-      <div className="px-5 py-2 text-[9px]">
-        <p className="font-bold text-blue-800 mb-0.5">Betaalgegevens</p>
-        <p className="text-gray-700">IBAN: {props.supplierIban} &nbsp; t.n.v. {props.supplierName}</p>
-        <p className="text-gray-700">Betalingstermijn: {props.paymentDays} dagen</p>
       </div>
 
       <div className="bg-gray-50 rounded-b-xl px-5 py-1.5 text-[8px] text-gray-400 text-center border-t border-gray-100">

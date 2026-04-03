@@ -38,6 +38,12 @@ export async function initDatabase(): Promise<Database> {
       invoice_prefix TEXT DEFAULT 'FAC',
       next_invoice_number INTEGER DEFAULT 1,
       deepl_api_key TEXT DEFAULT '',
+      terms_accepted INTEGER DEFAULT 0,
+      subscription_type TEXT DEFAULT '',
+      subscription_start TEXT DEFAULT '',
+      subscription_end TEXT DEFAULT '',
+      reset_token TEXT DEFAULT '',
+      reset_token_expires TEXT DEFAULT '',
       created_at TEXT DEFAULT (datetime('now'))
     )
   `);
@@ -96,6 +102,13 @@ export async function initDatabase(): Promise<Database> {
       FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
     )
   `);
+
+  save();
+
+  const cols = ['terms_accepted', 'subscription_type', 'subscription_start', 'subscription_end', 'reset_token', 'reset_token_expires'];
+  for (const col of cols) {
+    try { db.run(`ALTER TABLE users ADD COLUMN ${col} TEXT DEFAULT ''`); } catch {}
+  }
 
   save();
   return db;
