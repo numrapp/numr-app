@@ -44,38 +44,37 @@ const langs8 = [
 function ScreenLangs({ size }: { size: 'phone' | 'ipad' }) {
   const isIpad = size === 'ipad';
   const w = isIpad ? 682 : 414;
-  const h = isIpad ? 910 : 896;
-  const fs = isIpad ? 1.4 : 1;
+  const h = isIpad ? 1024 : 896;
   return (
     <div style={{
       width: w, height: h, borderRadius: 20, overflow: 'hidden', flexShrink: 0,
       background: 'linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${isIpad ? 60 : 50}px ${isIpad ? 50 : 30}px 30px`,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${isIpad ? 40 : 36}px ${isIpad ? 40 : 24}px ${isIpad ? 30 : 20}px`,
     }}>
-      <h2 style={{ fontSize: 28 * fs, fontWeight: 900, color: '#1A1A1A', textAlign: 'center', lineHeight: 1.2, marginBottom: 6 }}>
+      <h2 style={{ fontSize: isIpad ? 34 : 24, fontWeight: 900, color: '#1A1A1A', textAlign: 'center', lineHeight: 1.2, marginBottom: 4 }}>
         De slimste manier om<br/>facturen te versturen
       </h2>
-      <p style={{ fontSize: 13 * fs, color: '#64748B', fontWeight: 600, marginBottom: isIpad ? 40 : 24 }}>8 talen beschikbaar</p>
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: isIpad ? 12 : 8 }}>
+      <p style={{ fontSize: isIpad ? 16 : 12, color: '#64748B', fontWeight: 600, marginBottom: isIpad ? 20 : 14 }}>8 talen beschikbaar</p>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: isIpad ? 8 : 6, flex: 1 }}>
         {langs8.map((item, i) => (
           <div key={i} style={{
-            display: 'flex', alignItems: 'center', gap: 14, padding: `${isIpad ? 16 : 12}px 16px`, borderRadius: 20,
+            display: 'flex', alignItems: 'center', gap: isIpad ? 14 : 10, padding: `${isIpad ? 12 : 9}px ${isIpad ? 16 : 12}px`, borderRadius: isIpad ? 18 : 14,
             background: '#FFFFFF', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)',
           }}>
-            <div style={{ width: isIpad ? 48 : 40, height: isIpad ? 48 : 40, borderRadius: 12, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isIpad ? 26 : 22, flexShrink: 0 }}>{item.flag}</div>
+            <div style={{ width: isIpad ? 42 : 34, height: isIpad ? 42 : 34, borderRadius: 10, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isIpad ? 22 : 18, flexShrink: 0 }}>{item.flag}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: (isIpad ? 15 : 13) * 1, fontWeight: 800, color: '#1A1A1A' }}>{item.lang}</p>
-              <p style={{ fontSize: (isIpad ? 11 : 9) * 1, fontWeight: 500, color: '#94A3B8', marginTop: 2 }}>{item.text}</p>
+              <p style={{ fontSize: isIpad ? 14 : 12, fontWeight: 800, color: '#1A1A1A' }}>{item.lang}</p>
+              <p style={{ fontSize: isIpad ? 10 : 8, fontWeight: 500, color: '#94A3B8', marginTop: 1 }}>{item.text}</p>
             </div>
             <div style={{ width: 8, height: 8, borderRadius: 4, background: item.color, flexShrink: 0 }} />
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 'auto', paddingTop: 16, textAlign: 'center' }}>
-        <div style={{ display: 'inline-block', background: '#DFFF00', borderRadius: 14, padding: '12px 36px', boxShadow: '0 6px 24px rgba(223,255,0,0.25)', marginBottom: 8 }}>
-          <span style={{ fontSize: 14, fontWeight: 900, color: '#1A1A1A' }}>Kies uw taal en begin</span>
+      <div style={{ paddingTop: isIpad ? 16 : 10, textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#DFFF00', borderRadius: 12, padding: `${isIpad ? 12 : 10}px ${isIpad ? 36 : 28}px`, boxShadow: '0 6px 24px rgba(223,255,0,0.25)' }}>
+          <span style={{ fontSize: isIpad ? 14 : 12, fontWeight: 900, color: '#1A1A1A', lineHeight: 1 }}>Kies uw taal en begin</span>
         </div>
-        <p style={{ fontSize: 24, fontWeight: 900, color: '#1A1A1A', opacity: 0.15 }}>numr</p>
+        <p style={{ fontSize: isIpad ? 20 : 16, fontWeight: 900, color: '#1A1A1A', opacity: 0.15, marginTop: 8 }}>numr</p>
       </div>
     </div>
   );
