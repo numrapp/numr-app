@@ -93,7 +93,7 @@ registerLocale('fr', {
   'status.toegangContacten':'Acces aux contacts','status.toegangContactenBeschrijving':'numr a besoin d\'acceder a vos contacts pour envoyer des messages.',
   'invoice.onizleme':'Apercu de la facture','invoice.bewerken':'Modifier',
   'status.profiel':'Profil','status.biografie':'Biographie','status.biografiePh':'Ecrivez quelque chose sur votre entreprise...','status.mijnVideos':'Mes videos','status.videoVerwijderen':'Supprimer','status.fotoUploaden':'Telecharger photo','register.kiesRol':'Choisissez votre role','register.ondernemer':'Je suis entrepreneur','register.geenOndernemer':'Je ne suis pas entrepreneur',
-  'dashboard.nieuwOfferte':'Nieuwe Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
+  'dashboard.nieuwOfferte':'Nouveau Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
   'offerte.title':'Nouveau Devis','offerte.onizleme':'Apercu du devis','offerte.verzonden':'Devis envoye!','offerte.confirmVersturen':'Voulez-vous envoyer ce devis?','offerte.nietVerstuurd':'Le devis n\'a pas ete envoye',
   'forgot.link':'Mot de passe oublie?','forgot.title':'Mot de passe oublie','forgot.desc':'Entrez votre adresse e-mail. Nous vous enverrons un lien pour reinitialiser votre mot de passe.','forgot.send':'Envoyer','forgot.sent':'E-mail envoye','forgot.sentDesc':'Si votre adresse e-mail est enregistree, vous recevrez un e-mail avec des instructions.','forgot.backToLogin':'Retour a la connexion',
   'login.faceId':'Se connecter avec Face ID',

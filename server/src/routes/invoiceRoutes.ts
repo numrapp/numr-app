@@ -194,12 +194,6 @@ router.get('/:id/pdf', async (req: AuthRequest, res) => {
     const invoice = queryOne('SELECT * FROM invoices WHERE id = ? AND user_id = ?', [Number(req.params.id), req.userId!]);
     if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
 
-    if (invoice.pdf_path && fs.existsSync(invoice.pdf_path)) {
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${invoice.invoice_number}.pdf"`);
-      return res.send(fs.readFileSync(invoice.pdf_path));
-    }
-
     const user = queryOne('SELECT * FROM users WHERE id = ?', [req.userId!]);
     const client = queryOne('SELECT * FROM clients WHERE id = ?', [invoice.client_id]);
     const items = queryAll('SELECT * FROM invoice_items WHERE invoice_id = ?', [invoice.id]);

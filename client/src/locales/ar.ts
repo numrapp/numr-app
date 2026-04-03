@@ -88,7 +88,7 @@ registerLocale('ar', {
   'status.toegangContacten':'الوصول للجهات','status.toegangContactenBeschrijving':'يحتاج numr للوصول إلى جهات الاتصال لإرسال الرسائل.',
   'invoice.onizleme':'معاينة الفاتورة','invoice.bewerken':'تعديل',
   'status.profiel':'الملف الشخصي','status.biografie':'السيرة الذاتية','status.biografiePh':'اكتب شيئا عن شركتك...','status.mijnVideos':'فيديوهاتي','status.videoVerwijderen':'حذف','status.fotoUploaden':'رفع صورة','register.kiesRol':'اختر دورك','register.ondernemer':'أنا رائد أعمال','register.geenOndernemer':'لست رائد أعمال',
-  'dashboard.nieuwOfferte':'Nieuwe Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
+  'dashboard.nieuwOfferte':'Offerte جديد','dashboard.offerteAanmaken':'Offerte aanmaken',
   'offerte.title':'عرض سعر جديد','offerte.onizleme':'معاينة العرض','offerte.verzonden':'تم إرسال العرض!','offerte.confirmVersturen':'هل تريد إرسال هذا العرض؟','offerte.nietVerstuurd':'لم يتم إرسال العرض',
   'forgot.link':'نسيت كلمة المرور؟','forgot.title':'نسيت كلمة المرور','forgot.desc':'أدخل بريدك الإلكتروني. سنرسل لك رابطا لإعادة تعيين كلمة المرور.','forgot.send':'إرسال','forgot.sent':'تم إرسال البريد','forgot.sentDesc':'إذا كان بريدك الإلكتروني مسجلا، ستتلقى بريدا إلكترونيا بالتعليمات.','forgot.backToLogin':'العودة لتسجيل الدخول',
   'login.faceId':'تسجيل الدخول بالوجه',

@@ -93,7 +93,7 @@ registerLocale('es', {
   'status.toegangContacten':'Acceso a contactos','status.toegangContactenBeschrijving':'numr necesita acceso a sus contactos para enviar mensajes.',
   'invoice.onizleme':'Vista previa','invoice.bewerken':'Editar',
   'status.profiel':'Perfil','status.biografie':'Biografia','status.biografiePh':'Escribe algo sobre tu empresa...','status.mijnVideos':'Mis videos','status.videoVerwijderen':'Eliminar','status.fotoUploaden':'Subir foto','register.kiesRol':'Elige tu rol','register.ondernemer':'Soy emprendedor','register.geenOndernemer':'No soy emprendedor',
-  'dashboard.nieuwOfferte':'Nieuwe Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
+  'dashboard.nieuwOfferte':'Nuevo Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
   'offerte.title':'Nuevo Presupuesto','offerte.onizleme':'Vista previa del presupuesto','offerte.verzonden':'Presupuesto enviado!','offerte.confirmVersturen':'Desea enviar este presupuesto?','offerte.nietVerstuurd':'El presupuesto no fue enviado',
   'forgot.link':'Olvide mi contrasena','forgot.title':'Olvide mi contrasena','forgot.desc':'Ingrese su correo electronico. Le enviaremos un enlace para restablecer su contrasena.','forgot.send':'Enviar','forgot.sent':'Correo enviado','forgot.sentDesc':'Si su correo esta registrado, recibira un correo con instrucciones.','forgot.backToLogin':'Volver al inicio de sesion',
   'login.faceId':'Iniciar sesion con Face ID',

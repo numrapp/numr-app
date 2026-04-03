@@ -88,7 +88,7 @@ registerLocale('bg', {
   'status.toegangContacten':'Достъп до контакти','status.toegangContactenBeschrijving':'numr се нуждае от достъп до контактите за изпращане на съобщения.',
   'invoice.onizleme':'Преглед на фактура','invoice.bewerken':'Редактиране',
   'status.profiel':'Профил','status.biografie':'Биография','status.biografiePh':'Напишете нещо за фирмата си...','status.mijnVideos':'Моите видеа','status.videoVerwijderen':'Изтрий','status.fotoUploaden':'Качи снимка','register.kiesRol':'Изберете роля','register.ondernemer':'Аз съм предприемач','register.geenOndernemer':'Не съм предприемач',
-  'dashboard.nieuwOfferte':'Nieuwe Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
+  'dashboard.nieuwOfferte':'Нов Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
   'offerte.title':'Нова Оферта','offerte.onizleme':'Преглед на оферта','offerte.verzonden':'Офертата е изпратена!','offerte.confirmVersturen':'Искате ли да изпратите тази оферта?','offerte.nietVerstuurd':'Офертата не беше изпратена',
   'forgot.link':'Забравена парола?','forgot.title':'Забравена парола','forgot.desc':'Въведете имейл адреса си. Ще ви изпратим линк за нулиране на паролата.','forgot.send':'Изпрати','forgot.sent':'Имейлът е изпратен','forgot.sentDesc':'Ако имейлът ви е регистриран, ще получите имейл с инструкции.','forgot.backToLogin':'Обратно към вход',
   'login.faceId':'Вход с Face ID',

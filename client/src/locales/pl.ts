@@ -88,7 +88,7 @@ registerLocale('pl', {
   'status.toegangContacten':'Dostep do kontaktow','status.toegangContactenBeschrijving':'numr potrzebuje dostepu do kontaktow aby wysylac wiadomosci.',
   'invoice.onizleme':'Podglad faktury','invoice.bewerken':'Edytuj',
   'status.profiel':'Profil','status.biografie':'Biografia','status.biografiePh':'Napisz cos o swojej firmie...','status.mijnVideos':'Moje filmy','status.videoVerwijderen':'Usun','status.fotoUploaden':'Dodaj zdjecie','register.kiesRol':'Wybierz role','register.ondernemer':'Jestem przedsiebiorca','register.geenOndernemer':'Nie jestem przedsiebiorca',
-  'dashboard.nieuwOfferte':'Nieuwe Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
+  'dashboard.nieuwOfferte':'Nowy Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
   'offerte.title':'Nowa Oferta','offerte.onizleme':'Podglad oferty','offerte.verzonden':'Oferta wyslana!','offerte.confirmVersturen':'Czy chcesz wyslac te oferte?','offerte.nietVerstuurd':'Oferta nie zostala wyslana',
   'forgot.link':'Nie pamietam hasla','forgot.title':'Zapomnialem hasla','forgot.desc':'Wpisz swoj adres e-mail. Wyslimy Ci link do zresetowania hasla.','forgot.send':'Wyslij','forgot.sent':'E-mail wyslany','forgot.sentDesc':'Jesli Twoj adres e-mail jest zarejestrowany, otrzymasz wiadomosc z instrukcjami.','forgot.backToLogin':'Powrot do logowania',
   'login.faceId':'Zaloguj sie za pomoca Face ID',
