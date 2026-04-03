@@ -112,7 +112,9 @@ export default function AppStoreScreenshots() {
       const isIpad = current === 3;
       const w = isIpad ? 2048 : 1242;
       const h = isIpad ? 2732 : 2688;
-      const dataUrl = await toPng(node, { width: w, height: h, pixelRatio: w / node.offsetWidth });
+      const nodeW = node.offsetWidth;
+      const nodeH = node.offsetHeight;
+      const dataUrl = await toPng(node, { width: w, height: h, pixelRatio: 1, style: { transform: `scale(${w/nodeW})`, transformOrigin: 'top left', width: `${nodeW}px`, height: `${nodeH}px` } });
       const link = document.createElement('a');
       link.download = `numr-${isIpad ? 'ipad' : 'iphone'}-${current + 1}.png`;
       link.href = dataUrl;
