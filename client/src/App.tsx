@@ -41,6 +41,13 @@ function AuthOnly({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function LoginGuard({ children }: { children: React.ReactNode }) {
+  if (!sessionStorage.getItem('teaserShown')) {
+    return <Navigate to="/teaser" replace />;
+  }
+  return <>{children}</>;
+}
+
 const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots', '/forgot-password', '/terms-agreement', '/subscription', '/teaser'];
 const FULL_SCREEN = ['/status/video'];
 
@@ -53,7 +60,7 @@ export default function App() {
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-hidden flex flex-col">
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginGuard><LoginPage /></LoginGuard>} />
           <Route path="/teaser" element={<TeaserPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

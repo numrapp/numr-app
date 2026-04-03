@@ -29,7 +29,10 @@ export default function TeaserPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleClose = () => navigate('/login');
+  const handleClose = () => {
+    sessionStorage.setItem('teaserShown', 'true');
+    navigate('/login');
+  };
 
   return (
     <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: '#000' }}>
