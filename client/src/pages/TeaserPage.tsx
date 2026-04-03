@@ -20,7 +20,6 @@ export default function TeaserPage() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('teaserSeen', 'true');
     const interval = setInterval(() => {
       setCurrent(prev => {
         if (prev >= slogans.length - 1) { setDone(true); return prev; }

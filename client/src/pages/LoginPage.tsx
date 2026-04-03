@@ -23,7 +23,8 @@ export default function LoginPage() {
     if (isNative && localStorage.getItem('biometric_token')) {
       setHasBiometric(true);
     }
-    if (!localStorage.getItem('teaserSeen')) {
+    if (!sessionStorage.getItem('teaserShown')) {
+      sessionStorage.setItem('teaserShown', 'true');
       navigate('/teaser');
     }
   }, [isNative, navigate]);
