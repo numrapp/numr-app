@@ -173,7 +173,7 @@ router.get('/:id/pdf', async (req, res) => {
         const pdfData = buildPdfData(user, client, invoice, items);
         const pdfBuffer = await (0, pdfService_1.generateInvoicePDF)(pdfData);
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${invoice.invoice_number}.pdf"`);
+        res.setHeader('Content-Disposition', `inline; filename="${invoice.invoice_number}.pdf"`);
         res.send(pdfBuffer);
     }
     catch (err) {

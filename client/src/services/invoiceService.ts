@@ -23,21 +23,32 @@ export const invoiceService = {
   },
 
   async downloadPdf(id: number) {
-    const res = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
-    const blob = new Blob([res.data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const isMobileSafari = /iPhone|iPad/.test(navigator.userAgent);
-    if (isMobileSafari) {
-      window.open(url, '_blank');
-    } else {
+    const token = localStorage.getItem('token');
+    const baseUrl = (window as any).__API_BASE || '/api';
+    const pdfUrl = `${baseUrl}/invoices/${id}/pdf`;
+
+    try {
+      const res = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+
       const link = document.createElement('a');
       link.href = url;
       link.download = `factuur_${id}.pdf`;
+      link.target = '_blank';
+      link.rel = 'noopener';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      setTimeout(() => {
+        window.open(url, '_blank');
+        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+      }, 300);
+    } catch {
+      const directUrl = `${window.location.origin}/api/invoices/${id}/pdf?token=${token}`;
+      window.open(directUrl, '_blank');
     }
-    setTimeout(() => window.URL.revokeObjectURL(url), 5000);
   },
 
   async updateStatus(id: number, status: string) {

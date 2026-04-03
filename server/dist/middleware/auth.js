@@ -9,10 +9,11 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.JWT_SECRET = process.env.JWT_SECRET || 'fatura-muhasebe-jwt-secret-2026';
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const queryToken = req.query.token;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : queryToken;
+    if (!token) {
         return res.status(401).json({ error: 'Authentication required' });
     }
-    const token = authHeader.split(' ')[1];
     try {
         const decoded = jsonwebtoken_1.default.verify(token, exports.JWT_SECRET);
         req.userId = decoded.userId;
