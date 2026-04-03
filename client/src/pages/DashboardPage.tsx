@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, Inbox, FileText } from 'lucide-react';
+import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, FileText } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import LanguageSelector from '../components/LanguageSelector';
@@ -66,20 +66,6 @@ export default function DashboardPage() {
               <p className="text-sm text-red-500/70 font-medium">{t('dashboard.creditAanmaken')}</p>
             </div>
             <ChevronRight size={22} className="text-red-300" />
-          </motion.button>
-
-          <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.25}}
-            onClick={() => navigate('/received')}
-            className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
-            style={{ background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)', boxShadow: '0 8px 32px rgba(245,158,11,0.15)' }}>
-            <div className="w-16 h-16 rounded-2xl bg-white/50 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <Inbox size={28} className="text-amber-600" strokeWidth={2.2} />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-lg font-extrabold text-dark">{t('dashboard.ontvangenFactuur')}</p>
-              <p className="text-sm text-amber-600/70 font-medium">{t('dashboard.ontvangenBekijken')}</p>
-            </div>
-            <ChevronRight size={22} className="text-amber-400" />
           </motion.button>
         </div>
       </div>

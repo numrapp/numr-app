@@ -313,36 +313,36 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
 
               <div className="space-y-2">
                 {parsedItems.map((item, i) => (
-                  <div key={i} className="bg-white border border-gray-100 rounded-2xl overflow-hidden" style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
+                  <div key={i} className="bg-white border-2 border-black/80 rounded-xl overflow-hidden">
                     <div className="flex items-center gap-2 px-3 pt-3 pb-1">
                       <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500">{i + 1}</span>
                       <input type="text" value={item.description} onChange={e => { const n=[...parsedItems]; n[i]={...n[i],description:e.target.value}; setParsedItems(n); }}
                         className="flex-1 text-sm font-medium bg-transparent border-none outline-none placeholder-gray-300" placeholder="bijv. 02-03-2026 Amsterdam" />
                       {parsedItems.length > 1 && <button onClick={() => setParsedItems(p => p.filter((_,idx) => idx!==i))} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"><Trash2 size={14} /></button>}
                     </div>
-                    <div className="grid grid-cols-[2fr_2fr_1.5fr] gap-0 border-t border-gray-50">
-                      <div className="p-3.5 border-r border-gray-50">
+                    <div className="grid grid-cols-[2fr_2fr_1.5fr] gap-0 border-t border-black/20">
+                      <div className="p-3.5 border-r border-black/20">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.aantalLabel')}</span>
                         <div className="flex items-center gap-1">
                           <input type="text" inputMode="decimal" value={item.quantity === 0 ? '' : item.quantity}
-                            onChange={e => { const n=[...parsedItems]; n[i]={...n[i],quantity:parseFloat(e.target.value)||0}; setParsedItems(n); }}
+                            onChange={e => { const v = e.target.value.replace(',','.'); const n=[...parsedItems]; n[i]={...n[i],quantity: v === '' || v === '.' ? 0 : (v.endsWith('.') ? v as any : parseFloat(v)||0)}; setParsedItems(n); }}
                             onFocus={e => e.target.select()}
                             className="w-full text-base font-bold bg-transparent border-none outline-none placeholder-gray-300" placeholder="0" />
                         </div>
                       </div>
-                      <div className="p-3.5 border-r border-gray-50">
+                      <div className="p-3.5 border-r border-black/20">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">{t('invoice.bedrag')}</span>
                         <div className="flex items-center gap-0.5">
                           <span className="text-sm font-bold text-gray-300 notranslate">€</span>
                           <input type="text" inputMode="decimal" value={item.unit_price === 0 ? '' : item.unit_price}
-                            onChange={e => { const n=[...parsedItems]; n[i]={...n[i],unit_price:parseFloat(e.target.value.replace(',','.'))||0}; setParsedItems(n); }}
+                            onChange={e => { const v = e.target.value.replace(',','.'); const n=[...parsedItems]; n[i]={...n[i],unit_price: v === '' || v === '.' ? 0 : (v.endsWith('.') ? v as any : parseFloat(v)||0)}; setParsedItems(n); }}
                             onFocus={e => e.target.select()}
                             className="w-full text-base font-bold bg-transparent border-none outline-none placeholder-gray-300 notranslate" placeholder="0,00" />
                         </div>
                       </div>
                       <div className="p-3.5">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">Totaal</span>
-                        <p className="text-base font-extrabold text-dark notranslate">{formatCurrency((item.quantity || 0) * (item.unit_price || 0) * (1 + rate / 100))}</p>
+                        <p className="text-base font-extrabold text-dark notranslate">{formatCurrency((parseFloat(String(item.quantity)) || 0) * (parseFloat(String(item.unit_price)) || 0) * (1 + rate / 100))}</p>
                       </div>
                     </div>
                   </div>
@@ -378,9 +378,9 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                   paymentDays={payDays} description={description || previewItems.map(i => i.description).join(', ')}
                   items={previewItems} subtotal={subtotal} btwAmount={btwAmount} total={subtotal + btwAmount}
                 />
-                <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => setStep(42)} className="btn-outline w-full">{t('invoice.bewerken')}</button>
-                  <button onClick={() => setStep(6)} className="btn-brand w-full">{t('invoice.verzenden')}</button>
+                <div className="grid grid-cols-2 gap-3 sticky bottom-0 bg-white pt-3 pb-2">
+                  <button onClick={() => setStep(42)} className="py-4 rounded-2xl border-2 border-black text-dark font-extrabold text-base active:scale-[0.97] transition-all">{t('invoice.bewerken')}</button>
+                  <button onClick={() => setStep(6)} className="py-4 rounded-2xl bg-brand text-dark font-extrabold text-base shadow-lg shadow-brand/30 active:scale-[0.97] transition-all">{t('invoice.verzenden')}</button>
                 </div>
               </motion.div>
             );
