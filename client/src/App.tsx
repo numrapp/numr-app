@@ -16,6 +16,7 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AppStoreScreenshots from './pages/AppStoreScreenshots';
 import InvoiceEditPage from './pages/InvoiceEditPage';
+import TeaserPage from './pages/TeaserPage';
 import StatusPage from './pages/StatusPage';
 import VideoPlayerPage from './pages/VideoPlayerPage';
 import VideoUploadPage from './pages/VideoUploadPage';
@@ -40,7 +41,7 @@ function AuthOnly({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots', '/forgot-password', '/terms-agreement', '/subscription'];
+const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots', '/forgot-password', '/terms-agreement', '/subscription', '/teaser'];
 const FULL_SCREEN = ['/status/video'];
 
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
       <div className="flex-1 overflow-hidden flex flex-col">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/teaser" element={<TeaserPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

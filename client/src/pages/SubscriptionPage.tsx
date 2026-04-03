@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Crown, Check } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import api from '../services/api';
@@ -46,6 +46,7 @@ export default function SubscriptionPage() {
                   <p className="text-sm text-gray-500 mt-0.5">{t('sub.yearlyFree')}</p>
                 </div>
                 <div className="text-right">
+                  <p className="text-sm font-bold text-red-400 line-through notranslate">&euro;95,88</p>
                   <p className="text-2xl font-black text-dark notranslate">&euro;79,90</p>
                   <p className="text-[11px] text-gray-400">/ {t('sub.year')}</p>
                 </div>
@@ -70,7 +71,10 @@ export default function SubscriptionPage() {
             </motion.button>
           </div>
 
-          <p className="text-center text-[11px] text-gray-400 mt-6 px-4">{t('sub.required')}</p>
+          <div className="text-center mt-6 space-y-1">
+            <p className="text-sm font-bold text-dark">{t('sub.trial')}</p>
+            <p className="text-[11px] text-gray-400">{t('sub.cancelAnytime')}</p>
+          </div>
         </motion.div>
       </div>
     </div>

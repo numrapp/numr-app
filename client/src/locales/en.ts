@@ -98,10 +98,11 @@ registerLocale('en', {
   'forgot.link':'Forgot password?','forgot.title':'Forgot Password','forgot.desc':'Enter your email address. We will send you a link to reset your password.','forgot.send':'Send','forgot.sent':'Email sent','forgot.sentDesc':'If your email address is registered, you will receive an email with instructions.','forgot.backToLogin':'Back to login',
   'login.faceId':'Sign in with Face ID',
   'terms.title':'Terms of Use','terms.agree':'I have read and agree to the terms of use','terms.continue':'Continue',
-  'sub.title':'Choose your plan','sub.desc':'A subscription is required to use numr','sub.monthly':'Monthly','sub.monthlyDesc':'Cancel anytime','sub.yearly':'Yearly','sub.yearlyFree':'2 months free!','sub.month':'month','sub.year':'year','sub.popular':'Popular','sub.required':'An active subscription is required to create and send invoices.',
+  'sub.title':'Choose your plan','sub.desc':'A subscription is required to use numr','sub.monthly':'Monthly','sub.monthlyDesc':'Cancel anytime','sub.yearly':'Yearly','sub.yearlyFree':'2 months free!','sub.month':'month','sub.year':'year','sub.popular':'Popular','sub.required':'An active subscription is required to create and send invoices.','sub.trial':'3 days free trial','sub.cancelAnytime':'Cancel anytime',
   'settings.logoUpload':'Upload logo','settings.logoDesc':'Your logo appears on invoices',
   'status.it':'IT','status.videoproductie':'Video Production','status.boekhouder':'Accountant',
   'history.faturalarim':'Invoices','history.offertelerim':'Quotes',
   'offerte.convert':'Convert to invoice','offerte.convertConfirm':'Do you want to convert this quote to an invoice?','offerte.converted':'Converted','offerte.open':'Open',
   'export.confirm':'Do you want to download all invoices?','export.allInvoices':'All invoices','common.downloaden':'Download',
+  'rating.title':'Enjoying numr?','rating.desc':'Rate us on the App Store','rating.button':'Rate numr',
 });

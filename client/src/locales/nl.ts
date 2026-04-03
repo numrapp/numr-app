@@ -98,10 +98,11 @@ registerLocale('nl', {
   'forgot.link':'Wachtwoord vergeten?','forgot.title':'Wachtwoord vergeten','forgot.desc':'Voer uw e-mailadres in. Wij sturen u een link om uw wachtwoord opnieuw in te stellen.','forgot.send':'Verstuur','forgot.sent':'E-mail verstuurd','forgot.sentDesc':'Als het e-mailadres bij ons bekend is, ontvangt u een e-mail met instructies.','forgot.backToLogin':'Terug naar inloggen',
   'login.faceId':'Inloggen met Face ID',
   'terms.title':'Gebruiksvoorwaarden','terms.agree':'Ik heb de gebruiksvoorwaarden gelezen en ga akkoord','terms.continue':'Doorgaan',
-  'sub.title':'Kies uw abonnement','sub.desc':'Een abonnement is vereist om numr te gebruiken','sub.monthly':'Maandelijks','sub.monthlyDesc':'Flexibel opzegbaar','sub.yearly':'Jaarlijks','sub.yearlyFree':'2 maanden gratis!','sub.month':'maand','sub.year':'jaar','sub.popular':'Populair','sub.required':'Een actief abonnement is vereist om facturen aan te maken en te versturen.',
+  'sub.title':'Kies uw abonnement','sub.desc':'Een abonnement is vereist om numr te gebruiken','sub.monthly':'Maandelijks','sub.monthlyDesc':'Flexibel opzegbaar','sub.yearly':'Jaarlijks','sub.yearlyFree':'2 maanden gratis!','sub.month':'maand','sub.year':'jaar','sub.popular':'Populair','sub.required':'Een actief abonnement is vereist om facturen aan te maken en te versturen.','sub.trial':'3 dagen gratis proberen','sub.cancelAnytime':'Op elk moment opzegbaar',
   'settings.logoUpload':'Logo uploaden','settings.logoDesc':'Uw logo verschijnt op facturen',
   'status.it':'IT','status.videoproductie':'Video Productie','status.boekhouder':'Boekhouder',
   'history.faturalarim':'Facturen','history.offertelerim':'Offertes',
   'offerte.convert':'Omzetten naar factuur','offerte.convertConfirm':'Wilt u deze offerte omzetten naar een factuur?','offerte.converted':'Omgezet','offerte.open':'Open',
   'export.confirm':'Wilt u alle facturen downloaden?','export.allInvoices':'Alle facturen','common.downloaden':'Downloaden',
+  'rating.title':'Vind je numr leuk?','rating.desc':'Beoordeel ons op de App Store','rating.button':'Beoordeel numr',
 });

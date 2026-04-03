@@ -98,10 +98,11 @@ registerLocale('tr', {
   'forgot.link':'Sifremi unuttum','forgot.title':'Sifremi Unuttum','forgot.desc':'E-posta adresinizi girin. Sifrenizi sifirlamak icin bir baglanti gonderecegiz.','forgot.send':'Gonder','forgot.sent':'E-posta gonderildi','forgot.sentDesc':'E-posta adresiniz kayitli ise sifirlama talimatlari iceren bir e-posta alacaksiniz.','forgot.backToLogin':'Girise don',
   'login.faceId':'Face ID ile giris yap',
   'terms.title':'Kullanim Kosullari','terms.agree':'Kullanim kosullarini okudum ve kabul ediyorum','terms.continue':'Devam et',
-  'sub.title':'Aboneliginizi secin','sub.desc':'numr kullanmak icin abonelik gereklidir','sub.monthly':'Aylik','sub.monthlyDesc':'Esnek iptal','sub.yearly':'Yillik','sub.yearlyFree':'2 ay bedava!','sub.month':'ay','sub.year':'yil','sub.popular':'Populer','sub.required':'Fatura olusturmak ve gondermek icin aktif bir abonelik gereklidir.',
+  'sub.title':'Aboneliginizi secin','sub.desc':'numr kullanmak icin abonelik gereklidir','sub.monthly':'Aylik','sub.monthlyDesc':'Esnek iptal','sub.yearly':'Yillik','sub.yearlyFree':'2 ay bedava!','sub.month':'ay','sub.year':'yil','sub.popular':'Populer','sub.required':'Fatura olusturmak ve gondermek icin aktif bir abonelik gereklidir.','sub.trial':'3 gun ucretsiz deneyin','sub.cancelAnytime':'Istediginiz zaman iptal edin',
   'settings.logoUpload':'Logo yukle','settings.logoDesc':'Logonuz faturalarda gorunur',
   'status.it':'IT','status.videoproductie':'Video Produksiyon','status.boekhouder':'Muhasebeci',
   'history.faturalarim':'Faturalar','history.offertelerim':'Teklifler',
   'offerte.convert':'Faturaya donustur','offerte.convertConfirm':'Bu teklifi faturaya donusturmek istiyor musunuz?','offerte.converted':'Donusturuldu','offerte.open':'Acik',
   'export.confirm':'Tum faturalari indirmek istiyor musunuz?','export.allInvoices':'Tum faturalar','common.downloaden':'Indir',
+  'rating.title':'numr\'u begendiniz mi?','rating.desc':'App Store\'da bizi degerlendirin','rating.button':'numr\'u degerlendir',
 });

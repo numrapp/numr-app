@@ -23,7 +23,10 @@ export default function LoginPage() {
     if (isNative && localStorage.getItem('biometric_token')) {
       setHasBiometric(true);
     }
-  }, [isNative]);
+    if (!localStorage.getItem('teaserSeen')) {
+      navigate('/teaser');
+    }
+  }, [isNative, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setLoading(true);

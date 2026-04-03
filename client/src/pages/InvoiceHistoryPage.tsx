@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Download, Pencil, ArrowRightLeft, Package } from 'lucide-react';
+import { ArrowLeft, Download, Pencil, ArrowRightLeft } from 'lucide-react';
 import { useI18n } from '../i18n';
-import { useAuth } from '../hooks/useAuth';
 import { invoiceService } from '../services/invoiceService';
 import { offerteService } from '../services/offerteService';
 import { Invoice } from '../types';
@@ -12,7 +11,6 @@ import LanguageSelector from '../components/LanguageSelector';
 
 export default function InvoiceHistoryPage() {
   const { t } = useI18n();
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<'invoices' | 'offertes'>('invoices');
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -20,8 +18,6 @@ export default function InvoiceHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [convertPopup, setConvertPopup] = useState<any>(null);
   const [convertLoading, setConvertLoading] = useState(false);
-  const [zipPopup, setZipPopup] = useState<string | null>(null);
-  const [zipLoading, setZipLoading] = useState(false);
 
   useEffect(() => {
     Promise.all([invoiceService.getAll(), offerteService.getAll()])
@@ -37,20 +33,6 @@ export default function InvoiceHistoryPage() {
       setInvoices(inv); setOffertes(off);
       setConvertPopup(null);
     } catch {} finally { setConvertLoading(false); }
-  };
-
-  const year = new Date().getFullYear();
-  const quarters: { label: string; start: string; end: string }[] = [
-    { label: 'Q1', start: `${year}-01-01`, end: `${year}-03-31` },
-    { label: 'Q2', start: `${year}-04-01`, end: `${year}-06-30` },
-    { label: 'Q3', start: `${year}-07-01`, end: `${year}-09-30` },
-    { label: 'Q4', start: `${year}-10-01`, end: `${year}-12-31` },
-  ];
-
-  const handleZipDownload = async (q: typeof quarters[0]) => {
-    setZipLoading(true);
-    try { await invoiceService.downloadZip(q.start, q.end); } catch {}
-    finally { setZipLoading(false); setZipPopup(null); }
   };
 
   return (
@@ -78,43 +60,33 @@ export default function InvoiceHistoryPage() {
         {loading ? <div className="py-10 text-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand mx-auto" /></div> : (
           <>
             {tab === 'invoices' && (
-              <>
-                <div className="flex gap-2 mb-4">
-                  {quarters.map(q => (
-                    <button key={q.label} onClick={() => setZipPopup(q.label)}
-                      className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gray-50 text-xs font-bold text-gray-500 hover:bg-gray-100 transition-colors">
-                      <Package size={12} /> {q.label}
-                    </button>
+              invoices.length === 0 ? <div className="py-14 text-center text-gray-300 font-medium">{t('history.geen')}</div> : (
+                <div className="space-y-2">
+                  {invoices.map((inv, i) => (
+                    <motion.div key={inv.id} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:i*0.03}}
+                      className="flex items-center justify-between py-3.5 px-4 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-100">
+                      <div className="flex-1">
+                        <p className="font-extrabold text-sm text-dark notranslate">{inv.invoice_number}</p>
+                        <p className="text-xs text-gray-400">{inv.client_name} · {formatDate(inv.invoice_date)}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-right mr-1">
+                          <p className="text-sm font-extrabold notranslate">{formatCurrency(inv.total)}</p>
+                          <span className={`text-[10px] font-bold ${inv.status==='paid'?'text-success':inv.status==='sent'?'text-blue-500':'text-gray-400'}`}>
+                            {inv.status==='paid'?t('history.betaald'):inv.status==='sent'?t('history.verstuurd'):t('history.concept')}
+                          </span>
+                        </div>
+                        <button onClick={async () => { try { await invoiceService.downloadPdf(inv.id); } catch (e) { console.error(e); } }} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('common.downloaden')}>
+                          <Download size={16} />
+                        </button>
+                        <button onClick={() => navigate(`/invoices/edit/${inv.id}`)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('invoice.bewerken')}>
+                          <Pencil size={16} />
+                        </button>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
-                {invoices.length === 0 ? <div className="py-14 text-center text-gray-300 font-medium">{t('history.geen')}</div> : (
-                  <div className="space-y-2">
-                    {invoices.map((inv, i) => (
-                      <motion.div key={inv.id} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:i*0.03}}
-                        className="flex items-center justify-between py-3.5 px-4 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-100">
-                        <div className="flex-1">
-                          <p className="font-extrabold text-sm text-dark notranslate">{inv.invoice_number}</p>
-                          <p className="text-xs text-gray-400">{inv.client_name} · {formatDate(inv.invoice_date)}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="text-right mr-1">
-                            <p className="text-sm font-extrabold notranslate">{formatCurrency(inv.total)}</p>
-                            <span className={`text-[10px] font-bold ${inv.status==='paid'?'text-success':inv.status==='sent'?'text-blue-500':'text-gray-400'}`}>
-                              {inv.status==='paid'?t('history.betaald'):inv.status==='sent'?t('history.verstuurd'):t('history.concept')}
-                            </span>
-                          </div>
-                          <button onClick={async()=>{try{await invoiceService.downloadPdf(inv.id)}catch{}}} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('common.downloaden')}>
-                            <Download size={16} />
-                          </button>
-                          <button onClick={() => navigate(`/invoices/edit/${inv.id}`)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('invoice.bewerken')}>
-                            <Pencil size={16} />
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </>
+              )
             )}
 
             {tab === 'offertes' && (
@@ -162,23 +134,6 @@ export default function InvoiceHistoryPage() {
                 <button onClick={() => setConvertPopup(null)} className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-base">{t('invoice.nee')}</button>
                 <button onClick={() => handleConvert(convertPopup)} disabled={convertLoading}
                   className="py-3 rounded-2xl bg-brand text-dark font-bold text-base disabled:opacity-50">{convertLoading ? '...' : t('invoice.ja')}</button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {zipPopup && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-6">
-            <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
-              <Package size={32} className="mx-auto mb-4 text-blue-500" />
-              <p className="text-lg font-extrabold text-dark mb-2">{t('export.confirm')}</p>
-              <p className="text-sm text-gray-500 mb-6">{zipPopup} {year} - {t('export.allInvoices')}</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => setZipPopup(null)} className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-base">{t('invoice.nee')}</button>
-                <button onClick={() => { const q = quarters.find(q => q.label === zipPopup); if (q) handleZipDownload(q); }} disabled={zipLoading}
-                  className="py-3 rounded-2xl bg-blue-500 text-white font-bold text-base disabled:opacity-50">{zipLoading ? '...' : t('invoice.ja')}</button>
               </div>
             </motion.div>
           </motion.div>
