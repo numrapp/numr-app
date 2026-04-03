@@ -43,7 +43,7 @@ const langs8 = [
 
 function ScreenLangs({ size }: { size: 'phone' | 'ipad' }) {
   const isIpad = size === 'ipad';
-  const w = isIpad ? 680 : 414;
+  const w = isIpad ? 682 : 414;
   const h = isIpad ? 910 : 896;
   const fs = isIpad ? 1.4 : 1;
   return (
@@ -110,11 +110,13 @@ export default function AppStoreScreenshots() {
     setDownloading(true);
     try {
       const isIpad = current === 3;
-      const w = isIpad ? 2048 : 1242;
-      const h = isIpad ? 2732 : 2688;
-      const nodeW = node.offsetWidth;
-      const nodeH = node.offsetHeight;
-      const dataUrl = await toPng(node, { width: w, height: h, pixelRatio: 1, style: { transform: `scale(${w/nodeW})`, transformOrigin: 'top left', width: `${nodeW}px`, height: `${nodeH}px` } });
+      const targetW = isIpad ? 2048 : 1242;
+      const targetH = isIpad ? 2732 : 2688;
+      const scale = targetW / node.offsetWidth;
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const dataUrl = await toPng(node, { canvasWidth: targetW, canvasHeight: targetH, pixelRatio: scale });
       const link = document.createElement('a');
       link.download = `numr-${isIpad ? 'ipad' : 'iphone'}-${current + 1}.png`;
       link.href = dataUrl;
