@@ -43,8 +43,8 @@ const langs8 = [
 
 function ScreenLangs({ size }: { size: 'phone' | 'ipad' }) {
   const isIpad = size === 'ipad';
-  const w = isIpad ? 680 : 430;
-  const h = isIpad ? 910 : 932;
+  const w = isIpad ? 680 : 414;
+  const h = isIpad ? 910 : 896;
   const fs = isIpad ? 1.4 : 1;
   return (
     <div style={{
@@ -110,8 +110,8 @@ export default function AppStoreScreenshots() {
     setDownloading(true);
     try {
       const isIpad = current === 3;
-      const w = isIpad ? 2048 : 1290;
-      const h = isIpad ? 2732 : 2796;
+      const w = isIpad ? 2048 : 1242;
+      const h = isIpad ? 2732 : 2688;
       const dataUrl = await toPng(node, { width: w, height: h, pixelRatio: w / node.offsetWidth });
       const link = document.createElement('a');
       link.download = `numr-${isIpad ? 'ipad' : 'iphone'}-${current + 1}.png`;
@@ -142,7 +142,7 @@ export default function AppStoreScreenshots() {
 
       <div style={{ display: 'flex', justifyContent: 'center', padding: 30 }}>
         {current === 0 && <div ref={refs[0]} style={{
-          width: 430, height: 932, borderRadius: 20, overflow: 'hidden',
+          width: 414, height: 896, borderRadius: 20, overflow: 'hidden',
           background: 'linear-gradient(160deg, #0A0A0A 0%, #1A1A1A 50%, #0D0D0D 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative',
         }}>
@@ -175,7 +175,7 @@ export default function AppStoreScreenshots() {
         </div>}
 
         {current === 1 && <div ref={refs[1]} style={{
-          width: 430, height: 932, borderRadius: 20, overflow: 'hidden',
+          width: 414, height: 896, borderRadius: 20, overflow: 'hidden',
           background: 'linear-gradient(180deg, #DFFF00 0%, #B8D900 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px 30px 30px',
         }}>
