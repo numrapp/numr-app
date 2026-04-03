@@ -93,7 +93,7 @@ registerLocale('tr', {
   'status.toegangContacten':'Kisilere erisim','status.toegangContactenBeschrijving':'numr mesaj gondermek icin kisilerinize erisim istiyor.',
   'invoice.onizleme':'Fatura onizleme','invoice.bewerken':'Duzenle',
   'status.profiel':'Profil','status.biografie':'Biyografi','status.biografiePh':'Sirketiniz hakkinda bir seyler yazin...','status.mijnVideos':'Videolarim','status.videoVerwijderen':'Sil','status.fotoUploaden':'Foto yukle','register.kiesRol':'Rolunuzu secin','register.ondernemer':'Ben bir girisimciyim','register.geenOndernemer':'Ben bir girisimci degilim',
-  'dashboard.nieuwOfferte':'Yeni Teklif','dashboard.offerteAanmaken':'Teklif olustur',
+  'dashboard.nieuwOfferte':'Nieuwe Offerte','dashboard.offerteAanmaken':'Offerte aanmaken',
   'offerte.title':'Yeni Teklif','offerte.onizleme':'Teklif onizleme','offerte.verzonden':'Teklif gonderildi!','offerte.confirmVersturen':'Bu teklifi gondermek istiyor musunuz?','offerte.nietVerstuurd':'Teklif gonderilmedi',
   'forgot.link':'Sifremi unuttum','forgot.title':'Sifremi Unuttum','forgot.desc':'E-posta adresinizi girin. Sifrenizi sifirlamak icin bir baglanti gonderecegiz.','forgot.send':'Gonder','forgot.sent':'E-posta gonderildi','forgot.sentDesc':'E-posta adresiniz kayitli ise sifirlama talimatlari iceren bir e-posta alacaksiniz.','forgot.backToLogin':'Girise don',
   'login.faceId':'Face ID ile giris yap',

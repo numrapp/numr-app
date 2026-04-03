@@ -29,7 +29,7 @@ export default function OffertePreview(props: Props) {
         </div>
       </div>
 
-      <div className="border-t border-gray-300 mx-5" />
+      <div className="border-t border-black/30 mx-5" />
 
       <div className="px-5 py-3 flex justify-between">
         <div className="text-[10px]">
@@ -55,7 +55,7 @@ export default function OffertePreview(props: Props) {
       <div className="mx-5">
         <table className="w-full text-[10px]">
           <thead>
-            <tr className="border-y border-gray-300">
+            <tr className="border-y border-black/40">
               <th className="text-left py-1.5 font-semibold text-gray-500">Omschrijving</th>
               <th className="text-right py-1.5 font-semibold text-gray-500 w-14">Aantal</th>
               <th className="text-right py-1.5 font-semibold text-gray-500 w-16">Prijs</th>
@@ -68,7 +68,7 @@ export default function OffertePreview(props: Props) {
               const sub = item.quantity * item.unit_price;
               const lineTotal = sub + sub * (item.btw_rate / 100);
               return (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-black/15">
                   <td className="py-1">{item.description || '-'}</td>
                   <td className="py-1 text-right">{item.quantity}</td>
                   <td className="py-1 text-right">{formatCurrency(item.unit_price)}</td>
@@ -86,11 +86,11 @@ export default function OffertePreview(props: Props) {
         <div className="w-44 text-[10px] space-y-0.5">
           <div className="flex justify-between text-gray-500"><span>Subtotaal:</span><span className="text-gray-900">{formatCurrency(props.subtotal)}</span></div>
           <div className="flex justify-between text-gray-500"><span>BTW:</span><span className="text-gray-900">{formatCurrency(props.btwAmount)}</span></div>
-          <div className="flex justify-between font-bold text-blue-800 text-[11px] border-t border-gray-300 pt-1 mt-1"><span>Totaal:</span><span>{formatCurrency(props.total)}</span></div>
+          <div className="flex justify-between font-bold text-blue-800 text-[11px] border-t border-black pt-1 mt-1"><span>Totaal:</span><span>{formatCurrency(props.total)}</span></div>
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-b-lg px-5 py-1.5 text-[8px] text-gray-400 text-center border-t border-gray-300">
+      <div className="bg-gray-50 rounded-b-lg px-5 py-1.5 text-[8px] text-gray-400 text-center border-t border-black/30">
         {props.supplierName} | KVK: {props.supplierKvk} | BTW: {props.supplierBtw}
       </div>
     </div>

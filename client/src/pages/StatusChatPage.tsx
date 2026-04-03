@@ -35,7 +35,7 @@ export default function StatusChatPage() {
   const handleSend = () => {
     if (!newMsg.trim()) return;
     const translations: Record<string, string> = {};
-    translations[chatLang] = newMsg;
+    LANGS.forEach(l => { translations[l.code] = newMsg; });
     setMessages(prev => [...prev, {
       id: prev.length + 1,
       fromMe: true,
@@ -98,7 +98,7 @@ export default function StatusChatPage() {
         )}
       </div>
 
-      <div className="flex-shrink-0 px-3 pt-2 pb-1 border-t border-gray-100">
+      <div className="flex-shrink-0 px-3 py-2 mb-2 border-t border-gray-100">
         <div className="flex items-center gap-2">
           <input type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSend()}

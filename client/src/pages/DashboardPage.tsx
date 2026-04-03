@@ -33,7 +33,7 @@ export default function DashboardPage() {
             <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
               <FileText size={28} className="text-blue-700" strokeWidth={2.2} />
             </div>
-            <div className="flex-1 text-left">
+            <div className="flex-1 text-left notranslate">
               <p className="text-lg font-extrabold text-dark">{t('dashboard.nieuwOfferte')}</p>
               <p className="text-sm text-blue-700/60 font-medium">{t('dashboard.offerteAanmaken')}</p>
             </div>

@@ -79,11 +79,6 @@ export default function InvoiceEditPage() {
           </div>
 
           <div>
-            <label className="label-send">{t('invoice.beschrijving')}</label>
-            <textarea value={form.description} onChange={e => setForm(p => ({...p, description: e.target.value}))} className="input-send resize-none" rows={2} />
-          </div>
-
-          <div>
             <div className="flex items-center justify-between mb-2">
               <p className="label-send mb-0">Items</p>
               <button onClick={addItem} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand text-dark text-xs font-bold active:scale-95 transition-all">
