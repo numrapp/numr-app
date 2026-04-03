@@ -10,6 +10,7 @@ import { todayISO, addDays, formatCurrency } from '../utils/formatters';
 import BtwChatbot from '../components/BtwChatbot';
 import SuccessAnimation from '../components/SuccessAnimation';
 import OffertePreview from '../components/invoice/OffertePreview';
+import { offerteService } from '../services/offerteService';
 
 const slide = { initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0}, transition:{duration:0.15} };
 const DRAFT_KEY = 'offerteCreateDraft';
@@ -96,9 +97,14 @@ export default function OfferteCreatePage() {
     setSaving(true);
     try {
       const finalItems = items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0);
-      const total = formatCurrency(totalFromItems(finalItems));
-      const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u onze offerte ter hoogte van ${total}.\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
+      const desc = description || finalItems.map(i => i.description).join(', ');
+      await offerteService.create({
+        client_id: clientId!, offerte_date: todayISO(), valid_until: addDays(todayISO(), 30),
+        description: desc, items: finalItems,
+      });
       if (method === 'whatsapp') {
+        const total = formatCurrency(totalFromItems(finalItems));
+        const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u onze offerte ter hoogte van ${total}.\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       }
       setShowSuccess(true); setTimeout(() => navigate('/'), 2500);

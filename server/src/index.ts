@@ -10,6 +10,7 @@ import clientRoutes from './routes/clientRoutes';
 import invoiceRoutes from './routes/invoiceRoutes';
 import exportRoutes from './routes/exportRoutes';
 import kvkRoutes from './routes/kvkRoutes';
+import offerteRoutes from './routes/offerteRoutes';
 
 const PORT = process.env.PORT || 3001;
 const UPLOADS_DIR = path.join(__dirname, '../../uploads');
@@ -48,6 +49,7 @@ async function main() {
   app.use('/api/invoices', invoiceRoutes);
   app.use('/api/export', exportRoutes);
   app.use('/api/kvk', kvkRoutes);
+  app.use('/api/offertes', offerteRoutes);
 
   app.post('/api/upload-logo', authMiddleware, upload.single('logo'), (req: AuthRequest, res) => {
     try {

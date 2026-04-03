@@ -101,4 +101,7 @@ registerLocale('fr', {
   'sub.title':'Choisissez votre abonnement','sub.desc':'Un abonnement est requis pour utiliser numr','sub.monthly':'Mensuel','sub.monthlyDesc':'Resiliation flexible','sub.yearly':'Annuel','sub.yearlyFree':'2 mois gratuits!','sub.month':'mois','sub.year':'an','sub.popular':'Populaire','sub.required':'Un abonnement actif est requis pour creer et envoyer des factures.',
   'settings.logoUpload':'Telecharger le logo','settings.logoDesc':'Votre logo apparait sur les factures',
   'status.it':'IT','status.videoproductie':'Production Video','status.boekhouder':'Comptable',
+  'history.faturalarim':'Factures','history.offertelerim':'Devis',
+  'offerte.convert':'Convertir en facture','offerte.convertConfirm':'Voulez-vous convertir ce devis en facture?','offerte.converted':'Converti','offerte.open':'Ouvert',
+  'export.confirm':'Voulez-vous telecharger toutes les factures?','export.allInvoices':'Toutes les factures','common.downloaden':'Telecharger',
 });

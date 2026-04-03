@@ -96,4 +96,7 @@ registerLocale('pl', {
   'sub.title':'Wybierz plan','sub.desc':'Subskrypcja jest wymagana do korzystania z numr','sub.monthly':'Miesieczny','sub.monthlyDesc':'Elastyczne anulowanie','sub.yearly':'Roczny','sub.yearlyFree':'2 miesiace gratis!','sub.month':'miesiac','sub.year':'rok','sub.popular':'Popularny','sub.required':'Aktywna subskrypcja jest wymagana do tworzenia i wysylania faktur.',
   'settings.logoUpload':'Dodaj logo','settings.logoDesc':'Twoje logo pojawi sie na fakturach',
   'status.it':'IT','status.videoproductie':'Produkcja Wideo','status.boekhouder':'Ksiegowy',
+  'history.faturalarim':'Faktury','history.offertelerim':'Oferty',
+  'offerte.convert':'Konwertuj na fakture','offerte.convertConfirm':'Czy chcesz przeksztalcic te oferte w fakture?','offerte.converted':'Przeksztalcona','offerte.open':'Otwarta',
+  'export.confirm':'Czy chcesz pobrac wszystkie faktury?','export.allInvoices':'Wszystkie faktury','common.downloaden':'Pobierz',
 });

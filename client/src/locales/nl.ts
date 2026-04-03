@@ -101,4 +101,7 @@ registerLocale('nl', {
   'sub.title':'Kies uw abonnement','sub.desc':'Een abonnement is vereist om numr te gebruiken','sub.monthly':'Maandelijks','sub.monthlyDesc':'Flexibel opzegbaar','sub.yearly':'Jaarlijks','sub.yearlyFree':'2 maanden gratis!','sub.month':'maand','sub.year':'jaar','sub.popular':'Populair','sub.required':'Een actief abonnement is vereist om facturen aan te maken en te versturen.',
   'settings.logoUpload':'Logo uploaden','settings.logoDesc':'Uw logo verschijnt op facturen',
   'status.it':'IT','status.videoproductie':'Video Productie','status.boekhouder':'Boekhouder',
+  'history.faturalarim':'Facturen','history.offertelerim':'Offertes',
+  'offerte.convert':'Omzetten naar factuur','offerte.convertConfirm':'Wilt u deze offerte omzetten naar een factuur?','offerte.converted':'Omgezet','offerte.open':'Open',
+  'export.confirm':'Wilt u alle facturen downloaden?','export.allInvoices':'Alle facturen','common.downloaden':'Downloaden',
 });

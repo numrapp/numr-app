@@ -24,12 +24,20 @@ export const invoiceService = {
 
   async downloadPdf(id: number) {
     const res = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
-    const url = window.URL.createObjectURL(new Blob([res.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `invoice_${id}.pdf`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const isMobileSafari = /iPhone|iPad/.test(navigator.userAgent);
+    if (isMobileSafari) {
+      window.open(url, '_blank');
+    } else {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `factuur_${id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    setTimeout(() => window.URL.revokeObjectURL(url), 5000);
   },
 
   async updateStatus(id: number, status: string) {

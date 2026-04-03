@@ -107,14 +107,50 @@ async function initDatabase() {
       FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
     )
   `);
+    db.run(`
+    CREATE TABLE IF NOT EXISTS offertes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      client_id INTEGER NOT NULL,
+      offerte_number TEXT NOT NULL,
+      offerte_date TEXT NOT NULL,
+      valid_until TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      subtotal REAL DEFAULT 0,
+      btw_amount REAL DEFAULT 0,
+      total REAL DEFAULT 0,
+      status TEXT DEFAULT 'draft',
+      converted_invoice_id INTEGER,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (client_id) REFERENCES clients(id)
+    )
+  `);
+    db.run(`
+    CREATE TABLE IF NOT EXISTS offerte_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      offerte_id INTEGER NOT NULL,
+      description TEXT NOT NULL,
+      quantity REAL DEFAULT 1,
+      unit_price REAL DEFAULT 0,
+      btw_rate REAL DEFAULT 21,
+      btw_amount REAL DEFAULT 0,
+      line_total REAL DEFAULT 0,
+      FOREIGN KEY (offerte_id) REFERENCES offertes(id) ON DELETE CASCADE
+    )
+  `);
     save();
-    const cols = ['terms_accepted', 'subscription_type', 'subscription_start', 'subscription_end', 'reset_token', 'reset_token_expires'];
+    const cols = ['terms_accepted', 'subscription_type', 'subscription_start', 'subscription_end', 'reset_token', 'reset_token_expires', 'next_offerte_number'];
     for (const col of cols) {
         try {
             db.run(`ALTER TABLE users ADD COLUMN ${col} TEXT DEFAULT ''`);
         }
         catch { }
     }
+    try {
+        db.run(`UPDATE users SET next_offerte_number = '26001' WHERE next_offerte_number = '' OR next_offerte_number IS NULL`);
+    }
+    catch { }
     save();
     return db;
 }

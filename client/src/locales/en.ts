@@ -101,4 +101,7 @@ registerLocale('en', {
   'sub.title':'Choose your plan','sub.desc':'A subscription is required to use numr','sub.monthly':'Monthly','sub.monthlyDesc':'Cancel anytime','sub.yearly':'Yearly','sub.yearlyFree':'2 months free!','sub.month':'month','sub.year':'year','sub.popular':'Popular','sub.required':'An active subscription is required to create and send invoices.',
   'settings.logoUpload':'Upload logo','settings.logoDesc':'Your logo appears on invoices',
   'status.it':'IT','status.videoproductie':'Video Production','status.boekhouder':'Accountant',
+  'history.faturalarim':'Invoices','history.offertelerim':'Quotes',
+  'offerte.convert':'Convert to invoice','offerte.convertConfirm':'Do you want to convert this quote to an invoice?','offerte.converted':'Converted','offerte.open':'Open',
+  'export.confirm':'Do you want to download all invoices?','export.allInvoices':'All invoices','common.downloaden':'Download',
 });

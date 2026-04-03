@@ -15,6 +15,7 @@ const clientRoutes_1 = __importDefault(require("./routes/clientRoutes"));
 const invoiceRoutes_1 = __importDefault(require("./routes/invoiceRoutes"));
 const exportRoutes_1 = __importDefault(require("./routes/exportRoutes"));
 const kvkRoutes_1 = __importDefault(require("./routes/kvkRoutes"));
+const offerteRoutes_1 = __importDefault(require("./routes/offerteRoutes"));
 const PORT = process.env.PORT || 3001;
 const UPLOADS_DIR = path_1.default.join(__dirname, '../../uploads');
 if (!fs_1.default.existsSync(UPLOADS_DIR))
@@ -45,6 +46,7 @@ async function main() {
     app.use('/api/invoices', invoiceRoutes_1.default);
     app.use('/api/export', exportRoutes_1.default);
     app.use('/api/kvk', kvkRoutes_1.default);
+    app.use('/api/offertes', offerteRoutes_1.default);
     app.post('/api/upload-logo', auth_1.authMiddleware, upload.single('logo'), (req, res) => {
         try {
             if (!req.file)

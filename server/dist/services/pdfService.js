@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateInvoicePDF = generateInvoicePDF;
 const pdfkit_1 = __importDefault(require("pdfkit"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 function eur(n) { return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n); }
 function dt(s) { return new Date(s).toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
 function generateInvoicePDF(data) {
@@ -15,10 +17,22 @@ function generateInvoicePDF(data) {
         doc.on('end', () => resolve(Buffer.concat(chunks)));
         doc.on('error', reject);
         const L = 55, R = 540, W = R - L;
-        const dk = '#000000', md = '#444444', lt = '#cccccc';
+        const dk = '#000000', md = '#444444', border = '#000000';
         const rx = 340, vx = 400;
         let y = 40;
-        doc.font('Helvetica-Bold').fontSize(22).fillColor(dk).text(data.supplierName, L, y);
+        const title = data.docTitle || 'Factuur';
+        const logoPath = data.supplierLogo ? path_1.default.resolve(data.supplierLogo.startsWith('/') ? data.supplierLogo : path_1.default.join(__dirname, '../../../', data.supplierLogo)) : null;
+        if (logoPath && fs_1.default.existsSync(logoPath)) {
+            try {
+                doc.image(logoPath, L, y, { height: 40 });
+            }
+            catch {
+                doc.font('Helvetica-Bold').fontSize(22).fillColor(dk).text(data.supplierName, L, y);
+            }
+        }
+        else {
+            doc.font('Helvetica-Bold').fontSize(22).fillColor(dk).text(data.supplierName, L, y);
+        }
         doc.font('Helvetica').fontSize(9).fillColor(md);
         doc.text(data.supplierAddress, vx, y);
         doc.text(`${data.supplierPostcode} ${data.supplierCity}`, vx, y + 13);
@@ -31,7 +45,7 @@ function generateInvoicePDF(data) {
         doc.font('Helvetica-Bold').fontSize(9).fillColor(dk).text('e-mail', rx, contactY);
         doc.font('Helvetica').fontSize(9).fillColor(md).text(data.supplierEmail || '', vx, contactY);
         y += 48;
-        doc.font('Helvetica-Bold').fontSize(16).fillColor(dk).text('Factuur', L, y);
+        doc.font('Helvetica-Bold').fontSize(16).fillColor(dk).text(title, L, y);
         y += 26;
         doc.font('Helvetica-Bold').fontSize(10).fillColor(dk).text(data.customerName, L, y);
         y += 13;
@@ -56,7 +70,7 @@ function generateInvoicePDF(data) {
         doc.font('Helvetica-Bold').text('KvK', rx, ry);
         doc.font('Helvetica').text(data.supplierKvk, vx, ry);
         y = Math.max(y + 8, ry + 20, 160);
-        doc.rect(L, y, 235, 82).fillAndStroke('#f9f9f9', lt);
+        doc.rect(L, y, 235, 82).fillAndStroke('#f9f9f9', border);
         doc.font('Helvetica-Bold').fontSize(8).fillColor(dk).text('Betaalgegevens', L + 5, y + 4);
         doc.font('Helvetica').fontSize(9).fillColor(md);
         doc.text('Te betalen', L + 5, y + 18);
@@ -66,14 +80,16 @@ function generateInvoicePDF(data) {
         doc.font('Helvetica').fillColor(md).text('Op naam van', L + 5, y + 44);
         doc.font('Helvetica-Bold').fillColor(dk).text(data.supplierName, L + 85, y + 44);
         doc.font('Helvetica').fillColor(md).text('Betalingstermijn', L + 5, y + 57);
-        doc.font('Helvetica-Bold').fillColor(dk).text('14 dagen', L + 85, y + 57);
+        doc.font('Helvetica-Bold').fillColor(dk).text(`${data.paymentDays} dagen`, L + 85, y + 57);
         doc.font('Helvetica').fontSize(9).fillColor(md);
-        doc.text('Factuurnummer', rx, y + 18);
+        const numLabel = title === 'Offerte' ? 'Offertenummer' : 'Factuurnummer';
+        const dateLabel = title === 'Offerte' ? 'Offertedatum' : 'Factuurdatum';
+        doc.text(numLabel, rx, y + 18);
         doc.font('Helvetica-Bold').fillColor(dk).text(data.invoiceNumber, rx + 90, y + 18);
-        doc.font('Helvetica').fillColor(md).text('Factuurdatum', rx, y + 33);
+        doc.font('Helvetica').fillColor(md).text(dateLabel, rx, y + 33);
         doc.font('Helvetica-Bold').fillColor(dk).text(dt(data.invoiceDate), rx + 90, y + 33);
         y += 100;
-        doc.rect(L, y, W, 18).fillAndStroke('#f5f5f5', lt);
+        doc.rect(L, y, W, 18).fillAndStroke('#f0f0f0', border);
         doc.font('Helvetica-Bold').fontSize(9).fillColor(dk);
         doc.text('Omschrijving', L + 5, y + 4);
         doc.text('Aantal', 370, y + 4, { width: 50, align: 'right' });
@@ -89,18 +105,19 @@ function generateInvoicePDF(data) {
             y += 14;
         });
         const footerY = 735;
-        doc.rect(L, footerY, W, 24).fillAndStroke('#f5f5f5', lt);
+        doc.rect(L, footerY, W, 24).fillAndStroke('#f0f0f0', border);
         doc.font('Helvetica-Bold').fontSize(8).fillColor(dk);
         const btwText = data.items[0]?.btwRate === 0
             ? `Btw verlegd naar u. Uw btw-nummer is ${data.customerBtw || data.supplierBtw}.`
             : `BTW ${data.items[0]?.btwRate || 21}%: ${eur(data.btwAmount)}`;
         doc.text(btwText, L + 5, footerY + 7);
-        doc.text('Factuurbedrag', 390, footerY + 4);
+        const totalLabel = title === 'Offerte' ? 'Offertebedrag' : 'Factuurbedrag';
+        doc.text(totalLabel, 390, footerY + 4);
         doc.fontSize(9).text('\u20AC', 460, footerY + 4);
         doc.text(eur(data.total).replace('\u20AC ', ''), 472, footerY + 4, { width: R - 477, align: 'right' });
         const bannerY = 770;
         doc.rect(0, bannerY, 595, 30).fill('#DFFF00');
-        const p1 = 'Deze factuur is gemaakt met ';
+        const p1 = title === 'Offerte' ? 'Deze offerte is gemaakt met ' : 'Deze factuur is gemaakt met ';
         doc.font('Helvetica').fontSize(10);
         const p1w = doc.widthOfString(p1);
         doc.font('Helvetica-Bold').fontSize(12);

@@ -96,4 +96,7 @@ registerLocale('bg', {
   'sub.title':'Изберете план','sub.desc':'Абонамент е необходим за използване на numr','sub.monthly':'Месечно','sub.monthlyDesc':'Гъвкаво анулиране','sub.yearly':'Годишно','sub.yearlyFree':'2 месеца безплатно!','sub.month':'месец','sub.year':'година','sub.popular':'Популярен','sub.required':'Активен абонамент е необходим за създаване и изпращане на фактури.',
   'settings.logoUpload':'Качи лого','settings.logoDesc':'Логото ви се показва на фактурите',
   'status.it':'ИТ','status.videoproductie':'Видео Продукция','status.boekhouder':'Счетоводител',
+  'history.faturalarim':'Фактури','history.offertelerim':'Оферти',
+  'offerte.convert':'Преобразувай във фактура','offerte.convertConfirm':'Искате ли да преобразувате тази оферта във фактура?','offerte.converted':'Преобразувана','offerte.open':'Отворена',
+  'export.confirm':'Искате ли да изтеглите всички фактури?','export.allInvoices':'Всички фактури','common.downloaden':'Изтегли',
 });

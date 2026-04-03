@@ -35,8 +35,7 @@ export default function StatusChatPage() {
   const handleSend = () => {
     if (!newMsg.trim()) return;
     const translations: Record<string, string> = {};
-    LANGS.forEach(l => { translations[l.code] = l.code === 'nl' ? newMsg : newMsg; });
-    translations['nl'] = newMsg;
+    translations[chatLang] = newMsg;
     setMessages(prev => [...prev, {
       id: prev.length + 1,
       fromMe: true,

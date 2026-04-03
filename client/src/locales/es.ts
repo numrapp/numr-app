@@ -101,4 +101,7 @@ registerLocale('es', {
   'sub.title':'Elija su plan','sub.desc':'Se requiere una suscripcion para usar numr','sub.monthly':'Mensual','sub.monthlyDesc':'Cancelacion flexible','sub.yearly':'Anual','sub.yearlyFree':'2 meses gratis!','sub.month':'mes','sub.year':'ano','sub.popular':'Popular','sub.required':'Se requiere una suscripcion activa para crear y enviar facturas.',
   'settings.logoUpload':'Subir logo','settings.logoDesc':'Su logo aparece en las facturas',
   'status.it':'IT','status.videoproductie':'Produccion de Video','status.boekhouder':'Contador',
+  'history.faturalarim':'Facturas','history.offertelerim':'Presupuestos',
+  'offerte.convert':'Convertir a factura','offerte.convertConfirm':'Desea convertir este presupuesto a factura?','offerte.converted':'Convertido','offerte.open':'Abierto',
+  'export.confirm':'Desea descargar todas las facturas?','export.allInvoices':'Todas las facturas','common.downloaden':'Descargar',
 });

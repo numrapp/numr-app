@@ -96,4 +96,7 @@ registerLocale('ar', {
   'sub.title':'اختر خطتك','sub.desc':'الاشتراك مطلوب لاستخدام numr','sub.monthly':'شهري','sub.monthlyDesc':'إلغاء مرن','sub.yearly':'سنوي','sub.yearlyFree':'شهران مجانا!','sub.month':'شهر','sub.year':'سنة','sub.popular':'الأكثر شعبية','sub.required':'الاشتراك النشط مطلوب لإنشاء وإرسال الفواتير.',
   'settings.logoUpload':'رفع الشعار','settings.logoDesc':'يظهر شعارك على الفواتير',
   'status.it':'تكنولوجيا المعلومات','status.videoproductie':'إنتاج الفيديو','status.boekhouder':'محاسب',
+  'history.faturalarim':'الفواتير','history.offertelerim':'العروض',
+  'offerte.convert':'تحويل إلى فاتورة','offerte.convertConfirm':'هل تريد تحويل هذا العرض إلى فاتورة؟','offerte.converted':'تم التحويل','offerte.open':'مفتوح',
+  'export.confirm':'هل تريد تحميل جميع الفواتير؟','export.allInvoices':'جميع الفواتير','common.downloaden':'تحميل',
 });

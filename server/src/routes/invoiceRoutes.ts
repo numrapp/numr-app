@@ -28,6 +28,7 @@ function buildPdfData(user: any, client: any, invoice: any, items: any[]): Invoi
     supplierIban: user.iban,
     supplierPhone: user.phone,
     supplierEmail: user.email || user.smtp_user || '',
+    supplierLogo: user.logo_path || undefined,
     customerName: client.company_name,
     customerAddress: client.address,
     customerPostcode: client.postcode,

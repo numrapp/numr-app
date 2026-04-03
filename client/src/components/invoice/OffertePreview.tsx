@@ -12,7 +12,7 @@ interface Props {
 
 export default function OffertePreview(props: Props) {
   return (
-    <div className="notranslate bg-white rounded-xl shadow-md border border-gray-200 text-[11px] leading-relaxed" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+    <div className="notranslate bg-white rounded-lg shadow-md border-2 border-black text-[11px] leading-relaxed" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
       <div className="px-5 pt-5 pb-3 flex justify-between items-start">
         {props.supplierLogo ? (
           <img src={props.supplierLogo} alt="" className="h-10 object-contain" />
@@ -29,7 +29,7 @@ export default function OffertePreview(props: Props) {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 mx-5" />
+      <div className="border-t border-gray-300 mx-5" />
 
       <div className="px-5 py-3 flex justify-between">
         <div className="text-[10px]">
@@ -55,7 +55,7 @@ export default function OffertePreview(props: Props) {
       <div className="mx-5">
         <table className="w-full text-[10px]">
           <thead>
-            <tr className="border-y border-gray-200">
+            <tr className="border-y border-gray-300">
               <th className="text-left py-1.5 font-semibold text-gray-500">Omschrijving</th>
               <th className="text-right py-1.5 font-semibold text-gray-500 w-14">Aantal</th>
               <th className="text-right py-1.5 font-semibold text-gray-500 w-16">Prijs</th>
@@ -90,7 +90,7 @@ export default function OffertePreview(props: Props) {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-b-xl px-5 py-1.5 text-[8px] text-gray-400 text-center border-t border-gray-100">
+      <div className="bg-gray-50 rounded-b-lg px-5 py-1.5 text-[8px] text-gray-400 text-center border-t border-gray-300">
         {props.supplierName} | KVK: {props.supplierKvk} | BTW: {props.supplierBtw}
       </div>
     </div>
