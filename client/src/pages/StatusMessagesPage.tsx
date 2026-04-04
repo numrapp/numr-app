@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { mockChats } from '../data/mockMessages';
+import StatusBar from '../components/layout/StatusBar';
 
 export default function StatusMessagesPage() {
   const { t } = useI18n();
@@ -11,8 +11,8 @@ export default function StatusMessagesPage() {
   return (
     <div className="h-full flex flex-col safe-top">
       <div className="px-5 pt-5 flex items-center gap-3 mb-4 flex-shrink-0">
-        <button onClick={() => navigate('/status')} className="p-2 -ml-2 rounded-xl hover:bg-gray-100"><ArrowLeft size={22} /></button>
-        <h1 className="text-lg font-extrabold text-dark">{t('status.berichten')}</h1>
+        <span className="text-lg font-black text-brand notranslate">numr</span>
+        <h1 className="text-lg font-extrabold text-dark flex-1">{t('status.berichten')}</h1>
       </div>
 
       <div className="page-scroll px-5 pb-4">
@@ -38,6 +38,8 @@ export default function StatusMessagesPage() {
           </div>
         )}
       </div>
+
+      <StatusBar />
     </div>
   );
 }

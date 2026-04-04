@@ -1,20 +1,27 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Upload, Camera, X } from 'lucide-react';
+import { Upload, Camera, X } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { CATEGORIES } from '../data/mockVideos';
+import StatusBar from '../components/layout/StatusBar';
 
 export default function VideoUploadPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [showPermission, setShowPermission] = useState(true);
+  const alreadyGranted = !!localStorage.getItem('videoPermGranted');
+  const [showPermission, setShowPermission] = useState(!alreadyGranted);
   const [showContactPermission, setShowContactPermission] = useState(false);
-  const [granted, setGranted] = useState(false);
+  const [granted, setGranted] = useState(alreadyGranted);
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [uploaded, setUploaded] = useState(false);
+
+  const handleGrant = () => {
+    localStorage.setItem('videoPermGranted', 'true');
+    setGranted(true);
+  };
 
   const handleUpload = () => {
     setUploaded(true);
@@ -49,9 +56,9 @@ export default function VideoUploadPage() {
               <p className="text-lg font-extrabold text-dark mb-2">{t('status.toegangContacten')}</p>
               <p className="text-sm text-gray-500 mb-6">{t('status.toegangContactenBeschrijving')}</p>
               <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => { setShowContactPermission(false); setGranted(true); }}
+                <button onClick={() => { setShowContactPermission(false); handleGrant(); }}
                   className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold">{t('status.weigeren')}</button>
-                <button onClick={() => { setShowContactPermission(false); setGranted(true); }}
+                <button onClick={() => { setShowContactPermission(false); handleGrant(); }}
                   className="py-3 rounded-2xl bg-brand text-dark font-bold">{t('status.toestaan')}</button>
               </div>
             </motion.div>
@@ -70,8 +77,8 @@ export default function VideoUploadPage() {
       ) : (
         <>
           <div className="px-5 pt-5 flex items-center gap-3 mb-4 flex-shrink-0">
-            <button onClick={() => navigate('/status')} className="p-2 -ml-2 rounded-xl hover:bg-gray-100"><ArrowLeft size={22} /></button>
-            <h1 className="text-lg font-extrabold text-dark">{t('status.upload')}</h1>
+            <span className="text-lg font-black text-brand notranslate">numr</span>
+            <h1 className="text-lg font-extrabold text-dark flex-1">{t('status.upload')}</h1>
           </div>
 
           <div className="page-scroll px-5 pb-6">
@@ -119,6 +126,8 @@ export default function VideoUploadPage() {
           </div>
         </>
       )}
+
+      <StatusBar />
     </div>
   );
 }

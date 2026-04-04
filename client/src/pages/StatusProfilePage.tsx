@@ -4,6 +4,7 @@ import { Camera, Trash2, Edit3 } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { mockVideos } from '../data/mockVideos';
+import StatusBar from '../components/layout/StatusBar';
 
 export default function StatusProfilePage() {
   const { t } = useI18n();
@@ -81,6 +82,8 @@ export default function StatusProfilePage() {
           </div>
         </div>
       </div>
+
+      <StatusBar />
     </div>
   );
 }

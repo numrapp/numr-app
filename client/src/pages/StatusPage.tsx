@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, MessageCircle, User, MapPin, Search, Home } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { mockVideos, CATEGORIES } from '../data/mockVideos';
+import StatusBar from '../components/layout/StatusBar';
 
 export default function StatusPage() {
   const { t } = useI18n();
@@ -16,7 +17,7 @@ export default function StatusPage() {
 
   return (
     <div className="h-full flex flex-col safe-top">
-      <div className="px-5 pt-5 flex items-center justify-between flex-shrink-0 mb-2">
+      <div className="px-5 pt-5 flex items-center flex-shrink-0 mb-2">
         <span className="text-lg font-black text-brand notranslate">numr</span>
       </div>
 
@@ -65,26 +66,7 @@ export default function StatusPage() {
         {filtered.length === 0 && <p className="text-center text-gray-300 py-14 font-medium">{t('status.geen')}</p>}
       </div>
 
-      <div className="flex-shrink-0 bg-white/95 backdrop-blur-lg border-t border-gray-200/60 safe-bottom">
-        <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
-          <button onClick={() => navigate('/status')} className="flex flex-col items-center gap-0.5 text-dark">
-            <Home size={20} strokeWidth={2.5} />
-            <span className="text-[9px] font-extrabold">Home</span>
-          </button>
-          <button onClick={() => navigate('/status/upload')} className="flex flex-col items-center gap-0.5 text-gray-400">
-            <Plus size={20} strokeWidth={2} />
-            <span className="text-[9px] font-medium">{t('status.upload')}</span>
-          </button>
-          <button onClick={() => navigate('/status/messages')} className="flex flex-col items-center gap-0.5 text-gray-400">
-            <MessageCircle size={20} strokeWidth={1.8} />
-            <span className="text-[9px] font-medium">{t('status.berichten')}</span>
-          </button>
-          <button onClick={() => navigate('/status/profile')} className="flex flex-col items-center gap-0.5 text-gray-400">
-            <User size={20} strokeWidth={1.8} />
-            <span className="text-[9px] font-medium">{t('status.profiel')}</span>
-          </button>
-        </div>
-      </div>
+      <StatusBar />
     </div>
   );
 }
