@@ -5,6 +5,7 @@ import multer from 'multer';
 import fs from 'fs';
 import { initDatabase, queryOne, run } from './database';
 import { authMiddleware, AuthRequest } from './middleware/auth';
+import bcrypt from 'bcryptjs';
 import authRoutes from './routes/authRoutes';
 import clientRoutes from './routes/clientRoutes';
 import invoiceRoutes from './routes/invoiceRoutes';
@@ -23,8 +24,20 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+async function createDemoAccount() {
+  const existing = queryOne('SELECT id FROM users WHERE email = ?', ['test@numr.nl']);
+  if (!existing) {
+    const hash = await bcrypt.hash('Test1234!', 10);
+    run(`INSERT INTO users (email, password_hash, company_name, company_address, company_postcode, company_city, kvk_number, btw_number, iban, phone, terms_accepted, subscription_type, subscription_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ['test@numr.nl', hash, 'numr Demo BV', 'Keizersgracht 100', '1015 AA', 'Amsterdam', '12345678', 'NL123456789B01', 'NL91ABNA0417164300', '0612345678', '1', 'yearly', '2030-12-31']);
+  } else {
+    run(`UPDATE users SET terms_accepted = '1', subscription_type = 'yearly', subscription_end = '2030-12-31' WHERE email = ?`, ['test@numr.nl']);
+  }
+}
+
 async function main() {
   await initDatabase();
+  await createDemoAccount();
 
   const app = express();
   app.use(cors({ origin: true, credentials: true }));

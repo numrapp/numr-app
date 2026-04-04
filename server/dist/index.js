@@ -10,6 +10,7 @@ const multer_1 = __importDefault(require("multer"));
 const fs_1 = __importDefault(require("fs"));
 const database_1 = require("./database");
 const auth_1 = require("./middleware/auth");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const clientRoutes_1 = __importDefault(require("./routes/clientRoutes"));
 const invoiceRoutes_1 = __importDefault(require("./routes/invoiceRoutes"));
@@ -25,8 +26,19 @@ const storage = multer_1.default.diskStorage({
     filename: (_req, file, cb) => cb(null, `logo_${Date.now()}${path_1.default.extname(file.originalname)}`),
 });
 const upload = (0, multer_1.default)({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+async function createDemoAccount() {
+    const existing = (0, database_1.queryOne)('SELECT id FROM users WHERE email = ?', ['test@numr.nl']);
+    if (!existing) {
+        const hash = await bcryptjs_1.default.hash('Test1234!', 10);
+        (0, database_1.run)(`INSERT INTO users (email, password_hash, company_name, company_address, company_postcode, company_city, kvk_number, btw_number, iban, phone, terms_accepted, subscription_type, subscription_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, ['test@numr.nl', hash, 'numr Demo BV', 'Keizersgracht 100', '1015 AA', 'Amsterdam', '12345678', 'NL123456789B01', 'NL91ABNA0417164300', '0612345678', '1', 'yearly', '2030-12-31']);
+    }
+    else {
+        (0, database_1.run)(`UPDATE users SET terms_accepted = '1', subscription_type = 'yearly', subscription_end = '2030-12-31' WHERE email = ?`, ['test@numr.nl']);
+    }
+}
 async function main() {
     await (0, database_1.initDatabase)();
+    await createDemoAccount();
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({ origin: true, credentials: true }));
     app.use(express_1.default.json());

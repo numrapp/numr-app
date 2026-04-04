@@ -69,8 +69,9 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
   const [showCreditConfirm, setShowCreditConfirm] = useState(false);
 
   const [clientId, setClientId] = useState<number | null>(draft?.clientId ?? null);
-  const [newClient, setNewClient] = useState(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'' });
+  const [newClient, setNewClient] = useState(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'',postcode:'',city:'' });
   const [btwRate, setBtwRate] = useState<number | 'verlegd'>(draft?.btwRate ?? 21);
+  const [btwMode, setBtwMode] = useState<'incl' | 'excl'>(draft?.btwMode || 'excl');
   const [amount, setAmount] = useState(draft?.amount || '');
   const [rawText, setRawText] = useState('');
   const [parsedItems, setParsedItems] = useState<InvoiceItem[]>(draft?.parsedItems || []);
@@ -96,7 +97,7 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
 
   const goBack = useCallback(() => {
     const s = stepRef.current;
-    if (s===10) setStep(1); else if (s===11) setStep(10); else if (s===41||s===42) setStep(4); else if (s===43) setStep(42); else if (s===45) setStep(42); else if (s===51) setStep(5); else if (s>1) setStep(s-1); else navigate(-1);
+    if (s===10) setStep(1); else if (s===11) setStep(10); else if (s===41||s===42) setStep(4); else if (s===43) setStep(42); else if (s===44) setStep(41); else if (s===45) setStep(42); else if (s===51) setStep(5); else if (s>1) setStep(s-1); else navigate(-1);
   }, [navigate]);
 
   useEffect(() => {
@@ -198,11 +199,15 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
           {step === 2 && (
             <motion.div key="s2" {...slide} className="space-y-4">
               {clientError && <div className="p-3 bg-red-50 rounded-2xl text-red-600 text-sm font-medium">{clientError}</div>}
-              <div><label className="label-send notranslate">KVK Nummer *</label><input type="text" value={newClient.kvk_number} onChange={e => setNewClient(p=>({...p,kvk_number:e.target.value}))} className="input-send" maxLength={8} placeholder="12345678" /></div>
+              <div><label className="label-send notranslate">KVK Nummer</label><input type="text" value={newClient.kvk_number} onChange={e => setNewClient(p=>({...p,kvk_number:e.target.value}))} className="input-send" maxLength={8} placeholder="12345678" /></div>
               <div><label className="label-send">{t('register.bedrijfsnaam')} *</label><input type="text" value={newClient.company_name} onChange={e => setNewClient(p=>({...p,company_name:e.target.value}))} className="input-send" /></div>
-              <div><label className="label-send">{t('register.adres')} *</label><input type="text" value={newClient.address} onChange={e => setNewClient(p=>({...p,address:e.target.value}))} className="input-send" placeholder="Straatnaam 1, 1234 AB Plaats" /></div>
+              <div><label className="label-send">{t('register.adres')}</label><input type="text" value={newClient.address} onChange={e => setNewClient(p=>({...p,address:e.target.value}))} className="input-send" placeholder={t('register.adresPh')} /></div>
+              <div className="grid grid-cols-5 gap-3">
+                <div className="col-span-2"><label className="label-send">{t('register.postcode')}</label><input type="text" value={(newClient as any).postcode||''} onChange={e => setNewClient(p=>({...p,postcode:e.target.value} as any))} className="input-send" placeholder="1234 AB" maxLength={7} /></div>
+                <div className="col-span-3"><label className="label-send">{t('register.plaats')}</label><input type="text" value={(newClient as any).city||''} onChange={e => setNewClient(p=>({...p,city:e.target.value} as any))} className="input-send" placeholder="Amsterdam" /></div>
+              </div>
               <div><label className="label-send">{t('register.email')} *</label><input type="email" value={newClient.email} onChange={e => setNewClient(p=>({...p,email:e.target.value}))} className="input-send" /></div>
-              <div><label className="label-send notranslate">BTW Nummer *</label><input type="text" value={newClient.btw_number} onChange={handleBtw} className="input-send notranslate" placeholder="NL000000000B00" /></div>
+              <div><label className="label-send notranslate">BTW Nummer</label><input type="text" value={newClient.btw_number} onChange={handleBtw} className="input-send notranslate" placeholder="NL000000000B00" /></div>
               <button onClick={saveNewClient} disabled={saving} className="btn-brand w-full">{saving ? t('invoice.opslaan') : t('invoice.klantOpslaan')}</button>
             </motion.div>
           )}
@@ -264,6 +269,10 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
           {step === 4 && (
             <motion.div key="s4" {...slide} className="flex flex-col items-center justify-center min-h-[50vh] space-y-4 max-w-sm mx-auto w-full">
               <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.hoeFactureren')}</p>
+              <div className="flex bg-gray-100 rounded-2xl p-1 w-full max-w-xs">
+                <button onClick={() => setBtwMode('excl')} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${btwMode === 'excl' ? 'bg-white text-dark shadow-sm' : 'text-gray-400'}`}>Excl. BTW</button>
+                <button onClick={() => setBtwMode('incl')} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${btwMode === 'incl' ? 'bg-white text-dark shadow-sm' : 'text-gray-400'}`}>Incl. BTW</button>
+              </div>
               <button onClick={() => setStep(41)} className="card-send w-full flex items-center gap-4 p-5">
                 <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center"><span className="text-2xl font-black text-dark notranslate">€</span></div>
                 <div className="flex-1 text-left"><p className="font-bold text-dark">{t('invoice.direct')}</p><p className="text-sm text-gray-400">{t('invoice.directSub')}</p></div>
@@ -284,9 +293,38 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                 <span className="text-5xl font-black text-dark notranslate">€</span>
                 <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value.replace(/[^0-9.,]/g,''))} onFocus={e => e.target.select()} placeholder="0,00" className="text-5xl font-black text-dark bg-transparent border-none outline-none w-48 text-center notranslate" />
               </div>
-              <button onClick={() => { setItems([]); setStep(5); }} disabled={!amount || parseFloat(amount.replace(',','.'))=== 0} className="btn-brand w-full">{t('common.volgende')}</button>
+              <p className="text-center text-sm text-gray-400 font-medium">{btwMode === 'incl' ? 'Inclusief BTW' : 'Exclusief BTW'}</p>
+              <button onClick={() => { setItems([]); setStep(44); }} disabled={!amount || parseFloat(amount.replace(',','.'))=== 0} className="btn-brand w-full">{t('common.volgende')}</button>
             </motion.div>
           )}
+
+          {step === 44 && (() => {
+            const amt = parseFloat(amount.replace(',','.')) || 0;
+            const sub = btwMode === 'incl' ? amt / (1 + rate/100) : amt;
+            const btw = sub * (rate/100);
+            const tot = sub + btw;
+            const payDays = user?.default_payment_days || 30;
+            const previewItems = [{ description: description || 'Voor u verrichte werkzaamheden', quantity: 1, unit_price: sub, btw_rate: rate }];
+            return (
+              <motion.div key="s44" {...slide} className="space-y-4">
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.onizleme')}</p>
+                <InvoicePreview
+                  supplierName={user?.company_name || ''} supplierAddress={user?.company_address || ''} supplierPostcode={user?.company_postcode || ''} supplierCity={user?.company_city || ''}
+                  supplierKvk={user?.kvk_number || ''} supplierBtw={user?.btw_number || ''} supplierIban={user?.iban || ''} supplierPhone={user?.phone || ''}
+                  supplierLogo={user?.logo_path || undefined}
+                  customerName={selectedClient?.company_name || ''} customerAddress={selectedClient?.address || ''} customerPostcode={selectedClient?.postcode || ''} customerCity={selectedClient?.city || ''} customerCountry={selectedClient?.country || ''}
+                  invoiceNumber={`${user?.invoice_prefix || 'FAC'}${String(user?.next_invoice_number || 1).padStart(3, '0')}`}
+                  invoiceDate={todayISO()} dueDate={addDays(todayISO(), payDays)} deliveryDate={todayISO()}
+                  paymentDays={payDays} description={description || 'Voor u verrichte werkzaamheden'}
+                  items={previewItems} subtotal={sub} btwAmount={btw} total={tot}
+                />
+                <div className="grid grid-cols-2 gap-3 sticky bottom-0 bg-white pt-3 pb-2">
+                  <button onClick={() => setStep(41)} className="py-4 rounded-2xl border-2 border-black text-dark font-extrabold text-base active:scale-[0.97] transition-all">{t('invoice.bewerken')}</button>
+                  <button onClick={() => setStep(5)} className="py-4 rounded-2xl bg-brand text-dark font-extrabold text-base shadow-lg shadow-brand/30 active:scale-[0.97] transition-all">{t('invoice.verzenden')}</button>
+                </div>
+              </motion.div>
+            );
+          })()}
 
           {step === 42 && (
             <motion.div key="s42" {...slide} className="space-y-3">
@@ -491,7 +529,15 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
                 className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-base">{t('invoice.nee')}</button>
               <button onClick={async () => {
                 setShowCreditConfirm(false); setSaving(true);
-                try { await invoiceService.remove(selectedInvoice.id); setShowSuccess(true); setTimeout(() => navigate('/'), 2500); } catch {} finally { setSaving(false); }
+                try {
+                  const creditItems = [{ description: `Credit: ${selectedInvoice.invoice_number}`, quantity: 1, unit_price: -Math.abs(selectedInvoice.subtotal || selectedInvoice.total), btw_rate: 0 }];
+                  await invoiceService.create({
+                    client_id: selectedInvoice.client_id, invoice_date: todayISO(), delivery_date: todayISO(),
+                    due_date: todayISO(), payment_terms_days: 0,
+                    description: `Credit factuur voor ${selectedInvoice.invoice_number}`, items: creditItems,
+                  });
+                  setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
+                } catch {} finally { setSaving(false); }
               }} className="py-3 rounded-2xl bg-red-500 text-white font-bold text-base">{t('invoice.ja')}</button>
             </div>
           </motion.div>

@@ -19,124 +19,117 @@ function dt(s: string) { return new Date(s).toLocaleDateString('nl-NL', { day: '
 
 export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: 'A4', margins: { top: 40, bottom: 40, left: 50, right: 50 } });
+    const doc = new PDFDocument({ size: 'A4', margins: { top: 40, bottom: 40, left: 55, right: 55 } });
     const chunks: Buffer[] = [];
     doc.on('data', (c: Buffer) => chunks.push(c));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    const L = 50, R = 545, W = R - L;
-    const dk = '#000000', md = '#444444', bk = '#000000';
-    let y = 30;
-    const title = data.docTitle || 'FACTUUR';
-
-    doc.rect(L - 2, y - 2, W + 4, 760).stroke(bk);
+    const L = 55, R = 540, W = R - L;
+    const dk = '#000000', md = '#444444', lt = '#cccccc';
+    const rx = 340, vx = 400;
+    let y = 40;
+    const title = data.docTitle || 'Factuur';
 
     const logoPath = data.supplierLogo ? path.resolve(data.supplierLogo.startsWith('/') ? data.supplierLogo : path.join(__dirname, '../../../', data.supplierLogo)) : null;
     if (logoPath && fs.existsSync(logoPath)) {
-      try { doc.image(logoPath, L + 10, y + 8, { height: 36 }); } catch { doc.font('Helvetica-Bold').fontSize(18).fillColor('#1e40af').text(title, L + 10, y + 12); }
+      try { doc.image(logoPath, L, y, { height: 40 }); y += 48; } catch { doc.font('Helvetica-Bold').fontSize(22).fillColor(dk).text(data.supplierName, L, y); y += 30; }
     } else {
-      doc.font('Helvetica-Bold').fontSize(18).fillColor('#1e40af').text(title, L + 10, y + 12);
+      doc.font('Helvetica-Bold').fontSize(22).fillColor(dk).text(data.supplierName, L, y);
+      y += 30;
     }
 
-    const rx = 340, vx = 400;
-    doc.font('Helvetica').fontSize(8.5).fillColor(md);
-    doc.text(data.supplierName, vx, y + 8, { width: 140, align: 'right' });
-    doc.text(data.supplierAddress, vx, y + 19, { width: 140, align: 'right' });
-    doc.text(`${data.supplierPostcode} ${data.supplierCity}`, vx, y + 30, { width: 140, align: 'right' });
-    let cy = y + 41;
-    if (data.supplierKvk) { doc.text(`KVK: ${data.supplierKvk}`, vx, cy, { width: 140, align: 'right' }); cy += 11; }
-    if (data.supplierBtw) { doc.text(`BTW: ${data.supplierBtw}`, vx, cy, { width: 140, align: 'right' }); cy += 11; }
-    if (data.supplierPhone) { doc.text(`Tel: ${data.supplierPhone}`, vx, cy, { width: 140, align: 'right' }); }
+    doc.font('Helvetica').fontSize(9).fillColor(md);
+    doc.text(data.supplierAddress, vx, 40);
+    doc.text(`${data.supplierPostcode} ${data.supplierCity}`, vx, 53);
+    let contactY = 66;
+    if (data.supplierPhone) {
+      doc.font('Helvetica-Bold').fontSize(9).fillColor(dk).text('telefoon', rx, contactY);
+      doc.font('Helvetica').fontSize(9).fillColor(md).text(data.supplierPhone, vx, contactY);
+      contactY += 13;
+    }
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(dk).text('e-mail', rx, contactY);
+    doc.font('Helvetica').fontSize(9).fillColor(md).text(data.supplierEmail || '', vx, contactY);
+    contactY += 16;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(dk).text('IBAN', rx, contactY);
+    doc.font('Helvetica').text(data.supplierIban, vx, contactY); contactY += 13;
+    doc.font('Helvetica-Bold').text('Btw-nr', rx, contactY);
+    doc.font('Helvetica').text(data.supplierBtw, vx, contactY); contactY += 13;
+    doc.font('Helvetica-Bold').text('KvK', rx, contactY);
+    doc.font('Helvetica').text(data.supplierKvk, vx, contactY);
 
-    y += 60;
-    doc.moveTo(L, y).lineTo(R, y).lineWidth(0.5).strokeColor(bk).stroke();
+    y = Math.max(y + 10, 100);
+    doc.font('Helvetica-Bold').fontSize(16).fillColor(dk).text(title, L, y);
+    y += 22;
 
-    y += 10;
-    const leftX = L + 10;
-    const label = title === 'OFFERTE' ? 'Offerte aan' : 'Factuur aan';
-    doc.font('Helvetica-Bold').fontSize(7).fillColor('#9ca3af').text(label.toUpperCase(), leftX, y);
-    y += 12;
-    doc.font('Helvetica-Bold').fontSize(9).fillColor(dk).text(data.customerName || '-', leftX, y);
-    y += 12;
-    doc.font('Helvetica').fontSize(8.5).fillColor(md);
-    if (data.customerAddress) { doc.text(data.customerAddress, leftX, y); y += 11; }
+    doc.font('Helvetica-Bold').fontSize(10).fillColor(dk).text(data.customerName, L, y);
+    y += 13;
+    doc.font('Helvetica').fontSize(9).fillColor(md);
+    if (data.customerAddress) { doc.text(data.customerAddress, L, y); y += 11; }
     const custLoc = `${data.customerPostcode} ${data.customerCity}`.trim();
-    if (custLoc) { doc.text(custLoc, leftX, y); y += 11; }
+    if (custLoc) { doc.text(custLoc, L, y); y += 11; }
 
-    const numLabel = title === 'OFFERTE' ? 'Offertenummer' : 'Factuurnummer';
-    const dateLabel = title === 'OFFERTE' ? 'Offertedatum' : 'Factuurdatum';
-    const infoX = 370, valX = 450;
-    let infoY = y - 34;
-    doc.font('Helvetica').fontSize(8).fillColor('#9ca3af');
-    doc.text(numLabel + ':', infoX, infoY); doc.font('Helvetica-Bold').fontSize(8).fillColor(md).text(data.invoiceNumber, valX, infoY); infoY += 12;
-    doc.font('Helvetica').fillColor('#9ca3af').text(dateLabel + ':', infoX, infoY); doc.font('Helvetica-Bold').fillColor(md).text(dt(data.invoiceDate), valX, infoY); infoY += 12;
-    if (data.dueDate) { doc.font('Helvetica').fillColor('#9ca3af').text('Vervaldatum:', infoX, infoY); doc.font('Helvetica-Bold').fillColor(md).text(dt(data.dueDate), valX, infoY); infoY += 12; }
-    if (data.deliveryDate) { doc.font('Helvetica').fillColor('#9ca3af').text('Leveringsdatum:', infoX, infoY); doc.font('Helvetica-Bold').fillColor(md).text(dt(data.deliveryDate), valX, infoY); }
+    y = Math.max(y + 8, 160);
 
-    if (data.description) {
-      y += 5;
-      doc.font('Helvetica').fontSize(8).fillColor('#9ca3af').text('Opmerking: ', leftX, y, { continued: true });
-      doc.fillColor(md).text(data.description);
-      y += 14;
-    }
+    doc.rect(L, y, 235, 82).fillAndStroke('#f9f9f9', lt);
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(dk).text('Betaalgegevens', L + 5, y + 4);
+    doc.font('Helvetica').fontSize(9).fillColor(md);
+    doc.text('Te betalen', L + 5, y + 18); doc.font('Helvetica-Bold').fillColor(dk).text(eur(data.total), L + 85, y + 18);
+    doc.font('Helvetica').fillColor(md).text('Naar IBAN', L + 5, y + 31); doc.font('Helvetica-Bold').fillColor(dk).text(data.supplierIban, L + 85, y + 31);
+    doc.font('Helvetica').fillColor(md).text('Op naam van', L + 5, y + 44); doc.font('Helvetica-Bold').fillColor(dk).text(data.supplierName, L + 85, y + 44);
+    doc.font('Helvetica').fillColor(md).text('Betalingstermijn', L + 5, y + 57); doc.font('Helvetica-Bold').fillColor(dk).text(`${data.paymentDays} dagen`, L + 85, y + 57);
 
-    y = Math.max(y + 10, 220);
+    const numLabel = title === 'Offerte' ? 'Offertenummer' : 'Factuurnummer';
+    const dateLabel = title === 'Offerte' ? 'Offertedatum' : 'Factuurdatum';
+    doc.font('Helvetica').fontSize(9).fillColor(md);
+    doc.text(numLabel, rx, y + 18); doc.font('Helvetica-Bold').fillColor(dk).text(data.invoiceNumber, rx + 90, y + 18);
+    doc.font('Helvetica').fillColor(md).text(dateLabel, rx, y + 33); doc.font('Helvetica-Bold').fillColor(dk).text(dt(data.invoiceDate), rx + 90, y + 33);
 
-    doc.moveTo(L + 5, y).lineTo(R - 5, y).lineWidth(1).strokeColor(bk).stroke();
-    y += 4;
-    doc.font('Helvetica-Bold').fontSize(8).fillColor('#6b7280');
-    doc.text('Omschrijving', leftX, y);
-    doc.text('Aantal', 370, y, { width: 45, align: 'right' });
-    doc.text('Prijs', 420, y, { width: 50, align: 'right' });
-    doc.text('BTW', 472, y, { width: 30, align: 'right' });
-    doc.text('Bedrag', 505, y, { width: R - 510, align: 'right' });
-    y += 14;
-    doc.moveTo(L + 5, y).lineTo(R - 5, y).lineWidth(1).strokeColor(bk).stroke();
-    y += 6;
+    y += 100;
 
-    doc.font('Helvetica').fontSize(8.5).fillColor(dk);
+    doc.rect(L, y, W, 18).fillAndStroke('#f5f5f5', lt);
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(dk);
+    doc.text('Omschrijving', L + 5, y + 4);
+    doc.text('Aantal', 370, y + 4, { width: 50, align: 'right' });
+    doc.text('Prijs', 425, y + 4, { width: 55, align: 'right' });
+    doc.text('Totaal', 485, y + 4, { width: R - 485, align: 'right' });
+    y += 28;
+
+    doc.font('Helvetica').fontSize(9).fillColor(dk);
     data.items.forEach(item => {
-      doc.text(item.description || '-', leftX, y, { width: 290 });
-      doc.text(item.quantity.toFixed(2).replace('.', ','), 370, y, { width: 45, align: 'right' });
-      doc.text(eur(item.unitPrice).replace('\u20AC ', ''), 420, y, { width: 50, align: 'right' });
-      doc.text(`${item.btwRate}%`, 472, y, { width: 30, align: 'right' });
-      doc.text(eur(item.lineTotal).replace('\u20AC ', ''), 505, y, { width: R - 510, align: 'right' });
-      y += 15;
-      doc.moveTo(L + 5, y - 2).lineTo(R - 5, y - 2).lineWidth(0.3).strokeColor('#d1d5db').stroke();
+      doc.text(item.description, L + 5, y, { width: 305 });
+      doc.text(item.quantity.toFixed(2).replace('.', ','), 370, y, { width: 50, align: 'right' });
+      doc.text(eur(item.unitPrice).replace('\u20AC ', ''), 425, y, { width: 55, align: 'right' });
+      doc.text(eur(item.lineTotal).replace('\u20AC ', ''), 485, y, { width: R - 485, align: 'right' });
+      y += 14;
     });
 
-    y += 10;
-    const totX = 400, totVX = 480;
-    doc.font('Helvetica').fontSize(8.5).fillColor('#6b7280');
-    doc.text('Subtotaal:', totX, y); doc.fillColor(dk).text(eur(data.subtotal), totVX, y, { width: R - totVX - 10, align: 'right' }); y += 13;
-    doc.fillColor('#6b7280').text('BTW:', totX, y); doc.fillColor(dk).text(eur(data.btwAmount), totVX, y, { width: R - totVX - 10, align: 'right' }); y += 13;
-    doc.moveTo(totX, y).lineTo(R - 10, y).lineWidth(1).strokeColor(bk).stroke(); y += 5;
-    doc.font('Helvetica-Bold').fontSize(10).fillColor('#1e40af');
-    doc.text('Totaal:', totX, y); doc.text(eur(data.total), totVX, y, { width: R - totVX - 10, align: 'right' });
+    const footerY = 735;
+    doc.rect(L, footerY, W, 24).fillAndStroke('#f5f5f5', lt);
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(dk);
+    const btwText = data.items[0]?.btwRate === 0
+      ? `Btw verlegd naar u. Uw btw-nummer is ${data.customerBtw || data.supplierBtw}.`
+      : `BTW ${data.items[0]?.btwRate || 21}%: ${eur(data.btwAmount)}`;
+    doc.text(btwText, L + 5, footerY + 7);
+    const totalLabel = title === 'Offerte' ? 'Offertebedrag' : 'Factuurbedrag';
+    doc.text(totalLabel, 390, footerY + 4);
+    doc.fontSize(9).text('\u20AC', 460, footerY + 4);
+    doc.text(eur(data.total).replace('\u20AC ', ''), 472, footerY + 4, { width: R - 477, align: 'right' });
 
-    const payY = 680;
-    doc.moveTo(L + 5, payY).lineTo(R - 5, payY).lineWidth(0.5).strokeColor(bk).stroke();
-    doc.font('Helvetica-Bold').fontSize(8).fillColor('#1e40af').text('Betaalgegevens', leftX, payY + 6);
-    doc.font('Helvetica').fontSize(8).fillColor(md);
-    doc.text(`IBAN: ${data.supplierIban}   t.n.v. ${data.supplierName}`, leftX, payY + 18);
-    doc.text(`Betalingstermijn: ${data.paymentDays} dagen`, leftX, payY + 30);
-
-    const footY = 720;
-    doc.font('Helvetica').fontSize(7).fillColor('#9ca3af');
-    doc.text(`${data.supplierName} | KVK: ${data.supplierKvk} | BTW: ${data.supplierBtw}`, L, footY, { width: W, align: 'center' });
-
-    const bannerY = 758;
-    doc.rect(L - 2, bannerY, W + 4, 30).fill('#DFFF00');
-    const p1 = title === 'OFFERTE' ? 'Deze offerte is gemaakt met ' : 'Deze factuur is gemaakt met ';
-    doc.font('Helvetica').fontSize(9);
+    const bannerY = 770;
+    doc.rect(0, bannerY, 595, 30).fill('#DFFF00');
+    const p1 = title === 'Offerte' ? 'Deze offerte is gemaakt met ' : 'Deze factuur is gemaakt met ';
+    doc.font('Helvetica').fontSize(10);
     const p1w = doc.widthOfString(p1);
-    doc.font('Helvetica-Bold').fontSize(11);
+    doc.font('Helvetica-Bold').fontSize(12);
     const p2w = doc.widthOfString('numr');
-    const fx = L + (W - p1w - p2w) / 2;
-    const fy = bannerY + 9;
-    doc.font('Helvetica').fontSize(9).fillColor(dk).text(p1, fx, fy, { lineBreak: false });
-    doc.font('Helvetica-Bold').fontSize(11).fillColor(dk).text('numr', fx + p1w, fy - 1, { lineBreak: false });
+    const fx = (595 - p1w - p2w) / 2;
+    const fy = bannerY + 10;
+    doc.font('Helvetica').fontSize(10).fillColor('#000000').text(p1, fx, fy, { lineBreak: false });
+    const sx = fx + p1w;
+    const sy = fy - 1;
+    doc.font('Helvetica-Bold').fontSize(12).fillColor('#ffffff').text('numr', sx + 0.6, sy + 0.6, { lineBreak: false });
+    doc.font('Helvetica-Bold').fontSize(12).fillColor('#000000').text('numr', sx, sy, { lineBreak: false });
 
     doc.end();
   });

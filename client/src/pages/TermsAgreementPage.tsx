@@ -63,6 +63,21 @@ export default function TermsAgreementPage() {
 
           <h4 className="font-bold text-dark text-sm">10. Toepasselijk Recht</h4>
           <p>Op deze overeenkomst is Nederlands recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechter te Amsterdam.</p>
+
+          <h4 className="font-bold text-dark text-sm">11. BTW Hulp Functie</h4>
+          <p>De BTW Hulp functie binnen numr is uitsluitend bedoeld als hulpmiddel en kan onnauwkeurigheden bevatten. De gebruiker is te allen tijde zelf verantwoordelijk voor de juistheid van de BTW-berekening en het toepassen van het juiste BTW-tarief. MRE Finance aanvaardt geen enkele aansprakelijkheid voor onjuiste BTW-adviezen, verkeerd toegepaste tarieven of enige financiele schade die hieruit voortvloeit.</p>
+
+          <h4 className="font-bold text-dark text-sm">12. Disclaimer of Warranties</h4>
+          <p>De dienst wordt geleverd "as is" en "as available" zonder enige garantie, expliciet of impliciet. MRE Finance garandeert niet dat de dienst ononderbroken, veilig of foutloos zal functioneren.</p>
+
+          <h4 className="font-bold text-dark text-sm">13. Beperking van Aansprakelijkheid</h4>
+          <p>In geen geval zal MRE Finance aansprakelijk zijn voor indirecte, incidentele, bijzondere, gevolg- of punitieve schade, inclusief maar niet beperkt tot verlies van winst, gegevens, gebruik, goodwill of andere immatieriele verliezen, ongeacht of MRE Finance op de hoogte is gesteld van de mogelijkheid van dergelijke schade.</p>
+
+          <h4 className="font-bold text-dark text-sm">14. Vrijwaring (Indemnificatie)</h4>
+          <p>De gebruiker vrijwaart MRE Finance, haar directeuren, werknemers en partners van alle claims, verliezen, kosten en schade (inclusief juridische kosten) die voortvloeien uit het gebruik van de dienst, schending van deze voorwaarden of inbreuk op rechten van derden.</p>
+
+          <h4 className="font-bold text-dark text-sm">15. Gebruikersinhoud</h4>
+          <p>De gebruiker is volledig verantwoordelijk voor alle inhoud die via numr wordt aangemaakt, verzonden of opgeslagen. MRE Finance is niet verantwoordelijk voor de juistheid, volledigheid of rechtmatigheid van door gebruikers gegenereerde facturen, offertes of andere documenten.</p>
         </div>
       </div>
 
