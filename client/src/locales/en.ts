@@ -105,4 +105,5 @@ registerLocale('en', {
   'offerte.convert':'Convert to invoice','offerte.convertConfirm':'Do you want to convert this quote to an invoice?','offerte.converted':'Converted','offerte.open':'Open',
   'export.confirm':'Do you want to download all invoices?','export.allInvoices':'All invoices','common.downloaden':'Download',
   'rating.title':'Enjoying numr?','rating.desc':'Rate us on the App Store','rating.button':'Rate numr',
+  'settings.deleteAccount':'Delete account','settings.deleteTitle':'Delete your account?','settings.deleteDesc':'All your data will be permanently deleted. This cannot be undone.','settings.deleteConfirm':'Delete',
 });

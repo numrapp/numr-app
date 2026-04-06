@@ -37,12 +37,8 @@ export default function VideoUploadPage() {
               <Camera size={40} className="mx-auto mb-4 text-brand" />
               <p className="text-lg font-extrabold text-dark mb-2">{t('status.toegangGalerij')}</p>
               <p className="text-sm text-gray-500 mb-6">{t('status.toegangBeschrijving')}</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => { setShowPermission(false); navigate('/status'); }}
-                  className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold">{t('status.weigeren')}</button>
-                <button onClick={() => { setShowPermission(false); setShowContactPermission(true); }}
-                  className="py-3 rounded-2xl bg-brand text-dark font-bold">{t('status.toestaan')}</button>
-              </div>
+              <button onClick={() => { setShowPermission(false); setShowContactPermission(true); }}
+                className="w-full py-3 rounded-2xl bg-brand text-dark font-bold">{t('common.volgende')}</button>
             </motion.div>
           </motion.div>
         )}
@@ -55,12 +51,8 @@ export default function VideoUploadPage() {
               <svg className="mx-auto mb-4 w-10 h-10 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               <p className="text-lg font-extrabold text-dark mb-2">{t('status.toegangContacten')}</p>
               <p className="text-sm text-gray-500 mb-6">{t('status.toegangContactenBeschrijving')}</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => { setShowContactPermission(false); handleGrant(); }}
-                  className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold">{t('status.weigeren')}</button>
-                <button onClick={() => { setShowContactPermission(false); handleGrant(); }}
-                  className="py-3 rounded-2xl bg-brand text-dark font-bold">{t('status.toestaan')}</button>
-              </div>
+              <button onClick={() => { setShowContactPermission(false); handleGrant(); }}
+                className="w-full py-3 rounded-2xl bg-brand text-dark font-bold">{t('common.volgende')}</button>
             </motion.div>
           </motion.div>
         )}

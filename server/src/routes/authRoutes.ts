@@ -132,4 +132,19 @@ router.put('/profile', authMiddleware, (req: AuthRequest, res) => {
   }
 });
 
+router.delete('/account', authMiddleware, (req: AuthRequest, res) => {
+  try {
+    const userId = req.userId!;
+    const invoices = queryAll('SELECT id FROM invoices WHERE user_id = ?', [userId]);
+    for (const inv of invoices) { run('DELETE FROM invoice_items WHERE invoice_id = ?', [inv.id]); }
+    run('DELETE FROM invoices WHERE user_id = ?', [userId]);
+    const offertes = queryAll('SELECT id FROM offertes WHERE user_id = ?', [userId]);
+    for (const off of offertes) { run('DELETE FROM offerte_items WHERE offerte_id = ?', [off.id]); }
+    run('DELETE FROM offertes WHERE user_id = ?', [userId]);
+    run('DELETE FROM clients WHERE user_id = ?', [userId]);
+    run('DELETE FROM users WHERE id = ?', [userId]);
+    res.json({ success: true });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
 export default router;

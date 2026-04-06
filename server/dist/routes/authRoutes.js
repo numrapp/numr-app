@@ -117,5 +117,26 @@ router.put('/profile', auth_1.authMiddleware, (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+router.delete('/account', auth_1.authMiddleware, (req, res) => {
+    try {
+        const userId = req.userId;
+        const invoices = (0, database_1.queryAll)('SELECT id FROM invoices WHERE user_id = ?', [userId]);
+        for (const inv of invoices) {
+            (0, database_1.run)('DELETE FROM invoice_items WHERE invoice_id = ?', [inv.id]);
+        }
+        (0, database_1.run)('DELETE FROM invoices WHERE user_id = ?', [userId]);
+        const offertes = (0, database_1.queryAll)('SELECT id FROM offertes WHERE user_id = ?', [userId]);
+        for (const off of offertes) {
+            (0, database_1.run)('DELETE FROM offerte_items WHERE offerte_id = ?', [off.id]);
+        }
+        (0, database_1.run)('DELETE FROM offertes WHERE user_id = ?', [userId]);
+        (0, database_1.run)('DELETE FROM clients WHERE user_id = ?', [userId]);
+        (0, database_1.run)('DELETE FROM users WHERE id = ?', [userId]);
+        res.json({ success: true });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=authRoutes.js.map

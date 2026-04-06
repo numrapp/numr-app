@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, LogOut, Eye, EyeOff, Camera } from 'lucide-react';
+import { ArrowLeft, Save, LogOut, Eye, EyeOff, Camera, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import { authService } from '../services/authService';
@@ -17,6 +18,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (user) setForm({...user}); }, [user]);
@@ -95,9 +98,29 @@ export default function SettingsPage() {
 
           <button onClick={handleSave} disabled={saving} className="btn-brand w-full flex items-center justify-center gap-2"><Save size={18} /> {saving?'...':t('settings.opslaan')}</button>
           <button onClick={logout} className="w-full py-3 text-center text-red-500 font-extrabold text-sm mt-2"><LogOut size={16} className="inline mr-2" />{t('settings.uitloggen')}</button>
+          <button onClick={() => setShowDelete(true)} className="w-full py-3 text-center text-red-400 font-bold text-xs mt-1"><Trash2 size={14} className="inline mr-1" />{t('settings.deleteAccount')}</button>
         </div>
         <FooterBanner />
       </div>
+
+      <AnimatePresence>
+        {showDelete && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-6">
+            <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+              <Trash2 size={32} className="mx-auto mb-4 text-red-500" />
+              <p className="text-lg font-extrabold text-dark mb-2">{t('settings.deleteTitle')}</p>
+              <p className="text-sm text-gray-500 mb-6">{t('settings.deleteDesc')}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => setShowDelete(false)} className="py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-base">{t('common.annuleren')}</button>
+                <button onClick={async () => {
+                  setDeleting(true);
+                  try { await api.delete('/auth/account'); logout(); } catch {} finally { setDeleting(false); setShowDelete(false); }
+                }} disabled={deleting} className="py-3 rounded-2xl bg-red-500 text-white font-bold text-base disabled:opacity-50">{deleting ? '...' : t('settings.deleteConfirm')}</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

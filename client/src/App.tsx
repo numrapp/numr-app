@@ -30,7 +30,6 @@ function P({ children }: { children: React.ReactNode }) {
   if (loading) return <div className="h-full flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
   if (!user) return <Navigate to="/login" replace />;
   if (!(user as any).terms_accepted) return <Navigate to="/terms-agreement" replace />;
-  if (!(user as any).subscription_type) return <Navigate to="/subscription" replace />;
   return <>{children}</>;
 }
 

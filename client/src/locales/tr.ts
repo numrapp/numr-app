@@ -105,4 +105,5 @@ registerLocale('tr', {
   'offerte.convert':'Faturaya donustur','offerte.convertConfirm':'Bu teklifi faturaya donusturmek istiyor musunuz?','offerte.converted':'Donusturuldu','offerte.open':'Acik',
   'export.confirm':'Tum faturalari indirmek istiyor musunuz?','export.allInvoices':'Tum faturalar','common.downloaden':'Indir',
   'rating.title':'numr\'u begendiniz mi?','rating.desc':'App Store\'da bizi degerlendirin','rating.button':'numr\'u degerlendir',
+  'settings.deleteAccount':'Hesabi sil','settings.deleteTitle':'Hesabi silmek istiyor musunuz?','settings.deleteDesc':'Tum verileriniz kalici olarak silinecektir. Bu islem geri alinamaz.','settings.deleteConfirm':'Sil',
 });

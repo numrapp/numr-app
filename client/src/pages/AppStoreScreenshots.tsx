@@ -172,7 +172,7 @@ export default function AppStoreScreenshots() {
           </div>
           <div style={{ position: 'absolute', bottom: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <div style={{ background: 'linear-gradient(135deg, #DFFF00 0%, #C8E600 100%)', borderRadius: 16, padding: '16px 56px', boxShadow: '0 10px 40px rgba(223,255,0,0.35)' }}>
-              <span style={{ fontSize: 16, fontWeight: 900, color: '#1A1A1A' }}>Download nu gratis</span>
+              <span style={{ fontSize: 16, fontWeight: 900, color: '#1A1A1A' }}>Download nu</span>
             </div>
           </div>
         </div>}

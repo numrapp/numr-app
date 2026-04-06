@@ -18,7 +18,7 @@ export default function TermsAgreementPage() {
     try {
       await api.post('/auth/accept-terms');
       await refreshUser();
-      navigate('/subscription');
+      navigate('/');
     } catch {} finally { setLoading(false); }
   };
 
