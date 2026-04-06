@@ -52,7 +52,7 @@ function ScreenLangs({ size }: { size: 'phone' | 'ipad' }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${isIpad ? 40 : 36}px ${isIpad ? 40 : 24}px ${isIpad ? 30 : 20}px`,
     }}>
       <h2 style={{ fontSize: isIpad ? 34 : 24, fontWeight: 900, color: '#1A1A1A', textAlign: 'center', lineHeight: 1.2, marginBottom: 4 }}>
-        De slimste manier om<br/>facturen te versturen
+        De slimste manier om facturen te versturen
       </h2>
       <p style={{ fontSize: isIpad ? 16 : 12, color: '#64748B', fontWeight: 600, marginBottom: isIpad ? 20 : 14 }}>8 talen beschikbaar</p>
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: isIpad ? 8 : 6, flex: 1 }}>
