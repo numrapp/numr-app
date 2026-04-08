@@ -28,7 +28,7 @@ export default function StatusProfilePage() {
     <div className="h-full flex flex-col safe-top">
       <div className="px-5 pt-5 flex items-center justify-between flex-shrink-0 mb-4">
         <span className="text-lg font-black text-brand notranslate">numr</span>
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('status.profiel')}</span>
+        <button onClick={() => navigate('/')} className="text-sm font-extrabold text-brand active:opacity-70">{t('nav.mainMenu')}</button>
       </div>
 
       <div className="page-scroll px-5 pb-4">

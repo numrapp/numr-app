@@ -17,8 +17,9 @@ export default function StatusPage() {
 
   return (
     <div className="h-full flex flex-col safe-top">
-      <div className="px-5 pt-5 flex items-center flex-shrink-0 mb-2">
+      <div className="px-5 pt-5 flex items-center justify-between flex-shrink-0 mb-2">
         <span className="text-lg font-black text-brand notranslate">numr</span>
+        <button onClick={() => navigate('/')} className="text-sm font-extrabold text-brand active:opacity-70">{t('nav.mainMenu')}</button>
       </div>
 
       <div className="px-5 mb-2 flex gap-3 overflow-x-auto no-scrollbar flex-shrink-0">

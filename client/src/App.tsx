@@ -53,7 +53,7 @@ const FULL_SCREEN = ['/status/video'];
 export default function App() {
   const location = useLocation();
   const showBar = !NO_BAR.includes(location.pathname) && !FULL_SCREEN.some(p => location.pathname.startsWith(p));
-  const isStatusInternal = location.pathname.startsWith('/status/');
+  const isStatus = location.pathname.startsWith('/status');
 
   return (
     <div className="h-full flex flex-col">
@@ -86,7 +86,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-      {showBar && !isStatusInternal && <BottomBar />}
+      {showBar && !isStatus && <BottomBar />}
     </div>
   );
 }

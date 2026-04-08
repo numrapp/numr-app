@@ -10,9 +10,9 @@ export default function StatusMessagesPage() {
 
   return (
     <div className="h-full flex flex-col safe-top">
-      <div className="px-5 pt-5 flex items-center gap-3 mb-4 flex-shrink-0">
+      <div className="px-5 pt-5 flex items-center justify-between mb-4 flex-shrink-0">
         <span className="text-lg font-black text-brand notranslate">numr</span>
-        <h1 className="text-lg font-extrabold text-dark flex-1">{t('status.berichten')}</h1>
+        <button onClick={() => navigate('/')} className="text-sm font-extrabold text-brand active:opacity-70">{t('nav.mainMenu')}</button>
       </div>
 
       <div className="page-scroll px-5 pb-4">

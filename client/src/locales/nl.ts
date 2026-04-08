@@ -106,4 +106,5 @@ registerLocale('nl', {
   'export.confirm':'Wilt u alle facturen downloaden?','export.allInvoices':'Alle facturen','common.downloaden':'Downloaden',
   'rating.title':'Vind je numr leuk?','rating.desc':'Beoordeel ons op de App Store','rating.button':'Beoordeel numr',
   'settings.deleteAccount':'Account verwijderen','settings.deleteTitle':'Account verwijderen?','settings.deleteDesc':'Alle gegevens worden permanent verwijderd. Dit kan niet ongedaan worden gemaakt.','settings.deleteConfirm':'Verwijderen',
+  'nav.mainMenu':'Hoofdmenu','status.fileTooLarge':'Bestand is te groot (max 100MB)','status.fileError':'Fout bij het selecteren van het bestand',
 });

@@ -106,4 +106,5 @@ registerLocale('tr', {
   'export.confirm':'Tum faturalari indirmek istiyor musunuz?','export.allInvoices':'Tum faturalar','common.downloaden':'Indir',
   'rating.title':'numr\'u begendiniz mi?','rating.desc':'App Store\'da bizi degerlendirin','rating.button':'numr\'u degerlendir',
   'settings.deleteAccount':'Hesabi sil','settings.deleteTitle':'Hesabi silmek istiyor musunuz?','settings.deleteDesc':'Tum verileriniz kalici olarak silinecektir. Bu islem geri alinamaz.','settings.deleteConfirm':'Sil',
+  'nav.mainMenu':'Ana Menu','status.fileTooLarge':'Dosya cok buyuk (max 100MB)','status.fileError':'Dosya secilirken hata olustu',
 });

@@ -106,4 +106,5 @@ registerLocale('en', {
   'export.confirm':'Do you want to download all invoices?','export.allInvoices':'All invoices','common.downloaden':'Download',
   'rating.title':'Enjoying numr?','rating.desc':'Rate us on the App Store','rating.button':'Rate numr',
   'settings.deleteAccount':'Delete account','settings.deleteTitle':'Delete your account?','settings.deleteDesc':'All your data will be permanently deleted. This cannot be undone.','settings.deleteConfirm':'Delete',
+  'nav.mainMenu':'Main Menu','status.fileTooLarge':'File is too large (max 100MB)','status.fileError':'Error selecting file',
 });
