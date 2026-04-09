@@ -16,11 +16,15 @@ export default function StatusProfilePage() {
   const myVideos = mockVideos.slice(0, 3);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setProfileImg(ev.target?.result as string);
-      reader.readAsDataURL(file);
+    try {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) return;
+      if (profileImg) URL.revokeObjectURL(profileImg);
+      setProfileImg(URL.createObjectURL(file));
+    } catch (err) {
+      console.error('Photo upload error:', err);
     }
   };
 
@@ -43,7 +47,7 @@ export default function StatusProfilePage() {
             </div>
             <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-brand flex items-center justify-center cursor-pointer shadow-md active:scale-90 transition-transform">
               <Camera size={14} className="text-dark" />
-              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+              <input type="file" accept="image/jpeg,image/png,image/heic" className="hidden" onChange={handlePhotoUpload} />
             </label>
           </div>
           <p className="text-lg font-extrabold text-dark">{user?.company_name || 'numr'}</p>

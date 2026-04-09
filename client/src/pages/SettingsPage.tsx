@@ -28,15 +28,19 @@ export default function SettingsPage() {
   const handleSave = async () => { setSaving(true);setMessage('');try{await authService.updateProfile(form);await refreshUser();setMessage(t('settings.opgeslagen'));setTimeout(()=>setMessage(''),3000);}catch{setMessage('Error');}finally{setSaving(false);} };
 
   const handleLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const fd = new FormData();
-    fd.append('logo', file);
     try {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { setMessage('Max 5MB'); return; }
+      const fd = new FormData();
+      fd.append('logo', file);
       const res = await api.post('/upload-logo', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(p => ({ ...p, logo_path: res.data.logo_path }));
       await refreshUser();
-    } catch {}
+    } catch (err) {
+      console.error('Logo upload error:', err);
+    }
   };
 
   return (
@@ -62,7 +66,7 @@ export default function SettingsPage() {
               <button onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-brand flex items-center justify-center shadow-md">
                 <Camera size={14} className="text-dark" />
               </button>
-              <input ref={fileRef} type="file" accept="image/*" onChange={handleLogo} className="hidden" />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/heic" onChange={handleLogo} className="hidden" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-bold text-dark">{t('settings.logoUpload')}</p>

@@ -29,15 +29,16 @@ export default function VideoUploadPage() {
     try {
       setError('');
       const selected = e.target.files?.[0];
+      e.target.value = '';
       if (!selected) return;
       if (selected.size > MAX_FILE_SIZE) {
         setError(t('status.fileTooLarge'));
-        e.target.value = '';
         return;
       }
       setFile(selected);
-    } catch {
+    } catch (err) {
       setError(t('status.fileError'));
+      console.error('File select error:', err);
     }
   };
 
@@ -113,7 +114,7 @@ export default function VideoUploadPage() {
                   <label className="block w-full p-8 border-2 border-dashed border-gray-200 rounded-2xl text-center cursor-pointer hover:border-brand transition-colors">
                     <Upload size={28} className="mx-auto text-gray-300 mb-2" />
                     <p className="text-sm font-bold text-gray-400">{t('status.selecteerVideo')}</p>
-                    <input type="file" accept="video/mp4,video/quicktime,video/x-m4v" capture={undefined} className="hidden" onChange={handleFileSelect} />
+                    <input type="file" accept="video/mp4,video/quicktime" className="hidden" onChange={handleFileSelect} />
                   </label>
                 )}
               </div>
