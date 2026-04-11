@@ -1,24 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Crown } from 'lucide-react';
+import { Crown, RotateCw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import api from '../services/api';
+import { purchaseMonthly, purchaseYearly, getSubscriptionStatus, restorePurchases, initStore, isStoreReady } from '../services/storeService';
 
 export default function SubscriptionPage() {
   const { t } = useI18n();
   const { refreshUser } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState('');
+  const [restoring, setRestoring] = useState(false);
+  const [ready, setReady] = useState(isStoreReady());
 
-  const handleSubscribe = async (type: 'monthly' | 'yearly') => {
+  useEffect(() => {
+    if (!ready) {
+      initStore().then(() => setReady(true));
+    }
+  }, [ready]);
+
+  const handlePurchase = async (type: 'monthly' | 'yearly') => {
     setLoading(type);
     try {
-      await api.post('/auth/subscribe', { type });
-      await refreshUser();
-      navigate('/');
+      const success = type === 'monthly' ? await purchaseMonthly() : await purchaseYearly();
+      if (success) {
+        await refreshUser();
+        navigate('/');
+      }
     } catch {} finally { setLoading(''); }
+  };
+
+  const handleRestore = async () => {
+    setRestoring(true);
+    try {
+      await restorePurchases();
+      const status = getSubscriptionStatus();
+      if (status.active) {
+        await refreshUser();
+        navigate('/');
+      }
+    } catch {} finally { setRestoring(false); }
   };
 
   return (
@@ -35,7 +57,7 @@ export default function SubscriptionPage() {
 
           <div className="space-y-4">
             <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.2}}
-              onClick={() => handleSubscribe('yearly')} disabled={!!loading}
+              onClick={() => handlePurchase('yearly')} disabled={!!loading}
               className="w-full p-5 rounded-3xl border-2 border-brand bg-brand/5 transition-all active:scale-[0.97] relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-brand text-dark text-[10px] font-extrabold px-3 py-1 rounded-bl-2xl">
                 {t('sub.popular')}
@@ -55,7 +77,7 @@ export default function SubscriptionPage() {
             </motion.button>
 
             <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.3}}
-              onClick={() => handleSubscribe('monthly')} disabled={!!loading}
+              onClick={() => handlePurchase('monthly')} disabled={!!loading}
               className="w-full p-5 rounded-3xl border border-gray-200 bg-white transition-all active:scale-[0.97] relative">
               <div className="flex items-center justify-between">
                 <div className="text-left">
@@ -71,9 +93,12 @@ export default function SubscriptionPage() {
             </motion.button>
           </div>
 
-          <div className="text-center mt-6 space-y-1">
+          <div className="text-center mt-6 space-y-2">
             <p className="text-sm font-bold text-dark">{t('sub.trial')}</p>
             <p className="text-[11px] text-gray-400">{t('sub.cancelAnytime')}</p>
+            <button onClick={handleRestore} disabled={restoring} className="flex items-center justify-center gap-1.5 mx-auto mt-3 text-sm font-bold text-gray-400 hover:text-dark transition-colors">
+              <RotateCw size={14} className={restoring ? 'animate-spin' : ''} /> {t('sub.restore')}
+            </button>
           </div>
         </motion.div>
       </div>
