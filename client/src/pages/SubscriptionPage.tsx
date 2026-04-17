@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Crown, RotateCw } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { purchaseMonthly, purchaseYearly, getSubscriptionStatus, restorePurchases, initStore, isStoreReady } from '../services/storeService';
+import { purchaseMonthly, purchaseYearly, restorePurchases } from '../services/storeService';
+import api from '../services/api';
 
 export default function SubscriptionPage() {
   const { t } = useI18n();
@@ -12,19 +14,16 @@ export default function SubscriptionPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState('');
   const [restoring, setRestoring] = useState(false);
-  const [ready, setReady] = useState(isStoreReady());
-
-  useEffect(() => {
-    if (!ready) {
-      initStore().then(() => setReady(true));
-    }
-  }, [ready]);
+  const isNative = Capacitor.isNativePlatform();
 
   const handlePurchase = async (type: 'monthly' | 'yearly') => {
     setLoading(type);
     try {
-      const success = type === 'monthly' ? await purchaseMonthly() : await purchaseYearly();
-      if (success) {
+      if (isNative) {
+        const success = type === 'monthly' ? await purchaseMonthly() : await purchaseYearly();
+        if (success) { await refreshUser(); navigate('/'); }
+      } else {
+        await api.post('/auth/subscribe', { type });
         await refreshUser();
         navigate('/');
       }
@@ -34,12 +33,9 @@ export default function SubscriptionPage() {
   const handleRestore = async () => {
     setRestoring(true);
     try {
-      await restorePurchases();
-      const status = getSubscriptionStatus();
-      if (status.active) {
-        await refreshUser();
-        navigate('/');
-      }
+      if (isNative) { await restorePurchases(); }
+      await refreshUser();
+      navigate('/');
     } catch {} finally { setRestoring(false); }
   };
 
