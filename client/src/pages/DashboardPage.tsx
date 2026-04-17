@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, FileText, Star, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, FileText } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import LanguageSelector from '../components/LanguageSelector';
@@ -11,20 +12,18 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const firstName = user?.company_name?.split(' ')[0] || '';
-  const [showRating, setShowRating] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem('rated')) {
-      const timer = setTimeout(() => setShowRating(true), 1500);
+      const timer = setTimeout(() => {
+        localStorage.setItem('rated', 'true');
+        if (Capacitor.isNativePlatform()) {
+          try { (window as any).webkit?.messageHandlers?.requestReview?.postMessage({}); } catch {}
+        }
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, []);
-
-  const handleRate = () => {
-    localStorage.setItem('rated', 'true');
-    setShowRating(false);
-    window.open('https://apps.apple.com/app/numr/id6744145967?action=write-review', '_blank');
-  };
 
   return (
     <div className="h-full flex flex-col safe-top">
@@ -84,26 +83,6 @@ export default function DashboardPage() {
           </motion.button>
         </div>
       </div>
-
-      <AnimatePresence>
-        {showRating && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-6">
-            <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="bg-white rounded-3xl p-6 w-full max-w-xs text-center shadow-2xl relative">
-              <button onClick={() => setShowRating(false)} className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                <X size={16} className="text-gray-500" />
-              </button>
-              <div className="flex justify-center gap-1 mb-4 mt-2">
-                {[1,2,3,4,5].map(i => <Star key={i} size={28} className="text-brand fill-brand" />)}
-              </div>
-              <p className="text-base font-extrabold text-dark mb-2">{t('rating.title')}</p>
-              <p className="text-sm text-gray-500 mb-5">{t('rating.desc')}</p>
-              <button onClick={handleRate} className="w-full py-3.5 rounded-2xl bg-brand text-dark font-extrabold text-base active:scale-[0.97] transition-all">
-                {t('rating.button')}
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

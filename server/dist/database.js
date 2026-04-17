@@ -140,6 +140,20 @@ async function initDatabase() {
     )
   `);
     save();
+    db.run(`
+    CREATE TABLE IF NOT EXISTS status_videos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      category TEXT DEFAULT '',
+      description TEXT DEFAULT '',
+      video_path TEXT DEFAULT '',
+      company_name TEXT DEFAULT '',
+      location TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+    save();
     const cols = ['terms_accepted', 'subscription_type', 'subscription_start', 'subscription_end', 'reset_token', 'reset_token_expires', 'next_offerte_number'];
     for (const col of cols) {
         try {

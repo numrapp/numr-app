@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Trash2, Edit3 } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
-import { mockVideos } from '../data/mockVideos';
 import StatusBar from '../components/layout/StatusBar';
+import api from '../services/api';
 
 export default function StatusProfilePage() {
   const { t } = useI18n();
@@ -13,19 +13,27 @@ export default function StatusProfilePage() {
   const [bio, setBio] = useState('');
   const [editBio, setEditBio] = useState(false);
   const [profileImg, setProfileImg] = useState<string | null>(null);
-  const myVideos = mockVideos.slice(0, 3);
+  const [myVideos, setMyVideos] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get('/status/videos/me').then(res => setMyVideos(res.data)).catch(() => {});
+  }, []);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0];
       e.target.value = '';
-      if (!file) return;
-      if (file.size > 10 * 1024 * 1024) return;
+      if (!file || file.size > 10 * 1024 * 1024) return;
       if (profileImg) URL.revokeObjectURL(profileImg);
       setProfileImg(URL.createObjectURL(file));
-    } catch (err) {
-      console.error('Photo upload error:', err);
-    }
+    } catch {}
+  };
+
+  const handleDeleteVideo = async (id: number) => {
+    try {
+      await api.delete(`/status/videos/${id}`);
+      setMyVideos(prev => prev.filter(v => v.id !== id));
+    } catch {}
   };
 
   return (
@@ -39,11 +47,7 @@ export default function StatusProfilePage() {
         <div className="flex flex-col items-center mb-6">
           <div className="relative mb-3">
             <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
-              {profileImg ? (
-                <img src={profileImg} alt="profile" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-3xl font-black text-gray-300">{user?.company_name?.charAt(0) || 'N'}</span>
-              )}
+              {profileImg ? <img src={profileImg} alt="" className="w-full h-full object-cover" /> : <span className="text-3xl font-black text-gray-300">{user?.company_name?.charAt(0) || 'N'}</span>}
             </div>
             <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-brand flex items-center justify-center cursor-pointer shadow-md active:scale-90 transition-transform">
               <Camera size={14} className="text-dark" />
@@ -59,31 +63,23 @@ export default function StatusProfilePage() {
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('status.biografie')}</span>
             <button onClick={() => setEditBio(!editBio)} className="p-1 rounded-lg hover:bg-gray-100"><Edit3 size={14} className="text-gray-400" /></button>
           </div>
-          {editBio ? (
-            <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3}
-              className="input-send resize-none text-sm" placeholder={t('status.biografiePh')} />
-          ) : (
-            <p className="text-sm text-gray-600">{bio || t('status.biografiePh')}</p>
-          )}
+          {editBio ? <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="input-send resize-none text-sm" placeholder={t('status.biografiePh')} /> : <p className="text-sm text-gray-600">{bio || t('status.biografiePh')}</p>}
         </div>
 
         <div>
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t('status.mijnVideos')} ({myVideos.length})</p>
-          <div className="grid grid-cols-3 gap-1.5">
-            {myVideos.map(v => (
-              <div key={v.id} className="relative aspect-square rounded-xl overflow-hidden" style={{background: v.videoBg}}>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[12px] border-l-white/60 ml-0.5" />
+          {myVideos.length === 0 ? <p className="text-center text-gray-300 py-8 text-sm">{t('status.geen')}</p> : (
+            <div className="grid grid-cols-3 gap-1.5">
+              {myVideos.map((v: any) => (
+                <div key={v.id} className="relative aspect-square rounded-xl overflow-hidden bg-gray-900">
+                  {v.video_path && <video src={v.video_path} className="w-full h-full object-cover" muted />}
+                  <button onClick={() => handleDeleteVideo(v.id)} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/40 flex items-center justify-center">
+                    <Trash2 size={10} className="text-white" />
+                  </button>
                 </div>
-                <button className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/40 flex items-center justify-center">
-                  <Trash2 size={10} className="text-white" />
-                </button>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-1.5 pt-4">
-                  <p className="text-white text-[8px] font-bold truncate">{v.company}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { Upload, Camera, X, AlertTriangle } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { CATEGORIES } from '../data/mockVideos';
 import StatusBar from '../components/layout/StatusBar';
+import api from '../services/api';
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
@@ -16,14 +17,13 @@ export default function VideoUploadPage() {
   const [granted, setGranted] = useState(alreadyGranted);
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGrant = () => {
-    localStorage.setItem('videoPermGranted', 'true');
-    setGranted(true);
-  };
+  const handleGrant = () => { localStorage.setItem('videoPermGranted', 'true'); setGranted(true); };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -31,21 +31,25 @@ export default function VideoUploadPage() {
       const selected = e.target.files?.[0];
       e.target.value = '';
       if (!selected) return;
-      if (selected.size > MAX_FILE_SIZE) {
-        setError(t('status.fileTooLarge'));
-        return;
-      }
+      if (selected.size > MAX_FILE_SIZE) { setError(t('status.fileTooLarge')); return; }
       setFile(selected);
-    } catch (err) {
-      setError(t('status.fileError'));
-      console.error('File select error:', err);
-    }
+    } catch { setError(t('status.fileError')); }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file || !category) return;
-    setUploaded(true);
-    setTimeout(() => navigate('/status'), 2000);
+    setUploading(true); setError('');
+    try {
+      const fd = new FormData();
+      fd.append('video', file);
+      fd.append('category', category);
+      fd.append('description', description);
+      fd.append('location', location);
+      await api.post('/status/videos', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setUploaded(true);
+      setTimeout(() => navigate('/status'), 2000);
+    } catch { setError(t('status.fileError')); }
+    finally { setUploading(false); }
   };
 
   return (
@@ -78,18 +82,10 @@ export default function VideoUploadPage() {
             <span className="text-lg font-black text-brand notranslate">numr</span>
             <button onClick={() => navigate('/')} className="text-sm font-extrabold text-brand active:opacity-70">{t('nav.mainMenu')}</button>
           </div>
-
           <div className="page-scroll px-5 pb-6">
             <div className="space-y-4">
               <h1 className="text-lg font-extrabold text-dark">{t('status.upload')}</h1>
-
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 rounded-2xl">
-                  <AlertTriangle size={16} className="text-red-500 flex-shrink-0" />
-                  <p className="text-sm text-red-600 font-medium">{error}</p>
-                </div>
-              )}
-
+              {error && <div className="flex items-center gap-2 p-3 bg-red-50 rounded-2xl"><AlertTriangle size={16} className="text-red-500 flex-shrink-0" /><p className="text-sm text-red-600 font-medium">{error}</p></div>}
               <div>
                 <label className="label-send">{t('status.categorie')}</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -101,7 +97,6 @@ export default function VideoUploadPage() {
                   ))}
                 </div>
               </div>
-
               <div>
                 <label className="label-send">Video (max 100MB)</label>
                 {file ? (
@@ -118,22 +113,22 @@ export default function VideoUploadPage() {
                   </label>
                 )}
               </div>
-
+              <div>
+                <label className="label-send">{t('status.zoekLocatie')}</label>
+                <input type="text" value={location} onChange={e => setLocation(e.target.value)} className="input-send" placeholder="Amsterdam" />
+              </div>
               <div>
                 <label className="label-send">{t('status.beschrijving')}</label>
-                <textarea value={description} onChange={e => setDescription(e.target.value)} className="input-send resize-none" rows={3}
-                  placeholder={t('status.beschrijvingPh')} />
+                <textarea value={description} onChange={e => setDescription(e.target.value)} className="input-send resize-none" rows={2} placeholder={t('status.beschrijvingPh')} />
               </div>
-
-              <button onClick={handleUpload} disabled={!category || !file}
-                className="btn-brand w-full flex items-center justify-center gap-2">
-                <Upload size={18} /> {t('status.uploaden')}
+              <button onClick={handleUpload} disabled={!category || !file || uploading}
+                className="btn-brand w-full flex items-center justify-center gap-2 disabled:opacity-50">
+                <Upload size={18} /> {uploading ? '...' : t('status.uploaden')}
               </button>
             </div>
           </div>
         </>
       )}
-
       <StatusBar />
     </div>
   );

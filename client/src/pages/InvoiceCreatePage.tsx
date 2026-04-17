@@ -151,7 +151,10 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
         due_date: addDays(todayISO(), user?.default_payment_days || 30),
         payment_terms_days: user?.default_payment_days || 30, description: desc, items: finalItems,
       });
-      if (method === 'email') { try { await invoiceService.send(invoice.id); } catch {} }
+      if (method === 'email') {
+        if (!user?.smtp_pass) { alert('E-mail instellingen ontbreken. Ga naar Instellingen om uw e-mail wachtwoord in te stellen.'); setSaving(false); return; }
+        try { await invoiceService.send(invoice.id); } catch (err: any) { alert(err?.response?.data?.error || 'E-mail verzenden mislukt'); }
+      }
       if (method === 'whatsapp') {
         const total = formatCurrency(finalItems.reduce((s, i) => s + i.quantity * i.unit_price * (1 + rate/100), 0));
         const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
@@ -197,18 +200,20 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
           )}
 
           {step === 2 && (
-            <motion.div key="s2" {...slide} className="space-y-4">
+            <motion.div key="s2" {...slide} className="space-y-3 pb-20">
               {clientError && <div className="p-3 bg-red-50 rounded-2xl text-red-600 text-sm font-medium">{clientError}</div>}
-              <div><label className="label-send notranslate">KVK Nummer</label><input type="text" value={newClient.kvk_number} onChange={e => setNewClient(p=>({...p,kvk_number:e.target.value}))} className="input-send" maxLength={8} placeholder="12345678" /></div>
-              <div><label className="label-send">{t('register.bedrijfsnaam')} *</label><input type="text" value={newClient.company_name} onChange={e => setNewClient(p=>({...p,company_name:e.target.value}))} className="input-send" /></div>
-              <div><label className="label-send">{t('register.adres')}</label><input type="text" value={newClient.address} onChange={e => setNewClient(p=>({...p,address:e.target.value}))} className="input-send" placeholder={t('register.adresPh')} /></div>
+              <div><label className="label-send notranslate">KVK Nummer</label><input type="text" value={newClient.kvk_number} onChange={e => setNewClient(p=>({...p,kvk_number:e.target.value}))} className="input-send py-2.5" maxLength={8} placeholder="12345678" /></div>
+              <div><label className="label-send">{t('register.bedrijfsnaam')} *</label><input type="text" value={newClient.company_name} onChange={e => setNewClient(p=>({...p,company_name:e.target.value}))} className="input-send py-2.5" /></div>
+              <div><label className="label-send">{t('register.adres')}</label><input type="text" value={newClient.address} onChange={e => setNewClient(p=>({...p,address:e.target.value}))} className="input-send py-2.5" placeholder={t('register.adresPh')} /></div>
               <div className="grid grid-cols-5 gap-3">
-                <div className="col-span-2"><label className="label-send">{t('register.postcode')}</label><input type="text" value={(newClient as any).postcode||''} onChange={e => setNewClient(p=>({...p,postcode:e.target.value} as any))} className="input-send" placeholder="1234 AB" maxLength={7} /></div>
-                <div className="col-span-3"><label className="label-send">{t('register.plaats')}</label><input type="text" value={(newClient as any).city||''} onChange={e => setNewClient(p=>({...p,city:e.target.value} as any))} className="input-send" placeholder="Amsterdam" /></div>
+                <div className="col-span-2"><label className="label-send">{t('register.postcode')}</label><input type="text" value={(newClient as any).postcode||''} onChange={e => setNewClient(p=>({...p,postcode:e.target.value} as any))} className="input-send py-2.5" placeholder="1234 AB" maxLength={7} /></div>
+                <div className="col-span-3"><label className="label-send">{t('register.plaats')}</label><input type="text" value={(newClient as any).city||''} onChange={e => setNewClient(p=>({...p,city:e.target.value} as any))} className="input-send py-2.5" placeholder="Amsterdam" /></div>
               </div>
-              <div><label className="label-send">{t('register.email')} *</label><input type="email" value={newClient.email} onChange={e => setNewClient(p=>({...p,email:e.target.value}))} className="input-send" /></div>
-              <div><label className="label-send notranslate">BTW Nummer</label><input type="text" value={newClient.btw_number} onChange={handleBtw} className="input-send notranslate" placeholder="NL000000000B00" /></div>
-              <button onClick={saveNewClient} disabled={saving} className="btn-brand w-full">{saving ? t('invoice.opslaan') : t('invoice.klantOpslaan')}</button>
+              <div><label className="label-send">{t('register.email')} *</label><input type="email" value={newClient.email} onChange={e => setNewClient(p=>({...p,email:e.target.value}))} className="input-send py-2.5" /></div>
+              <div><label className="label-send notranslate">BTW Nummer</label><input type="text" value={newClient.btw_number} onChange={handleBtw} className="input-send py-2.5 notranslate" placeholder="NL000000000B00" /></div>
+              <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 safe-bottom">
+                <button onClick={saveNewClient} disabled={saving} className="btn-brand w-full">{saving ? t('invoice.opslaan') : t('invoice.klantOpslaan')}</button>
+              </div>
             </motion.div>
           )}
 
