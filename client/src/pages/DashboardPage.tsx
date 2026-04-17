@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const firstName = user?.company_name?.split(' ')[0] || '';
+  const hasSub = !!(user as any)?.subscription_type;
 
   useEffect(() => {
     if (!localStorage.getItem('rated')) {
@@ -24,6 +25,11 @@ export default function DashboardPage() {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  const go = (path: string) => {
+    if (!hasSub) { navigate('/subscription'); return; }
+    navigate(path);
+  };
 
   return (
     <div className="h-full flex flex-col safe-top">
@@ -41,7 +47,7 @@ export default function DashboardPage() {
 
         <div className="w-full max-w-sm space-y-3">
           <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}}
-            onClick={() => navigate('/offerte/new')}
+            onClick={() => go('/offerte/new')}
             className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
             style={{ background: 'linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%)', boxShadow: '0 8px 32px rgba(59,130,246,0.2)' }}>
             <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
@@ -55,7 +61,7 @@ export default function DashboardPage() {
           </motion.button>
 
           <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.15}}
-            onClick={() => navigate('/invoices/new')}
+            onClick={() => go('/invoices/new')}
             className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
             style={{ background: 'linear-gradient(135deg, #DFFF00 0%, #B8D900 100%)', boxShadow: '0 8px 32px rgba(223,255,0,0.3)' }}>
             <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
@@ -69,7 +75,7 @@ export default function DashboardPage() {
           </motion.button>
 
           <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.2}}
-            onClick={() => navigate('/credit/new')}
+            onClick={() => go('/credit/new')}
             className="w-full flex items-center gap-5 p-5 rounded-3xl transition-all duration-200 active:scale-[0.97]"
             style={{ background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', boxShadow: '0 8px 32px rgba(239,68,68,0.12)' }}>
             <div className="w-16 h-16 rounded-2xl bg-white/50 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
