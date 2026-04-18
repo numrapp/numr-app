@@ -115,11 +115,14 @@ router.post('/forgot-password', async (req, res) => {
 
     try {
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com', port: 587, secure: false,
-        auth: { user: process.env.SMTP_USER || 'noreply@numr.nl', pass: process.env.SMTP_PASS || '' },
+        host: process.env.SMTP_HOST || 'smtp.office365.com',
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: false,
+        auth: { user: process.env.SMTP_USER || 'info@mrefinance.nl', pass: process.env.SMTP_PASS || '' },
+        tls: { ciphers: 'SSLv3', rejectUnauthorized: false },
       });
       await transporter.sendMail({
-        from: '"numr" <noreply@numr.nl>',
+        from: `"numr" <${process.env.SMTP_USER || 'info@mrefinance.nl'}>`,
         to: email,
         subject: 'Wachtwoord herstellen - numr',
         html: `<div style="font-family:Arial;max-width:500px;margin:0 auto;padding:20px;">
