@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import TermsAgreementPage from './pages/TermsAgreementPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import DashboardPage from './pages/DashboardPage';
@@ -47,7 +48,7 @@ function LoginGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots', '/forgot-password', '/terms-agreement', '/subscription', '/teaser'];
+const NO_BAR = ['/login', '/register', '/privacy', '/terms', '/screenshots', '/forgot-password', '/reset-password', '/terms-agreement', '/subscription', '/teaser'];
 const FULL_SCREEN = ['/status/video'];
 
 export default function App() {
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/teaser" element={<TeaserPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/terms-agreement" element={<AuthOnly><TermsAgreementPage /></AuthOnly>} />

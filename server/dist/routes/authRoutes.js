@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
 const database_1 = require("../database");
 const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
@@ -96,12 +97,55 @@ router.post('/forgot-password', async (req, res) => {
         const { email } = req.body;
         if (!email)
             return res.status(400).json({ error: 'Email is required' });
-        const user = (0, database_1.queryOne)('SELECT id FROM users WHERE email = ?', [email]);
-        if (user) {
-            const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
-            const expires = new Date(Date.now() + 3600000).toISOString();
-            (0, database_1.run)('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [token, expires, user.id]);
+        const user = (0, database_1.queryOne)('SELECT id, email FROM users WHERE email = ?', [email]);
+        if (!user)
+            return res.json({ success: true });
+        const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        const expires = new Date(Date.now() + 3600000).toISOString();
+        (0, database_1.run)('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [token, expires, user.id]);
+        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+        try {
+            const transporter = nodemailer_1.default.createTransport({
+                host: 'smtp.gmail.com', port: 587, secure: false,
+                auth: { user: process.env.SMTP_USER || 'noreply@numr.nl', pass: process.env.SMTP_PASS || '' },
+            });
+            await transporter.sendMail({
+                from: '"numr" <noreply@numr.nl>',
+                to: email,
+                subject: 'Wachtwoord herstellen - numr',
+                html: `<div style="font-family:Arial;max-width:500px;margin:0 auto;padding:20px;">
+          <h2 style="color:#1A1A1A;">Wachtwoord herstellen</h2>
+          <p>U heeft een verzoek ingediend om uw wachtwoord te herstellen.</p>
+          <a href="${resetUrl}" style="display:inline-block;background:#DFFF00;color:#1A1A1A;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:bold;margin:20px 0;">Nieuw wachtwoord instellen</a>
+          <p style="color:#999;font-size:12px;">Deze link is 1 uur geldig. Als u dit verzoek niet heeft gedaan, kunt u deze e-mail negeren.</p>
+          <p style="color:#ccc;font-size:11px;">numr - Professionele facturen</p>
+        </div>`,
+            });
         }
+        catch (emailErr) {
+            console.error('Email send error:', emailErr);
+        }
+        res.json({ success: true });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, password } = req.body;
+        if (!token || !password)
+            return res.status(400).json({ error: 'Token and password are required' });
+        if (password.length < 6)
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
+        const user = (0, database_1.queryOne)('SELECT id, reset_token_expires FROM users WHERE reset_token = ?', [token]);
+        if (!user)
+            return res.status(400).json({ error: 'Invalid or expired reset link' });
+        if (user.reset_token_expires && new Date(user.reset_token_expires) < new Date()) {
+            return res.status(400).json({ error: 'Reset link has expired' });
+        }
+        const password_hash = await bcryptjs_1.default.hash(password, 10);
+        (0, database_1.run)('UPDATE users SET password_hash = ?, reset_token = ?, reset_token_expires = ? WHERE id = ?', [password_hash, '', '', user.id]);
         res.json({ success: true });
     }
     catch (err) {
