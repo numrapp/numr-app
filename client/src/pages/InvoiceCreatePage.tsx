@@ -214,7 +214,7 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
           )}
 
           {step === 2 && (
-            <motion.div key="s2" {...slide} className="space-y-3 pb-20">
+            <motion.div key="s2" {...slide} className="space-y-3">
               {clientError && <div className="p-3 bg-red-50 rounded-2xl text-red-600 text-sm font-medium">{clientError}</div>}
               <div><label className="label-send notranslate">KVK Nummer</label><input type="text" value={newClient.kvk_number} onChange={e => setNewClient(p=>({...p,kvk_number:e.target.value}))} className="input-send py-2.5" maxLength={8} placeholder="12345678" /></div>
               <div><label className="label-send">{t('register.bedrijfsnaam')} *</label><input type="text" value={newClient.company_name} onChange={e => setNewClient(p=>({...p,company_name:e.target.value}))} className="input-send py-2.5" /></div>
@@ -225,9 +225,7 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
               </div>
               <div><label className="label-send">{t('register.email')} *</label><input type="email" value={newClient.email} onChange={e => setNewClient(p=>({...p,email:e.target.value}))} className="input-send py-2.5" /></div>
               <div><label className="label-send notranslate">BTW Nummer</label><input type="text" value={newClient.btw_number} onChange={handleBtw} className="input-send py-2.5 notranslate" placeholder="NL000000000B00" /></div>
-              <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 safe-bottom">
-                <button onClick={saveNewClient} disabled={saving} className="btn-brand w-full">{saving ? t('invoice.opslaan') : t('invoice.klantOpslaan')}</button>
-              </div>
+              <button onClick={saveNewClient} disabled={saving} className="btn-brand w-full mt-4 mb-8">{saving ? t('invoice.opslaan') : t('invoice.klantOpslaan')}</button>
             </motion.div>
           )}
 
