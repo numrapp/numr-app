@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Crown, RotateCw } from 'lucide-react';
+import { Crown, RotateCw, X } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
@@ -16,14 +16,14 @@ export default function SubscriptionPage() {
   const [restoring, setRestoring] = useState(false);
   const isNative = Capacitor.isNativePlatform();
 
-  const handlePurchase = async (type: 'monthly' | 'yearly') => {
+  const handlePurchase = async (type: 'monthly' | 'yearly' | 'trial') => {
     setLoading(type);
     try {
       if (isNative) {
-        const success = type === 'monthly' ? await purchaseMonthly() : await purchaseYearly();
+        const success = type === 'yearly' ? await purchaseYearly() : await purchaseMonthly();
         if (success) { await refreshUser(); navigate('/'); }
       } else {
-        await api.post('/auth/subscribe', { type });
+        await api.post('/auth/subscribe', { type: type === 'trial' ? 'trial' : type });
         await refreshUser();
         navigate('/');
       }
@@ -41,9 +41,12 @@ export default function SubscriptionPage() {
 
   return (
     <div className="h-full flex flex-col safe-top bg-white">
+      <div className="px-6 pt-4 flex justify-end">
+        <button onClick={() => navigate(-1)} className="p-2 rounded-xl hover:bg-gray-100"><X size={20} className="text-gray-400" /></button>
+      </div>
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="w-full max-w-sm">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <div className="w-20 h-20 rounded-full bg-brand/20 flex items-center justify-center mx-auto mb-5">
               <Crown size={36} className="text-dark" />
             </div>
@@ -51,13 +54,17 @@ export default function SubscriptionPage() {
             <p className="text-sm text-gray-500">{t('sub.desc')}</p>
           </div>
 
-          <div className="space-y-4">
-            <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.2}}
+          <div className="space-y-3">
+            <button onClick={() => handlePurchase('trial')} disabled={!!loading}
+              className="w-full py-4 rounded-2xl bg-dark text-white font-extrabold text-base active:scale-[0.97] transition-all disabled:opacity-50 relative">
+              {t('sub.trial')}
+              {loading === 'trial' && <div className="absolute inset-0 bg-dark/80 flex items-center justify-center rounded-2xl"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" /></div>}
+            </button>
+
+            <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.1}}
               onClick={() => handlePurchase('yearly')} disabled={!!loading}
               className="w-full p-5 rounded-3xl border-2 border-brand bg-brand/5 transition-all active:scale-[0.97] relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-brand text-dark text-[10px] font-extrabold px-3 py-1 rounded-bl-2xl">
-                {t('sub.popular')}
-              </div>
+              <div className="absolute top-0 right-0 bg-brand text-dark text-[10px] font-extrabold px-3 py-1 rounded-bl-2xl">{t('sub.popular')}</div>
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-lg font-extrabold text-dark">{t('sub.yearly')}</p>
@@ -72,7 +79,7 @@ export default function SubscriptionPage() {
               {loading === 'yearly' && <div className="absolute inset-0 bg-white/60 flex items-center justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand" /></div>}
             </motion.button>
 
-            <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.3}}
+            <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.2}}
               onClick={() => handlePurchase('monthly')} disabled={!!loading}
               className="w-full p-5 rounded-3xl border border-gray-200 bg-white transition-all active:scale-[0.97] relative">
               <div className="flex items-center justify-between">
@@ -89,10 +96,9 @@ export default function SubscriptionPage() {
             </motion.button>
           </div>
 
-          <div className="text-center mt-6 space-y-2">
-            <p className="text-sm font-bold text-dark">{t('sub.trial')}</p>
+          <div className="text-center mt-5 space-y-2">
             <p className="text-[11px] text-gray-400">{t('sub.cancelAnytime')}</p>
-            <button onClick={handleRestore} disabled={restoring} className="flex items-center justify-center gap-1.5 mx-auto mt-3 text-sm font-bold text-gray-400 hover:text-dark transition-colors">
+            <button onClick={handleRestore} disabled={restoring} className="flex items-center justify-center gap-1.5 mx-auto text-sm font-bold text-gray-400 hover:text-dark transition-colors">
               <RotateCw size={14} className={restoring ? 'animate-spin' : ''} /> {t('sub.restore')}
             </button>
           </div>

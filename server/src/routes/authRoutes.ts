@@ -91,6 +91,7 @@ router.post('/subscribe', authMiddleware, (req: AuthRequest, res) => {
     const start = new Date().toISOString().split('T')[0];
     const endDate = new Date();
     if (type === 'yearly') endDate.setFullYear(endDate.getFullYear() + 1);
+    else if (type === 'trial') endDate.setDate(endDate.getDate() + 3);
     else endDate.setMonth(endDate.getMonth() + 1);
     const end = endDate.toISOString().split('T')[0];
     run('UPDATE users SET subscription_type = ?, subscription_start = ?, subscription_end = ? WHERE id = ?', [type, start, end, req.userId!]);

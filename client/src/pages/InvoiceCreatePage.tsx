@@ -152,16 +152,30 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
         payment_terms_days: user?.default_payment_days || 30, description: desc, items: finalItems,
       });
       if (method === 'email') {
-        if (!user?.smtp_pass) { alert('E-mail instellingen ontbreken. Ga naar Instellingen om uw e-mail wachtwoord in te stellen.'); setSaving(false); return; }
-        try { await invoiceService.send(invoice.id); } catch (err: any) { alert(err?.response?.data?.error || 'E-mail verzenden mislukt'); }
+        if (!user?.smtp_pass || !user?.email) {
+          alert('E-mail instellingen ontbreken. Ga naar Instellingen om uw e-mail wachtwoord in te stellen.');
+          setSaving(false); return;
+        }
+        try {
+          await invoiceService.send(invoice.id);
+          setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
+        } catch (err: any) {
+          alert(err?.response?.data?.error || 'E-mail verzenden mislukt. Controleer uw SMTP-instellingen.');
+          setSaving(false); return;
+        }
       }
       if (method === 'whatsapp') {
         const total = formatCurrency(finalItems.reduce((s, i) => s + i.quantity * i.unit_price * (1 + rate/100), 0));
-        const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        const pdfLink = `${window.location.origin}/api/invoices/${invoice.id}/pdf?token=${localStorage.getItem('token')}`;
+        const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\nPDF: ${pdfLink}\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        window.location.href = whatsappUrl;
+        setTimeout(() => { setShowSuccess(true); setTimeout(() => navigate('/'), 2500); }, 1000);
       }
-      setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
-    } catch {} finally { setSaving(false); }
+    } catch (err) {
+      console.error('Send error:', err);
+      alert('Er is een fout opgetreden. Probeer het opnieuw.');
+    } finally { setSaving(false); }
   };
 
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;

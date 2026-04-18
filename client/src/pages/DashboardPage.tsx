@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, FolderOpen, Settings, Send, RotateCcw, FileText } from 'lucide-react';
-import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import LanguageSelector from '../components/LanguageSelector';
@@ -13,18 +11,6 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const firstName = user?.company_name?.split(' ')[0] || '';
   const hasSub = !!(user as any)?.subscription_type;
-
-  useEffect(() => {
-    if (!localStorage.getItem('rated')) {
-      const timer = setTimeout(() => {
-        localStorage.setItem('rated', 'true');
-        if (Capacitor.isNativePlatform()) {
-          try { (window as any).webkit?.messageHandlers?.requestReview?.postMessage({}); } catch {}
-        }
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   const go = (path: string) => {
     if (!hasSub) { navigate('/subscription'); return; }

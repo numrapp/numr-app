@@ -79,6 +79,8 @@ router.post('/subscribe', auth_1.authMiddleware, (req, res) => {
         const endDate = new Date();
         if (type === 'yearly')
             endDate.setFullYear(endDate.getFullYear() + 1);
+        else if (type === 'trial')
+            endDate.setDate(endDate.getDate() + 3);
         else
             endDate.setMonth(endDate.getMonth() + 1);
         const end = endDate.toISOString().split('T')[0];
