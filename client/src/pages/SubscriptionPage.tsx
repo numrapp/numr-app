@@ -10,12 +10,14 @@ import api from '../services/api';
 
 export default function SubscriptionPage() {
   const { t } = useI18n();
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState('');
   const [restoring, setRestoring] = useState(false);
   const [error, setError] = useState('');
   const isNative = Capacitor.isNativePlatform();
+  const subType = (user as any)?.subscription_type || '';
+  const alreadyTrialed = subType === 'trial';
 
   useEffect(() => {
     if (isNative) initStore();
@@ -87,10 +89,12 @@ export default function SubscriptionPage() {
           )}
 
           <div className="space-y-3">
-            <button onClick={() => handlePurchase('trial')} disabled={!!loading}
-              className="w-full py-4 rounded-2xl bg-dark text-white font-extrabold text-base active:scale-[0.97] transition-all disabled:opacity-50">
-              {loading === 'trial' ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto" /> : t('sub.trial')}
-            </button>
+            {!alreadyTrialed && (
+              <button onClick={() => handlePurchase('trial')} disabled={!!loading}
+                className="w-full py-4 rounded-2xl bg-dark text-white font-extrabold text-base active:scale-[0.97] transition-all disabled:opacity-50">
+                {loading === 'trial' ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto" /> : t('sub.trial')}
+              </button>
+            )}
 
             <button onClick={() => handlePurchase('yearly')} disabled={!!loading}
               className="w-full p-5 rounded-3xl border-2 border-brand bg-brand/5 transition-all active:scale-[0.97] relative overflow-hidden text-left">

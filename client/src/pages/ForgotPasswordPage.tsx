@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
       await api.post('/auth/forgot-password', { email });
       setSent(true);
     } catch {
-      setSent(true);
+      setError('Er is een fout opgetreden. Neem contact op via info@mrefinance.nl');
     } finally { setLoading(false); }
   };
 

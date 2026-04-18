@@ -47,7 +47,7 @@ export default function RegisterPage() {
         btw_number: form.btw_number, iban: form.iban, phone: '',
       });
       setSuccess(true);
-      setTimeout(() => navigate('/'), 2500);
+      setTimeout(() => navigate('/login'), 2500);
     } catch (err: any) {
       setError(err.response?.data?.error || t('login.failed'));
     } finally { setLoading(false); }

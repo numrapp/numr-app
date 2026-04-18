@@ -10,7 +10,10 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const firstName = user?.company_name?.split(' ')[0] || '';
-  const hasSub = !!(user as any)?.subscription_type;
+  const subType = (user as any)?.subscription_type || '';
+  const subEnd = (user as any)?.subscription_end || '';
+  const isTrialExpired = subType === 'trial' && subEnd && new Date(subEnd) < new Date();
+  const hasSub = !!subType && !isTrialExpired;
 
   const go = (path: string) => {
     if (!hasSub) { navigate('/subscription'); return; }
