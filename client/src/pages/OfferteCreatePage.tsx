@@ -11,6 +11,7 @@ import BtwChatbot from '../components/BtwChatbot';
 import SuccessAnimation from '../components/SuccessAnimation';
 import OffertePreview from '../components/invoice/OffertePreview';
 import { offerteService } from '../services/offerteService';
+import { sendPdfByMail, sharePdfViaWhatsApp } from '../services/pdfDownload';
 
 const slide = { initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0}, transition:{duration:0.15} };
 const DRAFT_KEY = 'offerteCreateDraft';
@@ -31,8 +32,10 @@ export default function OfferteCreatePage() {
   const [clientError, setClientError] = useState('');
 
   const [clientId, setClientId] = useState<number | null>(draft?.clientId ?? null);
-  const [newClient, setNewClient] = useState(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'' });
+  type NewClient = { company_name: string; kvk_number: string; email: string; btw_number: string; address: string };
+  const [newClient, setNewClient] = useState<NewClient>(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'' });
   const [btwRate, setBtwRate] = useState<number | 'verlegd'>(draft?.btwRate ?? 21);
+  const [btwMode, setBtwMode] = useState<'incl' | 'excl'>(draft?.btwMode || 'excl');
   const [parsedItems, setParsedItems] = useState<InvoiceItem[]>(draft?.parsedItems || []);
   const [items, setItems] = useState<InvoiceItem[]>(draft?.items || []);
   const [description, setDescription] = useState(draft?.description || '');
@@ -47,15 +50,21 @@ export default function OfferteCreatePage() {
 
   useEffect(() => {
     if (showSuccess) { sessionStorage.removeItem(DRAFT_KEY); return; }
-    try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ step, clientId, newClient, btwRate, parsedItems, items, description })); } catch {}
-  }, [step, clientId, newClient, btwRate, parsedItems, items, description, showSuccess]);
+    try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ step, clientId, newClient, btwRate, btwMode, parsedItems, items, description })); } catch {}
+  }, [step, clientId, newClient, btwRate, btwMode, parsedItems, items, description, showSuccess]);
 
   const stepRef = useRef(step);
   stepRef.current = step;
 
   const goBack = useCallback(() => {
     const s = stepRef.current;
-    if (s===10) setStep(1); else if (s===42) setStep(3); else if (s===45) setStep(42); else if (s===6) setStep(45); else if (s>1) setStep(s-1); else navigate(-1);
+    if (s===10) setStep(1);
+    else if (s===4) setStep(3);
+    else if (s===42) setStep(4);
+    else if (s===45) setStep(42);
+    else if (s===6) setStep(45);
+    else if (s>1) setStep(s-1);
+    else navigate(-1);
   }, [navigate]);
 
   useEffect(() => {
@@ -91,21 +100,56 @@ export default function OfferteCreatePage() {
     finally { setSaving(false); }
   };
 
-  const totalFromItems = (list: InvoiceItem[]) => list.reduce((s, i) => s + i.quantity * i.unit_price * (1 + (btwRate === 'verlegd' ? 0 : i.btw_rate) / 100), 0);
+  // When the user enters "incl. BTW" prices we treat `unit_price` as the
+  // gross price and back the BTW out; otherwise it's the net/excl. price.
+  const effectiveNet = (q: number, p: number) => {
+    const gross = q * p;
+    if (btwMode === 'incl') return gross / (1 + rate / 100);
+    return gross;
+  };
+  const effectiveBtw = (q: number, p: number) => effectiveNet(q, p) * (rate / 100);
+  const effectiveTotal = (q: number, p: number) => effectiveNet(q, p) + effectiveBtw(q, p);
+  const totalFromItems = (list: InvoiceItem[]) => list.reduce((s, i) => s + effectiveTotal(i.quantity || 0, i.unit_price || 0), 0);
+
+  // Normalise items to use excl-BTW unit prices because the server always
+  // adds BTW on top. When the user entered gross (incl. BTW) prices we must
+  // back the BTW out first, otherwise the stored totals would be inflated.
+  const normaliseItemsForServer = (list: InvoiceItem[]): InvoiceItem[] => {
+    if (btwMode === 'excl') return list.map(i => ({ ...i, btw_rate: rate }));
+    return list.map(i => {
+      const netPrice = i.unit_price / (1 + rate / 100);
+      return { ...i, unit_price: Math.round(netPrice * 100) / 100, btw_rate: rate };
+    });
+  };
 
   const handleSend = async (method: 'email' | 'whatsapp') => {
     setSaving(true);
     try {
-      const finalItems = items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0);
+      const rawFinal = items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0);
+      const finalItems = normaliseItemsForServer(rawFinal);
       const desc = description || finalItems.map(i => i.description).join(', ');
-      await offerteService.create({
+      const created: any = await offerteService.create({
         client_id: clientId!, offerte_date: todayISO(), valid_until: addDays(todayISO(), 30),
         description: desc, items: finalItems,
       });
+      const total = formatCurrency(totalFromItems(finalItems));
+      const offerteNumber = created?.offerte_number || '';
+      const fileName = `${offerteNumber || 'offerte'}.pdf`;
+      const pdfPath = `/offertes/${created.id}/pdf`;
+      const greeting = `Beste ${selectedClient?.company_name || ''}`;
+      const signature = `Met vriendelijke groet,\n${user?.company_name || user?.email || ''}`;
+
       if (method === 'whatsapp') {
-        const total = formatCurrency(totalFromItems(finalItems));
-        const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u onze offerte ter hoogte van ${total}.\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        const text = `${greeting},\n\nHierbij ontvangt u onze offerte ${offerteNumber} ter hoogte van ${total}.\n\n${signature}`;
+        try {
+          await sharePdfViaWhatsApp({ path: pdfPath, fileName, phone: (selectedClient as any)?.phone, text });
+        } catch (err) { console.error('offerte whatsapp share', err); }
+      } else if (method === 'email') {
+        const subject = `Offerte ${offerteNumber}`;
+        const body = `${greeting},\n\nIn de bijlage vindt u onze offerte ${offerteNumber} ter hoogte van ${total}.\n\nDeze offerte is geldig tot ${addDays(todayISO(), 30)}.\n\nWij horen graag van u.\n\n${signature}`;
+        try {
+          await sendPdfByMail({ path: pdfPath, fileName, to: selectedClient?.email, subject, body });
+        } catch (err) { console.error('offerte mail share', err); }
       }
       setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
     } catch {} finally { setSaving(false); }
@@ -174,11 +218,25 @@ export default function OfferteCreatePage() {
             <motion.div key="s3" {...slide} className="flex flex-col items-center justify-center min-h-[55vh] space-y-4">
               <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.btwSelectie')}</p>
               <div className="w-full max-w-xs space-y-3">
-                <button onClick={() => { setBtwRate(21); setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:21}]); setStep(42); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate===21?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>21%</button>
-                <button onClick={() => { setBtwRate(9); setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:9}]); setStep(42); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate===9?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>9%</button>
-                <button onClick={() => { setBtwRate('verlegd'); setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:0}]); setStep(42); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate==='verlegd'?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>{t('invoice.verlegd')}</button>
+                <button onClick={() => { setBtwRate(21); setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:21}]); setStep(4); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate===21?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>21%</button>
+                <button onClick={() => { setBtwRate(9); setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:9}]); setStep(4); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate===9?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>9%</button>
+                <button onClick={() => { setBtwRate('verlegd'); setParsedItems([{description:'',quantity:0,unit_price:0,btw_rate:0}]); setStep(4); }} className={`w-full py-5 rounded-3xl text-xl font-extrabold transition-all ${btwRate==='verlegd'?'bg-brand text-dark shadow-lg shadow-brand/30':'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>{t('invoice.verlegd')}</button>
               </div>
               <button onClick={() => setShowBtw(true)} className="flex items-center gap-2 py-3 text-sm font-bold text-gray-400 hover:text-dark transition-colors"><MessageCircle size={18} /> {t('invoice.btwHulp')}</button>
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div key="s4" {...slide} className="flex flex-col items-center justify-center min-h-[50vh] space-y-5 max-w-sm mx-auto w-full">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('invoice.hoeFactureren')}</p>
+              <div className="flex bg-gray-100 rounded-2xl p-1 w-full max-w-xs">
+                <button onClick={() => setBtwMode('excl')} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${btwMode === 'excl' ? 'bg-white text-dark shadow-sm' : 'text-gray-400'}`}>Excl. BTW</button>
+                <button onClick={() => setBtwMode('incl')} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${btwMode === 'incl' ? 'bg-white text-dark shadow-sm' : 'text-gray-400'}`}>Incl. BTW</button>
+              </div>
+              <p className="text-center text-xs text-gray-400 font-medium max-w-[260px]">
+                {btwMode === 'incl' ? 'De prijzen die u invoert zijn inclusief BTW.' : 'De prijzen die u invoert zijn exclusief BTW.'}
+              </p>
+              <button onClick={() => setStep(42)} className="btn-brand w-full max-w-xs">{t('common.volgende')}</button>
             </motion.div>
           )}
 
@@ -223,17 +281,19 @@ export default function OfferteCreatePage() {
                       </div>
                       <div className="p-3.5">
                         <span className="text-[8px] font-bold text-gray-400 uppercase block mb-1">Totaal</span>
-                        <p className="text-base font-extrabold text-dark notranslate">{formatCurrency((parseFloat(String(item.quantity)) || 0) * (parseFloat(String(item.unit_price)) || 0) * (1 + rate / 100))}</p>
+                        <p className="text-base font-extrabold text-dark notranslate">{formatCurrency(effectiveTotal(parseFloat(String(item.quantity)) || 0, parseFloat(String(item.unit_price)) || 0))}</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
 
+              <p className="text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">{btwMode === 'incl' ? 'Prijzen incl. BTW' : 'Prijzen excl. BTW'}</p>
+
               {parsedItems.some(i => i.unit_price > 0) && (
                 <div className="p-4 rounded-2xl" style={{background:'linear-gradient(135deg, #DBEAFE, #93C5FD)'}}>
-                  <div className="flex justify-between text-sm text-dark/60 mb-1"><span>Subtotaal</span><span className="notranslate">{formatCurrency(parsedItems.reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0), 0))}</span></div>
-                  <div className="flex justify-between text-sm text-dark/60 mb-1"><span>BTW ({btwRate === 'verlegd' ? 'verlegd' : btwRate + '%'})</span><span className="notranslate">{formatCurrency(parsedItems.reduce((s,i) => s + (i.quantity||0)*(i.unit_price||0)*(rate/100), 0))}</span></div>
+                  <div className="flex justify-between text-sm text-dark/60 mb-1"><span>Subtotaal</span><span className="notranslate">{formatCurrency(parsedItems.reduce((s,i) => s + effectiveNet(i.quantity||0, i.unit_price||0), 0))}</span></div>
+                  <div className="flex justify-between text-sm text-dark/60 mb-1"><span>BTW ({btwRate === 'verlegd' ? 'verlegd' : btwRate + '%'})</span><span className="notranslate">{formatCurrency(parsedItems.reduce((s,i) => s + effectiveBtw(i.quantity||0, i.unit_price||0), 0))}</span></div>
                   <div className="flex justify-between text-lg font-extrabold text-dark border-t border-dark/10 pt-2 mt-1"><span>Totaal</span><span className="notranslate">{formatCurrency(totalFromItems(parsedItems))}</span></div>
                 </div>
               )}
@@ -244,8 +304,8 @@ export default function OfferteCreatePage() {
 
           {step === 45 && (() => {
             const previewItems = items.length > 0 ? items : parsedItems.filter(i => i.description.trim() && i.unit_price > 0);
-            const subtotal = previewItems.reduce((s, i) => s + (i.quantity || 0) * (i.unit_price || 0), 0);
-            const btwAmount = previewItems.reduce((s, i) => s + (i.quantity || 0) * (i.unit_price || 0) * (rate / 100), 0);
+            const subtotal = previewItems.reduce((s, i) => s + effectiveNet(i.quantity || 0, i.unit_price || 0), 0);
+            const btwAmount = previewItems.reduce((s, i) => s + effectiveBtw(i.quantity || 0, i.unit_price || 0), 0);
             return (
               <motion.div key="s45" {...slide} className="space-y-4">
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('offerte.onizleme')}</p>

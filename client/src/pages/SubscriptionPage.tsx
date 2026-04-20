@@ -40,6 +40,10 @@ export default function SubscriptionPage() {
           setError(t('sub.purchaseError'));
           return;
         }
+        // Receipt already activated the plan server-side via /auth/iap-receipt.
+        await refreshUser();
+        navigate('/');
+        return;
       }
 
       await api.post('/auth/subscribe', { type });

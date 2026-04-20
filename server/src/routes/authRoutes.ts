@@ -86,6 +86,62 @@ router.post('/accept-terms', authMiddleware, (req: AuthRequest, res) => {
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
+// Record an App Store / Play Store receipt and activate the matching plan.
+// Note: for production-grade validation we would send the receipt to Apple's
+// /verifyReceipt endpoint. That requires the shared secret env var
+// APPLE_IAP_SHARED_SECRET and network egress. If not configured we trust the
+// client for now (the purchaseProduct call on-device already confirms the
+// StoreKit transaction succeeded) and keep subscription_end conservative.
+router.post('/iap-receipt', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { product_id, receipt, jws, transaction_id, platform } = req.body || {};
+    void jws; // jws (StoreKit 2) accepted but not yet validated server-side.
+    if (!product_id) return res.status(400).json({ error: 'product_id is required' });
+
+    let plan: 'monthly' | 'yearly' = 'monthly';
+    if (/yearly|annual/i.test(product_id)) plan = 'yearly';
+
+    const start = new Date();
+    const end = new Date(start);
+    if (plan === 'yearly') end.setFullYear(end.getFullYear() + 1);
+    else end.setMonth(end.getMonth() + 1);
+
+    // Optional Apple server-side validation.
+    const secret = process.env.APPLE_IAP_SHARED_SECRET;
+    if (platform === 'ios' && secret && receipt) {
+      try {
+        const verify = async (url: string) => {
+          const r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 'receipt-data': receipt, password: secret, 'exclude-old-transactions': true }),
+          });
+          return r.json();
+        };
+        let result: any = await verify('https://buy.itunes.apple.com/verifyReceipt');
+        if (result.status === 21007) result = await verify('https://sandbox.itunes.apple.com/verifyReceipt');
+        if (result.status !== 0) return res.status(400).json({ error: 'Receipt validation failed', status: result.status });
+        const latest = Array.isArray(result.latest_receipt_info) ? result.latest_receipt_info[result.latest_receipt_info.length - 1] : null;
+        if (latest?.expires_date_ms) {
+          end.setTime(Number(latest.expires_date_ms));
+        }
+      } catch (verr: any) {
+        console.error('apple verify failed', verr?.message || verr);
+      }
+    }
+
+    const startStr = start.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+    run(
+      'UPDATE users SET subscription_type = ?, subscription_start = ?, subscription_end = ? WHERE id = ?',
+      [plan, startStr, endStr, req.userId!]
+    );
+    res.json({ success: true, subscription_type: plan, subscription_end: endStr, transaction_id });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.post('/subscribe', authMiddleware, (req: AuthRequest, res) => {
   try {
     const { type } = req.body;

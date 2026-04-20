@@ -72,11 +72,13 @@ export default function InvoiceHistoryPage() {
                       <div className="flex items-center gap-2">
                         <div className="text-right mr-1">
                           <p className="text-sm font-extrabold notranslate">{formatCurrency(inv.total)}</p>
-                          <span className={`text-[10px] font-bold ${inv.status==='paid'?'text-success':inv.status==='sent'?'text-blue-500':'text-gray-400'}`}>
-                            {inv.status==='paid'?t('history.betaald'):inv.status==='sent'?t('history.verstuurd'):t('history.concept')}
-                          </span>
+                          {(inv.status === 'paid' || inv.status === 'sent') && (
+                            <span className={`text-[10px] font-bold ${inv.status==='paid'?'text-success':'text-blue-500'}`}>
+                              {inv.status === 'paid' ? t('history.betaald') : t('history.verstuurd')}
+                            </span>
+                          )}
                         </div>
-                        <button onClick={async () => { try { await invoiceService.downloadPdf(inv.id); } catch (e) { console.error(e); } }} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('common.downloaden')}>
+                        <button onClick={async () => { try { await invoiceService.downloadPdf(inv.id, `${inv.invoice_number}.pdf`); } catch (e) { console.error(e); } }} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('common.downloaden')}>
                           <Download size={16} />
                         </button>
                         <button onClick={() => navigate(`/invoices/edit/${inv.id}`)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('invoice.bewerken')}>
@@ -100,11 +102,21 @@ export default function InvoiceHistoryPage() {
                           <p className="font-extrabold text-sm text-dark notranslate">{off.offerte_number}</p>
                           <p className="text-xs text-gray-400">{off.client_name} · {formatDate(off.offerte_date)}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-extrabold notranslate">{formatCurrency(off.total)}</p>
-                          <span className={`text-[10px] font-bold ${off.status==='converted'?'text-success':'text-blue-500'}`}>
-                            {off.status === 'converted' ? t('offerte.converted') : t('offerte.open')}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <div className="text-right mr-1">
+                            <p className="text-sm font-extrabold notranslate">{formatCurrency(off.total)}</p>
+                            <span className={`text-[10px] font-bold ${off.status==='converted'?'text-success':'text-blue-500'}`}>
+                              {off.status === 'converted' ? t('offerte.converted') : t('offerte.open')}
+                            </span>
+                          </div>
+                          <button onClick={async () => { try { await offerteService.downloadPdf(off.id, `${off.offerte_number}.pdf`); } catch (e) { console.error(e); } }} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('common.downloaden')}>
+                            <Download size={16} />
+                          </button>
+                          {off.status !== 'converted' && (
+                            <button onClick={() => navigate(`/offertes/edit/${off.id}`)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400" title={t('invoice.bewerken')}>
+                              <Pencil size={16} />
+                            </button>
+                          )}
                         </div>
                       </div>
                       {off.status !== 'converted' && (

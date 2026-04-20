@@ -1,5 +1,6 @@
 import api from './api';
 import { Invoice, InvoiceItem } from '../types';
+import { downloadDocumentPdf } from './pdfDownload';
 
 export const invoiceService = {
   async getAll() {
@@ -22,11 +23,8 @@ export const invoiceService = {
     return res.data;
   },
 
-  async downloadPdf(id: number) {
-    const token = localStorage.getItem('token');
-    const origin = window.location.origin;
-    const directUrl = `${origin}/api/invoices/${id}/pdf?token=${token}`;
-    window.open(directUrl, '_blank');
+  async downloadPdf(id: number, fileName?: string) {
+    await downloadDocumentPdf(`/invoices/${id}/pdf`, fileName || `factuur-${id}.pdf`);
   },
 
   async updateStatus(id: number, status: string) {

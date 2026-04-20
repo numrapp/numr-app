@@ -6,6 +6,7 @@ import { useI18n } from '../i18n';
 import { CATEGORIES } from '../data/mockVideos';
 import StatusBar from '../components/layout/StatusBar';
 import api from '../services/api';
+import { assetUrl } from '../utils/assetUrl';
 
 export default function StatusPage() {
   const { t } = useI18n();
@@ -16,7 +17,16 @@ export default function StatusPage() {
   const touchStart = useRef(0);
 
   useEffect(() => {
-    api.get('/status/videos').then(res => setVideos(res.data)).catch(() => {});
+    const load = () => api.get('/status/videos').then(res => setVideos(res.data)).catch(() => {});
+    load();
+    // Re-fetch when the page becomes visible again (e.g. after an upload).
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', load);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', load);
+    };
   }, []);
 
   let filtered = filter === 'alle' ? videos : videos.filter((v: any) => v.category === filter);
@@ -62,7 +72,7 @@ export default function StatusPage() {
                 onClick={() => navigate(`/status/video/${v.id}`)}
                 className="rounded-2xl overflow-hidden text-left active:scale-[0.97] transition-transform" style={{boxShadow:'0 2px 12px rgba(0,0,0,0.08)'}}>
                 <div className="h-44 flex items-center justify-center relative" style={{background: v.video_path ? '#000' : 'linear-gradient(135deg, #374151, #1F2937)'}}>
-                  {v.video_path && <video src={v.video_path} className="absolute inset-0 w-full h-full object-cover" muted />}
+                  {v.video_path && <video src={assetUrl(v.video_path)} className="absolute inset-0 w-full h-full object-cover" muted playsInline preload="metadata" />}
                   <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center z-10">
                     <div className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white/80 ml-1" />
                   </div>

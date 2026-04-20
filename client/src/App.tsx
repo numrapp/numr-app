@@ -17,6 +17,7 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AppStoreScreenshots from './pages/AppStoreScreenshots';
 import InvoiceEditPage from './pages/InvoiceEditPage';
+import OfferteEditPage from './pages/OfferteEditPage';
 import TeaserPage from './pages/TeaserPage';
 import StatusPage from './pages/StatusPage';
 import VideoPlayerPage from './pages/VideoPlayerPage';
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/credit/new" element={<P><InvoiceCreatePage docType="credit" /></P>} />
           <Route path="/invoices" element={<P><InvoiceHistoryPage /></P>} />
           <Route path="/invoices/edit/:id" element={<P><InvoiceEditPage /></P>} />
+          <Route path="/offertes/edit/:id" element={<P><OfferteEditPage /></P>} />
           <Route path="/settings" element={<P><SettingsPage /></P>} />
           <Route path="/received" element={<P><ReceivedInvoicesPage /></P>} />
           <Route path="/received/:id" element={<P><ReceivedInvoiceDetailPage /></P>} />

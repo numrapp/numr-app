@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import { clientService } from '../services/clientService';
 import { invoiceService } from '../services/invoiceService';
+import { sendPdfByMail, sharePdfViaWhatsApp } from '../services/pdfDownload';
 import { Client, InvoiceItem } from '../types';
 import { todayISO, addDays, formatCurrency } from '../utils/formatters';
 import BtwChatbot from '../components/BtwChatbot';
@@ -69,7 +70,8 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
   const [showCreditConfirm, setShowCreditConfirm] = useState(false);
 
   const [clientId, setClientId] = useState<number | null>(draft?.clientId ?? null);
-  const [newClient, setNewClient] = useState(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'',postcode:'',city:'' });
+  type NewClient = { company_name: string; kvk_number: string; email: string; btw_number: string; address: string; postcode: string; city: string };
+  const [newClient, setNewClient] = useState<NewClient>(draft?.newClient || { company_name:'',kvk_number:'',email:'',btw_number:'NL',address:'',postcode:'',city:'' });
   const [btwRate, setBtwRate] = useState<number | 'verlegd'>(draft?.btwRate ?? 21);
   const [btwMode, setBtwMode] = useState<'incl' | 'excl'>(draft?.btwMode || 'excl');
   const [amount, setAmount] = useState(draft?.amount || '');
@@ -151,26 +153,45 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
         due_date: addDays(todayISO(), user?.default_payment_days || 30),
         payment_terms_days: user?.default_payment_days || 30, description: desc, items: finalItems,
       });
+      const total = formatCurrency(finalItems.reduce((s, i) => s + i.quantity * i.unit_price * (1 + rate/100), 0));
+      const fileName = `${invoice.invoice_number}.pdf`;
+      const pdfPath = `/invoices/${invoice.id}/pdf`;
+      const greeting = `Beste ${selectedClient?.company_name || ''}`;
+      const signature = `Met vriendelijke groet,\n${user?.company_name || user?.email || ''}`;
+
       if (method === 'email') {
-        if (!user?.smtp_pass || !user?.email) {
-          alert('E-mail instellingen ontbreken. Ga naar Instellingen om uw e-mail wachtwoord in te stellen.');
-          setSaving(false); return;
-        }
+        const subject = `Factuur ${invoice.invoice_number}`;
+        const body = `${greeting},\n\nIn de bijlage vindt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\nGelieve dit bedrag binnen ${user?.default_payment_days || 30} dagen te voldoen.\n\nAlvast bedankt!\n\n${signature}`;
         try {
-          await invoiceService.send(invoice.id);
+          await sendPdfByMail({
+            path: pdfPath,
+            fileName,
+            to: selectedClient?.email,
+            subject,
+            body,
+          });
           setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
         } catch (err: any) {
-          alert(err?.response?.data?.error || 'E-mail verzenden mislukt. Controleer uw SMTP-instellingen.');
+          console.error('mail share error', err);
+          alert('Er ging iets mis bij het openen van de mail app. Probeer het opnieuw.');
           setSaving(false); return;
         }
       }
       if (method === 'whatsapp') {
-        const total = formatCurrency(finalItems.reduce((s, i) => s + i.quantity * i.unit_price * (1 + rate/100), 0));
-        const pdfLink = `${window.location.origin}/api/invoices/${invoice.id}/pdf?token=${localStorage.getItem('token')}`;
-        const msg = `Beste ${selectedClient?.company_name || ''},\n\nHierbij ontvangt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\nPDF: ${pdfLink}\n\nMet vriendelijke groet,\n${user?.company_name || ''}`;
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-        window.location.href = whatsappUrl;
-        setTimeout(() => { setShowSuccess(true); setTimeout(() => navigate('/'), 2500); }, 1000);
+        const text = `${greeting},\n\nHierbij ontvangt u factuur ${invoice.invoice_number} ter hoogte van ${total}.\n\n${signature}`;
+        try {
+          await sharePdfViaWhatsApp({
+            path: pdfPath,
+            fileName,
+            phone: (selectedClient as any)?.phone,
+            text,
+          });
+          setShowSuccess(true); setTimeout(() => navigate('/'), 2500);
+        } catch (err: any) {
+          console.error('whatsapp share error', err);
+          alert('Er ging iets mis bij het openen van WhatsApp. Probeer het opnieuw.');
+          setSaving(false); return;
+        }
       }
     } catch (err) {
       console.error('Send error:', err);
