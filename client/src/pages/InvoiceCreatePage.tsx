@@ -199,19 +199,36 @@ export default function InvoiceCreatePage({ docType = 'invoice' }: { docType?: s
     } finally { setSaving(false); }
   };
 
-  if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4F5F7' }}><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand" /></div>;
+
+  const totalSteps = 4;
+  const currentStep = step <= 2 ? (step === 1 ? 1 : 2) : step <= 4 ? 3 : 4;
 
   return (
-    <div className="min-h-screen bg-white safe-top">
+    <div className="min-h-screen safe-top" style={{ background: '#F4F5F7' }}>
       <AnimatePresence>{showSuccess && <SuccessAnimation message={t('invoice.factuurVerzonden')} />}</AnimatePresence>
       <BtwChatbot open={showBtw} onClose={() => setShowBtw(false)} onSelect={r => { setBtwRate(r); setShowBtw(false); setStep(4); }} />
 
-      <div className="px-6 pt-6 flex items-center gap-3 mb-6">
-        <button onClick={goBack} className="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors"><ArrowLeft size={22} /></button>
-        <h1 className="text-lg font-bold text-dark">{isCredit ? t('credit.title') : t('invoice.title')}</h1>
+      {/* v3 Nav */}
+      <div className="px-[22px] pt-4 pb-3 flex items-center">
+        <button onClick={goBack} className="w-10 h-10 bg-white rounded-full flex items-center justify-center" style={{ border: '1px solid #EEF0F3' }}>
+          <ArrowLeft size={14} className="text-dark" />
+        </button>
+        <span className="flex-1 text-center text-[15px] font-bold text-dark">{isCredit ? t('credit.title') : t('invoice.title')}</span>
+        <div className="w-10" />
       </div>
 
-      <div className="px-6">
+      {/* Step indicator */}
+      <div className="flex gap-1.5 px-[22px] mb-1">
+        {Array.from({ length: totalSteps }).map((_, i) => (
+          <div key={i} className={`flex-1 h-[3px] rounded-full ${currentStep > i ? 'bg-dark' : 'bg-v3-border-strong'}`} />
+        ))}
+      </div>
+      <p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-v3-mute px-[22px] mb-4">
+        Stap <span className="text-dark font-bold">{currentStep}</span> van {totalSteps}
+      </p>
+
+      <div className="px-[22px] pb-32">
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="s1" {...slide} className="flex flex-col items-center justify-center min-h-[50vh] space-y-4 max-w-sm mx-auto w-full">
