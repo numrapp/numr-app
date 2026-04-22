@@ -1,96 +1,119 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { MapPin, Search } from 'lucide-react';
-import { useI18n } from '../i18n';
-import { CATEGORIES } from '../data/mockVideos';
-import StatusBar from '../components/layout/StatusBar';
+import { Heart, MessageCircle, Send, Share2, Play } from 'lucide-react';
 import api from '../services/api';
-import { assetUrl } from '../utils/assetUrl';
 
 export default function StatusPage() {
-  const { t } = useI18n();
   const navigate = useNavigate();
-  const [filter, setFilter] = useState('alle');
-  const [search, setSearch] = useState('');
   const [videos, setVideos] = useState<any[]>([]);
-  const touchStart = useRef(0);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [activeTab, setActiveTab] = useState('foryou');
 
   useEffect(() => {
-    const load = () => api.get('/status/videos').then(res => setVideos(res.data)).catch(() => {});
-    load();
-    // Re-fetch when the page becomes visible again (e.g. after an upload).
-    const onVis = () => { if (document.visibilityState === 'visible') load(); };
-    document.addEventListener('visibilitychange', onVis);
-    window.addEventListener('focus', load);
-    return () => {
-      document.removeEventListener('visibilitychange', onVis);
-      window.removeEventListener('focus', load);
-    };
+    api.get('/status/videos').then(res => setVideos(res.data)).catch(() => {});
   }, []);
 
-  let filtered = filter === 'alle' ? videos : videos.filter((v: any) => v.category === filter);
-  if (search.trim()) filtered = filtered.filter((v: any) => (v.location || '').toLowerCase().includes(search.toLowerCase()));
+  const current = videos[currentIdx];
 
-  const handleTouchStart = (e: React.TouchEvent) => { touchStart.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const diff = e.changedTouches[0].clientX - touchStart.current;
-    if (diff > 100) navigate('/');
+  const handleScroll = (e: React.WheelEvent | React.TouchEvent) => {
+    // Placeholder for snap scroll
   };
 
   return (
-    <div className="h-full flex flex-col safe-top" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-      <div className="px-5 pt-5 flex items-center justify-between flex-shrink-0 mb-2">
-        <span className="text-lg font-black text-brand notranslate">numr</span>
-        <button onClick={() => navigate('/')} className="text-sm font-extrabold text-brand active:opacity-70">{t('nav.mainMenu')}</button>
+    <div className="h-full flex flex-col bg-black relative">
+      {/* Top tabs */}
+      <div className="absolute top-0 left-0 right-0 z-20 pt-14 flex justify-center gap-6 safe-top">
+        {['Volgend', 'Voor jou', 'Live'].map(tab => {
+          const isActive = (tab === 'Voor jou' && activeTab === 'foryou') || (tab === 'Volgend' && activeTab === 'following') || (tab === 'Live' && activeTab === 'live');
+          return (
+            <button key={tab} onClick={() => setActiveTab(tab === 'Volgend' ? 'following' : tab === 'Live' ? 'live' : 'foryou')}
+              className="flex flex-col items-center gap-1">
+              <span className={`text-[15px] font-bold ${isActive ? 'text-white' : 'text-white/55'}`}>{tab}</span>
+              {isActive && <div className="w-6 h-[3px] rounded-full bg-brand" />}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="px-5 mb-2 flex gap-3 overflow-x-auto no-scrollbar flex-shrink-0">
-        {CATEGORIES.map(c => (
-          <button key={c.key} onClick={() => setFilter(c.key)}
-            className={`px-4 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${filter === c.key ? 'bg-dark text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}>
-            {t(c.label)}
-          </button>
-        ))}
-      </div>
+      {/* Video area */}
+      <div className="flex-1 relative">
+        {videos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-white/40">
+            <Play size={48} className="mb-4" />
+            <p className="text-[15px] font-bold">Nog geen video's</p>
+            <p className="text-[13px] mt-1">Upload de eerste!</p>
+          </div>
+        ) : current ? (
+          <>
+            {/* Video background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90">
+              {current.video_path && (
+                <video src={current.video_path} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+              )}
+            </div>
 
-      <div className="px-5 mb-3 flex-shrink-0">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-            placeholder={t('status.zoekLocatie')} className="w-full pl-9 pr-4 py-2.5 bg-gray-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50 placeholder-gray-400" />
-        </div>
-      </div>
-
-      <div className="page-scroll px-5 pb-4">
-        {filtered.length === 0 ? (
-          <p className="text-center text-gray-300 py-14 font-medium">{t('status.geen')}</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {filtered.map((v: any, i: number) => (
-              <motion.button key={v.id} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:i*0.04}}
-                onClick={() => navigate(`/status/video/${v.id}`)}
-                className="rounded-2xl overflow-hidden text-left active:scale-[0.97] transition-transform" style={{boxShadow:'0 2px 12px rgba(0,0,0,0.08)'}}>
-                <div className="h-44 flex items-center justify-center relative" style={{background: v.video_path ? '#000' : 'linear-gradient(135deg, #374151, #1F2937)'}}>
-                  {v.video_path && <video src={assetUrl(v.video_path)} className="absolute inset-0 w-full h-full object-cover" muted playsInline preload="metadata" />}
-                  <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center z-10">
-                    <div className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white/80 ml-1" />
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2.5 pt-8 z-10">
-                    <p className="text-white text-[11px] font-bold leading-tight">{v.company_name || v.company || ''}</p>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <MapPin size={8} className="text-white/50" />
-                      <span className="text-white/50 text-[8px]">{v.location || ''}</span>
+            {/* Bottom info */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 pb-32 px-5">
+              <div className="flex items-end gap-4">
+                <div className="flex-1">
+                  {/* Creator */}
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center border-2 border-white"
+                      style={{ background: 'linear-gradient(135deg, #D4FF3A, #B5E024)' }}>
+                      <span className="font-display text-[14px] text-dark">{(current.company_name || 'N')[0]}</span>
                     </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[15px] font-extrabold text-white">@{(current.company_name || 'user').toLowerCase().replace(/\s/g, '.')}</span>
+                        <div className="w-3.5 h-3.5 rounded-full bg-brand flex items-center justify-center">
+                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                      </div>
+                      <span className="font-mono text-[10px] text-white/70">{current.category || 'Ondernemer'} &middot; {current.location || 'Nederland'}</span>
+                    </div>
+                    <button className="ml-2 px-3.5 py-1.5 rounded-full bg-brand text-[12px] font-bold text-dark">Volgen</button>
+                  </div>
+
+                  <p className="text-[14px] font-medium text-white leading-snug mb-2 line-clamp-3">{current.description || 'Video'}</p>
+                  <div className="flex gap-1.5">
+                    {['#ondernemen', '#numr'].map(tag => (
+                      <span key={tag} className="font-mono text-[11px] font-semibold text-brand">{tag}</span>
+                    ))}
                   </div>
                 </div>
-              </motion.button>
+
+                {/* Right rail */}
+                <div className="flex flex-col items-center gap-5 pb-2">
+                  <RailBtn icon={Heart} count="0" />
+                  <RailBtn icon={MessageCircle} count="0" />
+                  <RailBtn icon={Send} count="DM" />
+                  <RailBtn icon={Share2} count="0" />
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
+
+        {/* Swipe indicators */}
+        {videos.length > 1 && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 z-10">
+            {videos.map((_, i) => (
+              <div key={i} className={`w-1 rounded-full transition-all ${i === currentIdx ? 'h-4 bg-white' : 'h-1.5 bg-white/30'}`} />
             ))}
           </div>
         )}
       </div>
-
-      <StatusBar />
     </div>
+  );
+}
+
+function RailBtn({ icon: Icon, count, active }: { icon: any; count: string; active?: boolean }) {
+  return (
+    <button className="flex flex-col items-center gap-1">
+      <div className={`w-[46px] h-[46px] rounded-full flex items-center justify-center ${active ? 'bg-brand' : 'bg-white/12'}`} style={{ border: '1px solid rgba(255,255,255,0.15)' }}>
+        <Icon size={20} className={active ? 'text-dark' : 'text-white'} />
+      </div>
+      <span className="font-mono text-[10px] font-semibold text-white">{count}</span>
+    </button>
   );
 }
