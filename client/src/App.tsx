@@ -90,7 +90,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-      {showBar && !isStatus && <BottomBar />}
+      {showBar && <BottomBar />}
     </div>
   );
 }

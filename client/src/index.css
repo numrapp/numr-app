@@ -10,14 +10,14 @@
     overflow: hidden;
   }
   body {
-    @apply bg-white text-dark;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Archivo', 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #F4F5F7;
+    color: #0E1116;
     height: 100dvh;
     overflow: hidden;
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #ffffff;
   }
   #root {
     height: 100dvh;
@@ -36,33 +36,76 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
   }
+  .btn-primary {
+    @apply text-white font-bold px-6 py-4 rounded-full text-[15px] transition-all duration-150
+           active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed;
+    background: #0E1116;
+    box-shadow: 0 10px 24px rgba(14,17,22,0.15);
+    min-height: 56px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-lime {
+    @apply font-bold px-6 py-4 rounded-full text-[15px] transition-all duration-150
+           active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed;
+    background: #D4FF3A;
+    color: #0E1116;
+    box-shadow: 0 10px 24px rgba(212,255,58,0.4);
+    min-height: 56px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
   .btn-brand {
-    @apply text-dark font-extrabold px-6 py-4 rounded-2xl text-base transition-all duration-200
+    @apply font-extrabold px-6 py-4 rounded-2xl text-base transition-all duration-200
            active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed;
-    background: #DFFF00;
-    box-shadow: 0 4px 24px rgba(223,255,0,0.35);
+    background: #D4FF3A;
+    color: #0E1116;
+    box-shadow: 0 4px 24px rgba(212,255,58,0.35);
     min-height: 52px;
   }
-  .btn-brand:hover:not(:disabled) { background: #C8E600; }
   .btn-outline {
-    @apply bg-white text-dark font-bold px-6 py-4 rounded-2xl text-base border-2 border-gray-200
-           transition-all duration-200 active:scale-[0.96] hover:border-gray-300 hover:bg-gray-50;
+    @apply bg-white font-bold px-6 py-4 rounded-2xl text-base border transition-all duration-200
+           active:scale-[0.96];
+    border-color: #EEF0F3;
+    color: #0E1116;
     min-height: 52px;
   }
+  .input-v3 {
+    @apply w-full px-4 py-4 bg-white border-2 rounded-[16px] text-[15px] font-semibold
+           focus:outline-none focus:border-[#0E1116] transition-all duration-150;
+    border-color: #EEF0F3;
+    color: #0E1116;
+  }
+  .input-v3::placeholder { color: #8A8F99; }
   .input-send {
     @apply w-full px-4 py-4 bg-gray-50 border-0 rounded-2xl text-base font-medium
            focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white
            placeholder-gray-400 transition-all duration-200;
+  }
+  .card-v3 {
+    @apply bg-white transition-all duration-150 active:scale-[0.98] cursor-pointer;
+    border-radius: 18px;
+    box-shadow: 0 2px 8px rgba(14,17,22,0.04);
   }
   .card-send {
     @apply bg-white rounded-3xl border border-gray-100/80 p-5 transition-all duration-200
            active:scale-[0.98] cursor-pointer;
     box-shadow: 0 2px 16px rgba(0,0,0,0.05);
   }
-  .card-send:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); }
+  .label-v3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #8A8F99;
+    padding-left: 4px;
+    margin-bottom: 6px;
+    display: block;
+  }
   .label-send { @apply block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-widest; }
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .font-display { font-family: 'Archivo Black', 'Archivo', sans-serif; }
+  .font-mono-v3 { font-family: 'JetBrains Mono', monospace; }
 }
